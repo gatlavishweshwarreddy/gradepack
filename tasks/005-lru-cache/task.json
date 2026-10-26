@@ -1,0 +1,8 @@
+{
+  "id": "005-lru-cache",
+  "title": "Fix LRU cache eviction order",
+  "language": "python",
+  "difficulty": "medium",
+  "prompt": "The class LRUCache in starter/lru_cache.py implements a fixed-capacity least-recently-used cache with get(key) and put(key, value) methods. get returns the value or -1 if the key is not present, and accessing a key via get counts as a use. put inserts or updates; if the cache is at capacity the least-recently-used key must be evicted first. The bug is that get does not update the recency of the accessed key, so the eviction order is wrong. Fix get so that it moves the accessed key to the most-recently-used position. Do not edit the tests.",
+  "grader": "pytest"
+}

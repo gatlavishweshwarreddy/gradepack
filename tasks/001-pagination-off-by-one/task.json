@@ -1,0 +1,8 @@
+{
+  "id": "001-pagination-off-by-one",
+  "title": "Fix the off-by-one error in pagination",
+  "language": "python",
+  "difficulty": "easy",
+  "prompt": "The function paginate(items, page, per_page) in starter/paginate.py returns the wrong items on the last page. Fix it so that all tests in the grader pass. Do not edit the tests.",
+  "grader": "pytest"
+}

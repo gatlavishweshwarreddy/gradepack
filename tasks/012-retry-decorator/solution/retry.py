@@ -1,0 +1,20 @@
+import functools
+
+
+def retry(max_attempts, exceptions=(Exception,)):
+    """Decorator: retry the wrapped function on specified exceptions."""
+    exc_tuple = tuple(exceptions) if not isinstance(exceptions, tuple) else exceptions
+
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            attempt = 0
+            while True:
+                try:
+                    return func(*args, **kwargs)
+                except exc_tuple:
+                    attempt += 1
+                    if attempt >= max_attempts:
+                        raise
+        return wrapper
+    return decorator

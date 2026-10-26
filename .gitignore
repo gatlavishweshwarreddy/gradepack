@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Pytest
+.pytest_cache/
+.coverage
+
+# Environment / secrets
+.env
+*.env
+
+# Results (optional — commit if you want a persistent leaderboard)
+# results/
+
+# Editor
+.DS_Store
+.idea/
+.vscode/

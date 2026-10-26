@@ -1,0 +1,14 @@
+def flatten(obj, sep="."):
+    """Flatten a nested dict to dot-separated keys."""
+    result = {}
+
+    def _recurse(current, prefix):
+        for key, value in current.items():
+            new_key = prefix + key if not prefix else prefix + sep + key
+            if isinstance(value, dict):
+                _recurse(value, new_key)
+            else:
+                result[new_key] = value
+
+    _recurse(obj, "")
+    return result

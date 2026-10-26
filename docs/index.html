@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gradepack leaderboard</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; font-size: 14px; line-height: 1.5; background: #fff; color: #1f2328; padding: 24px; }
+  h1 { font-size: 1.4rem; font-weight: 600; margin-bottom: 4px; }
+  .subtitle { color: #57606a; margin-bottom: 24px; font-size: 13px; }
+  h2 { font-size: 1rem; font-weight: 600; margin: 28px 0 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 6px 10px; background: #f7f8fa; border-bottom: 2px solid #e5e7eb; white-space: nowrap; }
+  td { padding: 5px 10px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .score-bar { display: inline-block; height: 10px; background: #3b82d4; border-radius: 3px; vertical-align: middle; margin-right: 6px; }
+  .score-zero { background: #e5e7eb; }
+  .tag { display: inline-block; padding: 1px 6px; border-radius: 10px; font-size: 11px; font-weight: 500; background: #f0f4ff; color: #3b5bdb; margin: 1px; }
+  .tag-fail { background: #fff0f0; color: #c0392b; }
+  .tag-easy { background: #e8f8f0; color: #1a7a4a; }
+  .tag-medium { background: #fff8e1; color: #a16207; }
+  .tag-hard { background: #fdecea; color: #b91c1c; }
+  .empty { color: #57606a; font-style: italic; padding: 12px 0; }
+  #status { color: #57606a; font-size: 13px; margin-top: 8px; }
+  .model-header { display: flex; align-items: baseline; gap: 10px; }
+  .avg-score { font-size: 0.9rem; font-weight: 500; color: #3b82d4; }
+</style>
+</head>
+<body>
+
+<h1>gradepack leaderboard</h1>
+<p class="subtitle">Results are loaded from <code>../results/*.json</code> — no build step required.</p>
+<div id="status">Loading…</div>
+<div id="root"></div>
+
+<script>
+// ── helpers ──────────────────────────────────────────────────────────────────
+
+function el(tag, attrs, ...children) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === 'class') e.className = v;
+    else if (k === 'style') Object.assign(e.style, v);
+    else e.setAttribute(k, v);
+  }
+  for (const c of children.flat()) {
+    if (c == null) continue;
+    e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  }
+  return e;
+}
+
+function scoreBar(score) {
+  const pct = Math.round(score * 100);
+  const bar = el('span', {class: 'score-bar' + (pct === 0 ? ' score-zero' : ''), style: {width: Math.max(4, pct) + 'px'}});
+  return el('span', {}, bar, `${pct}%`);
+}
+
+// ── data loading ─────────────────────────────────────────────────────────────
+
+async function loadResultFiles() {
+  // Try to fetch a manifest, fall back to known filename pattern
+  let filenames = [];
+  try {
+    const idx = await fetch('../results/index.json');
+    if (idx.ok) filenames = await idx.json();
+  } catch (_) {}
+
+  if (filenames.length === 0) {
+    // Probe common model names from tasks/index.json context
+    const probe = ['mock', 'gpt-4o', 'gpt-4o-mini', 'claude-3-5-sonnet', 'gemini-1.5-pro'];
+    filenames = probe;
+  }
+
+  const results = {};
+  let loaded = 0;
+  for (const name of filenames) {
+    try {
+      const r = await fetch(`../results/${name}.json`);
+      if (r.ok) {
+        results[name] = await r.json();
+        loaded++;
+      }
+    } catch (_) {}
+  }
+  return {results, loaded};
+}
+
+async function loadTaskIndex() {
+  try {
+    const r = await fetch('../tasks/index.json');
+    if (r.ok) return await r.json();
+  } catch (_) {}
+  return [];
+}
+
+// ── render ───────────────────────────────────────────────────────────────────
+
+function renderModel(modelName, records, taskIndex) {
+  // Group by task_id, keep best score per task per attempt aggregation
+  const byTask = {};
+  for (const rec of records) {
+    const tid = rec.task_id;
+    if (!byTask[tid]) byTask[tid] = [];
+    byTask[tid].push(rec);
+  }
+
+  const taskScores = {};
+  for (const [tid, recs] of Object.entries(byTask)) {
+    const scores = recs.map(r => r.score ?? 0);
+    taskScores[tid] = Math.max(...scores);
+  }
+
+  const allScores = Object.values(taskScores);
+  const avg = allScores.length ? allScores.reduce((a, b) => a + b, 0) / allScores.length : 0;
+
+  const taskMeta = {};
+  for (const t of taskIndex) taskMeta[t.id] = t;
+
+  const rows = taskIndex.map(task => {
+    const tid = task.id;
+    const score = taskScores[tid] ?? null;
+    const recs = byTask[tid] ?? [];
+    const failReasons = [...new Set(recs.map(r => r.failure_reason).filter(r => r && r !== 'none'))];
+    const failTests = [...new Set(recs.flatMap(r => r.failing_tests ?? []))].slice(0, 5);
+
+    const diffTag = el('span', {class: `tag tag-${task.difficulty}`}, task.difficulty);
+
+    const scoreTd = score === null
+      ? el('td', {}, el('span', {class: 'empty'}, 'not run'))
+      : el('td', {}, scoreBar(score));
+
+    const reasonTags = failReasons.map(r => el('span', {class: 'tag tag-fail'}, r));
+    const testTags   = failTests.map(t => el('span', {class: 'tag tag-fail'}, t));
+
+    return el('tr', {},
+      el('td', {}, el('code', {}, tid)),
+      el('td', {}, diffTag),
+      scoreTd,
+      el('td', {}, ...reasonTags),
+      el('td', {}, ...testTags),
+    );
+  });
+
+  return el('div', {},
+    el('div', {class: 'model-header'},
+      el('h2', {}, modelName),
+      el('span', {class: 'avg-score'}, `avg score: ${(avg * 100).toFixed(1)}%`),
+    ),
+    el('table', {},
+      el('thead', {},
+        el('tr', {},
+          el('th', {}, 'Task'),
+          el('th', {}, 'Difficulty'),
+          el('th', {}, 'Score'),
+          el('th', {}, 'Failure reason'),
+          el('th', {}, 'Failing tests'),
+        )
+      ),
+      el('tbody', {}, ...rows),
+    )
+  );
+}
+
+async function main() {
+  const statusEl = document.getElementById('status');
+  const root = document.getElementById('root');
+
+  const [taskIndex, {results, loaded}] = await Promise.all([loadTaskIndex(), loadResultFiles()]);
+
+  if (loaded === 0) {
+    statusEl.textContent = 'No result files found. Run python -m gradepack bench --model <name> --mock to generate some.';
+    return;
+  }
+
+  statusEl.textContent = `Loaded ${loaded} model result file(s). Tasks: ${taskIndex.length}.`;
+
+  for (const [modelName, records] of Object.entries(results)) {
+    root.appendChild(renderModel(modelName, records, taskIndex));
+  }
+}
+
+main();
+</script>
+</body>
+</html>

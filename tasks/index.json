@@ -1,0 +1,74 @@
+[
+  {
+    "id": "001-pagination-off-by-one",
+    "title": "Fix the off-by-one error in pagination",
+    "difficulty": "easy",
+    "language": "python"
+  },
+  {
+    "id": "002-csv-parse-strip",
+    "title": "Fix CSV header and value whitespace stripping",
+    "difficulty": "easy",
+    "language": "python"
+  },
+  {
+    "id": "003-date-diff",
+    "title": "Fix elapsed days calculation to ignore time component",
+    "difficulty": "medium",
+    "language": "python"
+  },
+  {
+    "id": "004-word-frequency",
+    "title": "Fix word frequency counter to normalise case and strip punctuation",
+    "difficulty": "easy",
+    "language": "python"
+  },
+  {
+    "id": "005-lru-cache",
+    "title": "Fix LRU cache eviction order",
+    "difficulty": "medium",
+    "language": "python"
+  },
+  {
+    "id": "006-stack-with-min",
+    "title": "Fix constant-time minimum tracking in a stack",
+    "difficulty": "medium",
+    "language": "python"
+  },
+  {
+    "id": "007-slug-generator",
+    "title": "Fix URL slug generator",
+    "difficulty": "easy",
+    "language": "python"
+  },
+  {
+    "id": "008-run-length-encoding",
+    "title": "Fix run-length encoding to merge consecutive identical characters",
+    "difficulty": "easy",
+    "language": "python"
+  },
+  {
+    "id": "009-token-bucket",
+    "title": "Fix token bucket rate limiter refill logic",
+    "difficulty": "hard",
+    "language": "python"
+  },
+  {
+    "id": "010-json-flattener",
+    "title": "Fix nested JSON flattener key path construction",
+    "difficulty": "medium",
+    "language": "python"
+  },
+  {
+    "id": "011-iso-week",
+    "title": "Fix ISO week number calculation at year boundaries",
+    "difficulty": "medium",
+    "language": "python"
+  },
+  {
+    "id": "012-retry-decorator",
+    "title": "Fix retry decorator to catch only the specified exception types",
+    "difficulty": "medium",
+    "language": "python"
+  }
+]

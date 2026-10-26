@@ -1,0 +1,8 @@
+{
+  "id": "002-csv-parse-strip",
+  "title": "Fix CSV header and value whitespace stripping",
+  "language": "python",
+  "difficulty": "easy",
+  "prompt": "The function parse_csv(text) in starter/parse_csv.py parses a CSV string and returns a list of dicts mapping header names to values. It has two bugs: (1) header names are not stripped of leading/trailing whitespace, and (2) row values are not stripped of leading/trailing whitespace. Fix both so that parse_csv(' name , age\\nAlice , 30\\n Bob,25') returns [{'name': 'Alice', 'age': '30'}, {'name': 'Bob', 'age': '25'}]. The function must handle an empty string by returning an empty list. Do not edit the tests.",
+  "grader": "pytest"
+}

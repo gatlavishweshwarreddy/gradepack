@@ -1,0 +1,7 @@
+from datetime import date
+
+
+def iso_week(date_str):
+    """Return (iso_year, week_number) for an ISO date string."""
+    d = date.fromisoformat(date_str)
+    return (int(d.strftime("%G")), int(d.strftime("%V")))

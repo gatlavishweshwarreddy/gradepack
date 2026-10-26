@@ -1,0 +1,8 @@
+{
+  "id": "009-token-bucket",
+  "title": "Fix token bucket rate limiter refill logic",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The class TokenBucket in starter/token_bucket.py implements a token-bucket rate limiter. __init__(rate, capacity) sets the fill rate (tokens per second) and the maximum capacity. consume(n, now) attempts to consume n tokens at time `now` (a float, seconds). It must first refill tokens based on elapsed time since the last call (tokens = rate * elapsed, capped at capacity), then consume n tokens if available and return True, or return False without consuming if insufficient. The starter has two bugs: (1) it adds tokens without capping at capacity, and (2) it does not update self._last after a failed consume, so time keeps accumulating wrongly. Fix both. Do not edit the tests.",
+  "grader": "pytest"
+}
