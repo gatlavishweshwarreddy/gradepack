@@ -1,0 +1,21 @@
+{
+  "id": "002-csv-parse-strip",
+  "title": "Fix CSV header and value whitespace stripping",
+  "difficulty": "easy",
+  "language": "python",
+  "tags": [
+    "parsing",
+    "strings",
+    "csv"
+  ],
+  "estimated_minutes": 10,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/002-csv-parse-strip.json",
+  "prompt": "The function parse_csv(text) in starter/parse_csv.py parses a CSV string and returns a list of dicts mapping header names to values. It has two bugs: (1) header names are not stripped of leading/trailing whitespace, and (2) row values are not stripped of leading/trailing whitespace. Fix both so that parse_csv(' name , age\\nAlice , 30\\n Bob,25') returns [{'name': 'Alice', 'age': '30'}, {'name': 'Bob', 'age': '25'}]. The function must handle an empty string by returning an empty list. Do not edit the tests.",
+  "starter_files": {
+    "parse_csv.py": "def parse_csv(text):\n    \"\"\"Parse a CSV string and return a list of dicts.\"\"\"\n    lines = text.strip().splitlines()\n    if not lines:\n        return []\n    headers = lines[0].split(\",\")\n    result = []\n    for line in lines[1:]:\n        values = line.split(\",\")\n        result.append(dict(zip(headers, values)))\n    return result\n"
+  },
+  "grader_files": {
+    "test_parse_csv.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom parse_csv import parse_csv\n\n\ndef test_empty_string():\n    assert parse_csv(\"\") == []\n\n\ndef test_headers_stripped():\n    result = parse_csv(\" name , age\\nAlice,30\")\n    assert result[0][\"name\"] == \"Alice\"\n    assert result[0][\"age\"] == \"30\"\n\n\ndef test_values_stripped():\n    result = parse_csv(\"name,age\\n Alice , 30 \")\n    assert result[0][\"name\"] == \"Alice\"\n    assert result[0][\"age\"] == \"30\"\n\n\ndef test_both_stripped():\n    result = parse_csv(\" name , age\\nAlice , 30\\n Bob,25\")\n    assert result == [{\"name\": \"Alice\", \"age\": \"30\"}, {\"name\": \"Bob\", \"age\": \"25\"}]\n\n\ndef test_no_whitespace_unaffected():\n    result = parse_csv(\"x,y\\n1,2\")\n    assert result == [{\"x\": \"1\", \"y\": \"2\"}]\n"
+  }
+}

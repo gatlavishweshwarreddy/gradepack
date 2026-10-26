@@ -1,0 +1,21 @@
+{
+  "id": "014-mutable-default",
+  "title": "Fix mutable default argument leaking shared state",
+  "difficulty": "hard",
+  "language": "python",
+  "tags": [
+    "gotchas",
+    "state",
+    "oop"
+  ],
+  "estimated_minutes": 20,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/014-mutable-default.json",
+  "prompt": "The module starter/accumulator.py defines Accumulator(initial=[]). Each instance should have its own independent list of items. The bug is a classic mutable default argument: the default list is shared across all instances that do not pass an explicit initial value, so items added to one instance bleed into the next. Fix it by using None as the default and creating a new list inside __init__ when initial is None. The grader tests that two independently created Accumulator() instances do not share state, that adding to one does not affect the other, that the initial list is copied (not referenced), and checks correct behavior with seeded random sequences of add operations across multiple instances. Do not edit the tests.",
+  "starter_files": {
+    "accumulator.py": "class Accumulator:\n    # BUG: mutable default argument \u2014 shared across all instances\n    def __init__(self, initial=[]):\n        self.items = initial\n\n    def add(self, value):\n        self.items.append(value)\n        return self\n\n    def total(self):\n        return sum(self.items)\n\n    def values(self):\n        return list(self.items)\n"
+  },
+  "grader_files": {
+    "test_accumulator.py": "import os, sys, random\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nimport pytest\nfrom accumulator import Accumulator\n\n\ndef test_independent_instances():\n    a = Accumulator()\n    b = Accumulator()\n    a.add(1)\n    assert b.values() == [], \"b must be empty after adding to a\"\n\n\ndef test_no_shared_default():\n    \"\"\"Three instances created in sequence must each start empty.\"\"\"\n    instances = [Accumulator() for _ in range(3)]\n    instances[0].add(99)\n    for i, acc in enumerate(instances[1:], 1):\n        assert acc.values() == [], f\"instance {i} should be empty\"\n\n\ndef test_initial_list_is_copied():\n    \"\"\"Mutating the original list after construction must not affect the instance.\"\"\"\n    src = [1, 2, 3]\n    a = Accumulator(initial=src)\n    src.append(999)\n    assert 999 not in a.values()\n\n\ndef test_initial_list_values_present():\n    a = Accumulator(initial=[10, 20])\n    assert a.total() == 30\n\n\n@pytest.mark.parametrize(\"seed\", [0, 1, 42, 7, 99])\ndef test_seeded_random_isolation(seed):\n    \"\"\"Seeded random: two accumulators must stay independent.\"\"\"\n    rng = random.Random(seed)\n    a = Accumulator()\n    b = Accumulator()\n    ops_a = [rng.randint(1, 100) for _ in range(10)]\n    ops_b = [rng.randint(1, 100) for _ in range(10)]\n    for v in ops_a:\n        a.add(v)\n    for v in ops_b:\n        b.add(v)\n    assert a.values() == ops_a\n    assert b.values() == ops_b\n    assert a.total() == sum(ops_a)\n    assert b.total() == sum(ops_b)\n"
+  }
+}

@@ -106,7 +106,12 @@ def cmd_run(task_id: str, candidate_dir: str) -> None:
     tmp_task = core.make_temp_copy(task_id)
     tmp_parent = tmp_task.parent
     try:
-        core.overlay_dir(candidate, tmp_task / "starter")
+        try:
+            core.overlay_dir(candidate, tmp_task / "starter")
+        except core.CandidateError as exc:
+            _print_json_error(task_id, str(exc))
+            shutil.rmtree(tmp_parent, ignore_errors=True)
+            sys.exit(1)
         result = core.run_pytest(tmp_task / "grader")
 
         total  = result["total"]
@@ -133,6 +138,11 @@ def _print_json_error(task_id: str, message: str) -> None:
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
+
+def main_entry() -> None:
+    """Console-script entry point (installed as `gradepack`)."""
+    main(sys.argv[1:])
+
 
 def main(argv: list[str]) -> None:
     if not argv:
@@ -202,7 +212,19 @@ def main(argv: list[str]) -> None:
 
     elif command == "gen-registry":
         from gradepack import registry as _registry
-        _registry.cmd_gen_registry()
+        site = "--site" in argv[1:]
+        _registry.cmd_gen_registry(site=site)
+
+    elif command == "validate":
+        from gradepack import validate as _validate
+        _validate.cmd_validate()
+
+    elif command == "factory":
+        from gradepack import factory as _factory
+        rest = argv[1:]
+        n = int(_get_flag(rest, "--n") or "1")
+        mock = "--mock" in rest
+        _factory.cmd_factory(n=n, mock=mock)
 
     else:
         print(f"Unknown command: {command!r}")

@@ -4,5 +4,13 @@
   "language": "python",
   "difficulty": "medium",
   "prompt": "The function flatten(obj, sep='.') in starter/flatten.py flattens a nested dict into a single-level dict with dot-separated keys. The bug is that when recursing, it prepends the separator even for top-level keys, producing keys like '.a.b' instead of 'a.b'. Fix it so that flatten({'a': {'b': 1, 'c': 2}, 'd': 3}) == {'a.b': 1, 'a.c': 2, 'd': 3}. An empty dict returns {}. Lists are treated as leaf values and not recursed into. Do not edit the tests.",
-  "grader": "pytest"
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": [
+    "data-transformation",
+    "recursion",
+    "dicts"
+  ],
+  "estimated_minutes": 20,
+  "license": "MIT"
 }

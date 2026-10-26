@@ -1,0 +1,16 @@
+{
+  "id": "013-timezone-scheduler",
+  "title": "Fix timezone-aware event scheduler",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The module starter/scheduler.py contains a class EventScheduler. add_event(name, utc_dt) stores an event with its UTC datetime. next_event_in(tz_name) returns a (name, timedelta) tuple for the next upcoming event converted into the named timezone (e.g. 'US/Eastern'), using the 'now' supplied by a clock() callable passed to the constructor. The module starter/clock.py provides UtcClock with a now() method returning the current UTC time as a timezone-aware datetime. The bug: add_event silently strips tzinfo when the caller passes a naive datetime (it should raise ValueError), AND next_event_in uses a naive 'now' for comparison instead of the aware datetime from clock.now(), so events in non-UTC timezones are compared incorrectly. Fix both bugs: (1) raise ValueError in add_event if utc_dt.tzinfo is None, (2) use clock.now() (which is already UTC-aware) directly for the comparison. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": [
+    "datetime",
+    "timezone",
+    "state"
+  ],
+  "estimated_minutes": 30,
+  "license": "MIT"
+}

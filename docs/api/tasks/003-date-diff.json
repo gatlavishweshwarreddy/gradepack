@@ -1,0 +1,20 @@
+{
+  "id": "003-date-diff",
+  "title": "Fix elapsed days calculation to ignore time component",
+  "difficulty": "medium",
+  "language": "python",
+  "tags": [
+    "datetime",
+    "stdlib"
+  ],
+  "estimated_minutes": 15,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/003-date-diff.json",
+  "prompt": "The function days_between(d1, d2) in starter/date_diff.py accepts two ISO-8601 date strings (YYYY-MM-DD) and returns the absolute number of days between them as an integer. The current implementation includes an off-by-one error caused by using datetime instead of date, and it fails when dates are passed in reverse order. Fix it so that days_between('2024-01-01', '2024-01-10') == 9, days_between('2024-01-10', '2024-01-01') == 9 (absolute), days_between('2023-12-31', '2024-01-01') == 1, and days_between('2024-02-28', '2024-03-01') == 2. Do not edit the tests.",
+  "starter_files": {
+    "date_diff.py": "from datetime import datetime\n\n\ndef days_between(d1, d2):\n    \"\"\"Return the number of days between two ISO date strings.\"\"\"\n    dt1 = datetime.fromisoformat(d1)\n    dt2 = datetime.fromisoformat(d2)\n    return (dt2 - dt1).days\n"
+  },
+  "grader_files": {
+    "test_date_diff.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom date_diff import days_between\n\n\ndef test_forward_order():\n    assert days_between(\"2024-01-01\", \"2024-01-10\") == 9\n\n\ndef test_reverse_order():\n    assert days_between(\"2024-01-10\", \"2024-01-01\") == 9\n\n\ndef test_year_boundary():\n    assert days_between(\"2023-12-31\", \"2024-01-01\") == 1\n\n\ndef test_leap_year_feb():\n    assert days_between(\"2024-02-28\", \"2024-03-01\") == 2\n\n\ndef test_same_day():\n    assert days_between(\"2024-06-15\", \"2024-06-15\") == 0\n"
+  }
+}

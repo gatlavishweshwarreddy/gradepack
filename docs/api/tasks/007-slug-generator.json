@@ -1,0 +1,21 @@
+{
+  "id": "007-slug-generator",
+  "title": "Fix URL slug generator",
+  "difficulty": "easy",
+  "language": "python",
+  "tags": [
+    "strings",
+    "regex",
+    "normalization"
+  ],
+  "estimated_minutes": 10,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/007-slug-generator.json",
+  "prompt": "The function slugify(text) in starter/slugify.py converts a string to a URL slug: lowercase, words joined by hyphens, all characters that are not letters or digits replaced by hyphens, consecutive hyphens collapsed to one, and leading/trailing hyphens removed. The starter has three bugs: (1) it does not lowercase the result, (2) it does not collapse consecutive hyphens, and (3) it does not strip leading/trailing hyphens. Fix all three. Examples: slugify('Hello World') == 'hello-world', slugify('  Hello   World  ') == 'hello-world', slugify('Hello, World!') == 'hello-world', slugify('Python 3.11') == 'python-3-11'. Do not edit the tests.",
+  "starter_files": {
+    "slugify.py": "import re\n\n\ndef slugify(text):\n    \"\"\"Convert text to a URL slug.\"\"\"\n    # Replace non-alphanumeric characters with hyphens\n    slug = re.sub(r\"[^a-zA-Z0-9]+\", \"-\", text)\n    return slug\n"
+  },
+  "grader_files": {
+    "test_slugify.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom slugify import slugify\n\n\ndef test_simple():\n    assert slugify(\"Hello World\") == \"hello-world\"\n\n\ndef test_leading_trailing_spaces():\n    assert slugify(\"  Hello   World  \") == \"hello-world\"\n\n\ndef test_punctuation():\n    assert slugify(\"Hello, World!\") == \"hello-world\"\n\n\ndef test_digits():\n    assert slugify(\"Python 3.11\") == \"python-3-11\"\n\n\ndef test_already_slug():\n    assert slugify(\"hello-world\") == \"hello-world\"\n\n\ndef test_uppercase():\n    assert slugify(\"UPPER CASE\") == \"upper-case\"\n"
+  }
+}

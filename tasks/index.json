@@ -3,72 +3,233 @@
     "id": "001-pagination-off-by-one",
     "title": "Fix the off-by-one error in pagination",
     "difficulty": "easy",
-    "language": "python"
+    "language": "python",
+    "tags": [
+      "pagination",
+      "off-by-one",
+      "arithmetic"
+    ],
+    "estimated_minutes": 15,
+    "version": "1.0"
   },
   {
     "id": "002-csv-parse-strip",
     "title": "Fix CSV header and value whitespace stripping",
     "difficulty": "easy",
-    "language": "python"
+    "language": "python",
+    "tags": [
+      "parsing",
+      "strings",
+      "csv"
+    ],
+    "estimated_minutes": 10,
+    "version": "1.0"
   },
   {
     "id": "003-date-diff",
     "title": "Fix elapsed days calculation to ignore time component",
     "difficulty": "medium",
-    "language": "python"
+    "language": "python",
+    "tags": [
+      "datetime",
+      "stdlib"
+    ],
+    "estimated_minutes": 15,
+    "version": "1.0"
   },
   {
     "id": "004-word-frequency",
     "title": "Fix word frequency counter to normalise case and strip punctuation",
     "difficulty": "easy",
-    "language": "python"
+    "language": "python",
+    "tags": [
+      "strings",
+      "parsing",
+      "normalization"
+    ],
+    "estimated_minutes": 10,
+    "version": "1.0"
   },
   {
     "id": "005-lru-cache",
     "title": "Fix LRU cache eviction order",
     "difficulty": "medium",
-    "language": "python"
+    "language": "python",
+    "tags": [
+      "data-structures",
+      "caching",
+      "state"
+    ],
+    "estimated_minutes": 20,
+    "version": "1.0"
   },
   {
     "id": "006-stack-with-min",
     "title": "Fix constant-time minimum tracking in a stack",
     "difficulty": "medium",
-    "language": "python"
+    "language": "python",
+    "tags": [
+      "data-structures",
+      "state",
+      "stack"
+    ],
+    "estimated_minutes": 20,
+    "version": "1.0"
   },
   {
     "id": "007-slug-generator",
     "title": "Fix URL slug generator",
     "difficulty": "easy",
-    "language": "python"
+    "language": "python",
+    "tags": [
+      "strings",
+      "regex",
+      "normalization"
+    ],
+    "estimated_minutes": 10,
+    "version": "1.0"
   },
   {
     "id": "008-run-length-encoding",
     "title": "Fix run-length encoding to merge consecutive identical characters",
     "difficulty": "easy",
-    "language": "python"
+    "language": "python",
+    "tags": [
+      "encoding",
+      "strings",
+      "off-by-one"
+    ],
+    "estimated_minutes": 15,
+    "version": "1.0"
   },
   {
     "id": "009-token-bucket",
     "title": "Fix token bucket rate limiter refill logic",
     "difficulty": "hard",
-    "language": "python"
+    "language": "python",
+    "tags": [
+      "rate-limiting",
+      "state",
+      "arithmetic"
+    ],
+    "estimated_minutes": 25,
+    "version": "1.0"
   },
   {
     "id": "010-json-flattener",
     "title": "Fix nested JSON flattener key path construction",
     "difficulty": "medium",
-    "language": "python"
+    "language": "python",
+    "tags": [
+      "data-transformation",
+      "recursion",
+      "dicts"
+    ],
+    "estimated_minutes": 20,
+    "version": "1.0"
   },
   {
     "id": "011-iso-week",
     "title": "Fix ISO week number calculation at year boundaries",
     "difficulty": "medium",
-    "language": "python"
+    "language": "python",
+    "tags": [
+      "datetime",
+      "stdlib",
+      "calendar"
+    ],
+    "estimated_minutes": 20,
+    "version": "1.0"
   },
   {
     "id": "012-retry-decorator",
     "title": "Fix retry decorator to catch only the specified exception types",
     "difficulty": "medium",
-    "language": "python"
+    "language": "python",
+    "tags": [
+      "decorators",
+      "exceptions",
+      "state"
+    ],
+    "estimated_minutes": 20,
+    "version": "1.0"
+  },
+  {
+    "id": "013-timezone-scheduler",
+    "title": "Fix timezone-aware event scheduler",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "datetime",
+      "timezone",
+      "state"
+    ],
+    "estimated_minutes": 30,
+    "version": "1.0"
+  },
+  {
+    "id": "014-mutable-default",
+    "title": "Fix mutable default argument leaking shared state",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "gotchas",
+      "state",
+      "oop"
+    ],
+    "estimated_minutes": 20,
+    "version": "1.0"
+  },
+  {
+    "id": "015-sliding-window-max",
+    "title": "Fix off-by-one in sliding window maximum",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "algorithms",
+      "deque",
+      "off-by-one"
+    ],
+    "estimated_minutes": 30,
+    "version": "1.0"
+  },
+  {
+    "id": "016-decimal-money",
+    "title": "Fix float rounding errors in monetary calculations",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "arithmetic",
+      "decimal",
+      "rounding"
+    ],
+    "estimated_minutes": 25,
+    "version": "1.0"
+  },
+  {
+    "id": "017-unicode-dedup",
+    "title": "Fix unicode deduplicator to normalise before comparing",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "unicode",
+      "normalization",
+      "strings"
+    ],
+    "estimated_minutes": 25,
+    "version": "1.0"
+  },
+  {
+    "id": "018-thread-safe-cache",
+    "title": "Fix thread-safe memoize cache: wrong key and missing lock on write",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "concurrency",
+      "threading",
+      "caching"
+    ],
+    "estimated_minutes": 35,
+    "version": "1.0"
   }
 ]

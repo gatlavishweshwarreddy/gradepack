@@ -4,5 +4,13 @@
   "language": "python",
   "difficulty": "easy",
   "prompt": "The function slugify(text) in starter/slugify.py converts a string to a URL slug: lowercase, words joined by hyphens, all characters that are not letters or digits replaced by hyphens, consecutive hyphens collapsed to one, and leading/trailing hyphens removed. The starter has three bugs: (1) it does not lowercase the result, (2) it does not collapse consecutive hyphens, and (3) it does not strip leading/trailing hyphens. Fix all three. Examples: slugify('Hello World') == 'hello-world', slugify('  Hello   World  ') == 'hello-world', slugify('Hello, World!') == 'hello-world', slugify('Python 3.11') == 'python-3-11'. Do not edit the tests.",
-  "grader": "pytest"
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": [
+    "strings",
+    "regex",
+    "normalization"
+  ],
+  "estimated_minutes": 10,
+  "license": "MIT"
 }

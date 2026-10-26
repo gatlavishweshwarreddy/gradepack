@@ -1,0 +1,21 @@
+{
+  "id": "010-json-flattener",
+  "title": "Fix nested JSON flattener key path construction",
+  "difficulty": "medium",
+  "language": "python",
+  "tags": [
+    "data-transformation",
+    "recursion",
+    "dicts"
+  ],
+  "estimated_minutes": 20,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/010-json-flattener.json",
+  "prompt": "The function flatten(obj, sep='.') in starter/flatten.py flattens a nested dict into a single-level dict with dot-separated keys. The bug is that when recursing, it prepends the separator even for top-level keys, producing keys like '.a.b' instead of 'a.b'. Fix it so that flatten({'a': {'b': 1, 'c': 2}, 'd': 3}) == {'a.b': 1, 'a.c': 2, 'd': 3}. An empty dict returns {}. Lists are treated as leaf values and not recursed into. Do not edit the tests.",
+  "starter_files": {
+    "flatten.py": "def flatten(obj, sep=\".\"):\n    \"\"\"Flatten a nested dict to dot-separated keys.\"\"\"\n    result = {}\n\n    def _recurse(current, prefix):\n        for key, value in current.items():\n            # BUG: always adds sep before key, producing '.key' at top level\n            new_key = prefix + sep + key\n            if isinstance(value, dict):\n                _recurse(value, new_key)\n            else:\n                result[new_key] = value\n\n    _recurse(obj, \"\")\n    return result\n"
+  },
+  "grader_files": {
+    "test_flatten.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom flatten import flatten\n\n\ndef test_empty():\n    assert flatten({}) == {}\n\n\ndef test_flat():\n    assert flatten({\"a\": 1, \"b\": 2}) == {\"a\": 1, \"b\": 2}\n\n\ndef test_one_level_nested():\n    assert flatten({\"a\": {\"b\": 1}}) == {\"a.b\": 1}\n\n\ndef test_two_levels_nested():\n    assert flatten({\"a\": {\"b\": {\"c\": 42}}}) == {\"a.b.c\": 42}\n\n\ndef test_mixed():\n    assert flatten({\"a\": {\"b\": 1, \"c\": 2}, \"d\": 3}) == {\"a.b\": 1, \"a.c\": 2, \"d\": 3}\n\n\ndef test_list_is_leaf():\n    assert flatten({\"a\": [1, 2, 3]}) == {\"a\": [1, 2, 3]}\n\n\ndef test_custom_separator():\n    assert flatten({\"a\": {\"b\": 1}}, sep=\"/\") == {\"a/b\": 1}\n"
+  }
+}

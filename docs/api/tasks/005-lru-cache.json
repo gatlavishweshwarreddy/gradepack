@@ -1,0 +1,21 @@
+{
+  "id": "005-lru-cache",
+  "title": "Fix LRU cache eviction order",
+  "difficulty": "medium",
+  "language": "python",
+  "tags": [
+    "data-structures",
+    "caching",
+    "state"
+  ],
+  "estimated_minutes": 20,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/005-lru-cache.json",
+  "prompt": "The class LRUCache in starter/lru_cache.py implements a fixed-capacity least-recently-used cache with get(key) and put(key, value) methods. get returns the value or -1 if the key is not present, and accessing a key via get counts as a use. put inserts or updates; if the cache is at capacity the least-recently-used key must be evicted first. The bug is that get does not update the recency of the accessed key, so the eviction order is wrong. Fix get so that it moves the accessed key to the most-recently-used position. Do not edit the tests.",
+  "starter_files": {
+    "lru_cache.py": "from collections import OrderedDict\n\n\nclass LRUCache:\n    def __init__(self, capacity):\n        self.capacity = capacity\n        self._cache = OrderedDict()\n\n    def get(self, key):\n        if key not in self._cache:\n            return -1\n        # BUG: does not move key to most-recently-used position\n        return self._cache[key]\n\n    def put(self, key, value):\n        if key in self._cache:\n            self._cache.move_to_end(key)\n        self._cache[key] = value\n        if len(self._cache) > self.capacity:\n            self._cache.popitem(last=False)\n"
+  },
+  "grader_files": {
+    "test_lru_cache.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom lru_cache import LRUCache\n\n\ndef test_get_miss():\n    c = LRUCache(2)\n    assert c.get(1) == -1\n\n\ndef test_put_and_get():\n    c = LRUCache(2)\n    c.put(1, 10)\n    assert c.get(1) == 10\n\n\ndef test_evict_lru():\n    c = LRUCache(2)\n    c.put(1, 1)\n    c.put(2, 2)\n    c.put(3, 3)  # evicts key 1\n    assert c.get(1) == -1\n    assert c.get(2) == 2\n    assert c.get(3) == 3\n\n\ndef test_get_refreshes_recency():\n    # put 1, put 2; get 1 (makes 2 LRU); put 3 => evicts 2, not 1\n    c = LRUCache(2)\n    c.put(1, 1)\n    c.put(2, 2)\n    c.get(1)     # 1 is now MRU; 2 is LRU\n    c.put(3, 3)  # should evict 2\n    assert c.get(2) == -1\n    assert c.get(1) == 1\n    assert c.get(3) == 3\n\n\ndef test_update_existing():\n    c = LRUCache(2)\n    c.put(1, 1)\n    c.put(1, 99)\n    assert c.get(1) == 99\n"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "006-stack-with-min",
+  "title": "Fix constant-time minimum tracking in a stack",
+  "difficulty": "medium",
+  "language": "python",
+  "tags": [
+    "data-structures",
+    "state",
+    "stack"
+  ],
+  "estimated_minutes": 20,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/006-stack-with-min.json",
+  "prompt": "The class MinStack in starter/min_stack.py supports push(val), pop(), and get_min() all in O(1) time. The bug is in pop(): it always pops from the min-stack, even when the popped value is not the current minimum, so get_min() returns wrong values after pops. Fix pop() so that it only removes from the min-stack when the value being popped equals the current minimum. Do not edit the tests.",
+  "starter_files": {
+    "min_stack.py": "class MinStack:\n    def __init__(self):\n        self._stack = []\n        self._min_stack = []\n\n    def push(self, val):\n        self._stack.append(val)\n        if not self._min_stack or val <= self._min_stack[-1]:\n            self._min_stack.append(val)\n\n    def pop(self):\n        val = self._stack.pop()\n        # BUG: always pops min_stack regardless of whether val is the min\n        self._min_stack.pop()\n        return val\n\n    def get_min(self):\n        return self._min_stack[-1]\n"
+  },
+  "grader_files": {
+    "test_min_stack.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom min_stack import MinStack\n\n\ndef test_basic_min():\n    s = MinStack()\n    s.push(3)\n    assert s.get_min() == 3\n\n\ndef test_min_updates_on_push():\n    s = MinStack()\n    s.push(5)\n    s.push(2)\n    assert s.get_min() == 2\n\n\ndef test_min_restored_after_pop():\n    s = MinStack()\n    s.push(5)\n    s.push(2)\n    s.pop()\n    assert s.get_min() == 5\n\n\ndef test_pop_non_min_keeps_min():\n    # push 3, 5 \u2014 min is 3; pop 5 \u2014 min must still be 3\n    s = MinStack()\n    s.push(3)\n    s.push(5)\n    s.pop()\n    assert s.get_min() == 3\n\n\ndef test_duplicate_min():\n    s = MinStack()\n    s.push(2)\n    s.push(2)\n    s.pop()\n    assert s.get_min() == 2\n"
+  }
+}

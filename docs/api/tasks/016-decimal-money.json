@@ -1,0 +1,21 @@
+{
+  "id": "016-decimal-money",
+  "title": "Fix float rounding errors in monetary calculations",
+  "difficulty": "hard",
+  "language": "python",
+  "tags": [
+    "arithmetic",
+    "decimal",
+    "rounding"
+  ],
+  "estimated_minutes": 25,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/016-decimal-money.json",
+  "prompt": "The module starter/ledger.py defines a Ledger class for tracking monetary transactions. add(amount_str) records an amount (passed as a string like '0.10'), and balance() returns the running total as a string rounded to 2 decimal places. The bug: amounts are converted to float internally, causing accumulated floating-point error (e.g. 0.1 + 0.2 != 0.3 in float). Fix it by using Python's decimal.Decimal for all arithmetic. The constructor must accept an optional initial_balance string (default '0'). balance() must return a string with exactly 2 decimal places (e.g. '0.30', not '0.3'). add() must raise ValueError for non-numeric input. The grader tests exact cent-level accuracy with parametrized cases and seeded random cent sequences compared against a Decimal reference. Do not edit the tests.",
+  "starter_files": {
+    "ledger.py": "class Ledger:\n    def __init__(self, initial_balance=\"0\"):\n        # BUG: stores as float, accumulates rounding error\n        self._balance = float(initial_balance)\n\n    def add(self, amount_str: str) -> None:\n        try:\n            self._balance += float(amount_str)\n        except ValueError:\n            raise ValueError(f\"Invalid amount: {amount_str!r}\")\n\n    def balance(self) -> str:\n        return f\"{self._balance:.2f}\"\n"
+  },
+  "grader_files": {
+    "test_ledger.py": "import os, sys, random\nfrom decimal import Decimal, ROUND_HALF_UP\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nimport pytest\nfrom ledger import Ledger\n\n\ndef _ref_balance(amounts):\n    \"\"\"Reference: sum using Decimal.\"\"\"\n    total = sum(Decimal(a) for a in amounts)\n    return str(total.quantize(Decimal(\"0.01\"), rounding=ROUND_HALF_UP))\n\n\n@pytest.mark.parametrize(\"amounts,expected\", [\n    ([\"0.10\", \"0.20\"], \"0.30\"),\n    ([\"0.10\", \"0.10\", \"0.10\"], \"0.30\"),\n    ([\"1.005\"], \"1.01\"),        # rounds half-up at 2dp\n    ([\"100.00\", \"-50.00\"], \"50.00\"),\n    ([\"0.01\"] * 100, \"1.00\"),\n])\ndef test_parametrized_exact(amounts, expected):\n    ledger = Ledger()\n    for a in amounts:\n        ledger.add(a)\n    assert ledger.balance() == expected\n\n\ndef test_invalid_amount_raises():\n    ledger = Ledger()\n    with pytest.raises(ValueError):\n        ledger.add(\"not-a-number\")\n\n\ndef test_balance_format():\n    \"\"\"balance() must return exactly 2 decimal places.\"\"\"\n    ledger = Ledger()\n    ledger.add(\"1\")\n    assert ledger.balance() == \"1.00\"\n\n\ndef test_initial_balance():\n    ledger = Ledger(initial_balance=\"100.00\")\n    assert ledger.balance() == \"100.00\"\n\n\n@pytest.mark.parametrize(\"seed\", [0, 1, 13, 42, 99])\ndef test_seeded_random_cents(seed):\n    rng = random.Random(seed)\n    # Random cent amounts as strings to avoid float precision at generation time\n    amounts = [f\"{rng.randint(-100, 100)}.{rng.randint(0,99):02d}\" for _ in range(20)]\n    ledger = Ledger()\n    for a in amounts:\n        ledger.add(a)\n    assert ledger.balance() == _ref_balance(amounts)\n"
+  }
+}

@@ -4,5 +4,13 @@
   "language": "python",
   "difficulty": "easy",
   "prompt": "The function word_frequency(text) in starter/word_frequency.py returns a dict mapping each word to its count. It has two bugs: (1) it is case-sensitive so 'Hello' and 'hello' are counted separately, and (2) it does not strip punctuation so 'word.' and 'word' are counted separately. Fix it so that word_frequency('Hello, hello! World.') returns {'hello': 2, 'world': 1}. Words are separated by whitespace. Punctuation means any character that is not a letter or digit. An empty string returns {}. Do not edit the tests.",
-  "grader": "pytest"
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": [
+    "strings",
+    "parsing",
+    "normalization"
+  ],
+  "estimated_minutes": 10,
+  "license": "MIT"
 }

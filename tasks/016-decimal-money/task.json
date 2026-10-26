@@ -1,0 +1,16 @@
+{
+  "id": "016-decimal-money",
+  "title": "Fix float rounding errors in monetary calculations",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The module starter/ledger.py defines a Ledger class for tracking monetary transactions. add(amount_str) records an amount (passed as a string like '0.10'), and balance() returns the running total as a string rounded to 2 decimal places. The bug: amounts are converted to float internally, causing accumulated floating-point error (e.g. 0.1 + 0.2 != 0.3 in float). Fix it by using Python's decimal.Decimal for all arithmetic. The constructor must accept an optional initial_balance string (default '0'). balance() must return a string with exactly 2 decimal places (e.g. '0.30', not '0.3'). add() must raise ValueError for non-numeric input. The grader tests exact cent-level accuracy with parametrized cases and seeded random cent sequences compared against a Decimal reference. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": [
+    "arithmetic",
+    "decimal",
+    "rounding"
+  ],
+  "estimated_minutes": 25,
+  "license": "MIT"
+}

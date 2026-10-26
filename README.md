@@ -6,13 +6,27 @@ Built during the Meta Global AI Developer Hackathon (Oct 26 to Nov 4, 2026).
 
 ---
 
+## Built with
+
+IBM Bob wrote the majority of the code in this repository — runner, tasks, CLI, bench, factory, server, MCP server, leaderboard, and CI. Task design, difficulty calibration, and review decisions are mine.
+
+---
+
 ## Install
 
 ```bash
 pip install pytest mcp   # runtime dependencies
+pip install -e .         # install gradepack + console script
 ```
 
-No build step. Run directly from the repo root:
+After install, the `gradepack` command is available directly:
+
+```bash
+gradepack list
+gradepack verify 001-pagination-off-by-one
+```
+
+Or run without installing:
 
 ```bash
 cd gradepack
@@ -21,147 +35,167 @@ python -m gradepack <command>
 
 ---
 
+## Static API (GitHub Pages)
+
+```
+https://gatlavishweshwarreddy.github.io/gradepack/api/index.json
+https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/<id>.json
+```
+
+Regenerate with:
+
+```bash
+python -m gradepack gen-registry --site
+```
+
+---
+
 ## Commands
 
-### `list` — show all tasks
+### `list`
 
 ```bash
-python -m gradepack list
+gradepack list
 ```
 
-Prints every task ID with its title and difficulty.
+Prints every task ID with title and difficulty.
 
 ---
 
-### `verify <task-id>` — validate a task
+### `verify <task-id>`
 
 ```bash
-python -m gradepack verify 001-pagination-off-by-one
+gradepack verify 001-pagination-off-by-one
 ```
 
-Copies the task into a temp directory, runs the grader against the unmodified starter
-(expects ≥ 1 failing test), then overlays `solution/` and runs the grader again (expects
-all tests to pass). Prints `PASS` or `FAIL` with a reason.
+Copies the task to a temp directory, runs the grader against the unmodified starter (expects ≥ 1 failing test), overlays `solution/`, reruns (expects all passing). Prints `PASS` or `FAIL`.
 
 ---
 
-### `run <task-id> --candidate <dir>` — grade a candidate solution
+### `run <task-id> --candidate <dir>`
 
 ```bash
-python -m gradepack run 001-pagination-off-by-one \
+gradepack run 001-pagination-off-by-one \
   --candidate tasks/001-pagination-off-by-one/solution
 ```
 
-Copies the task, overlays the files from `<dir>` onto `starter/`, runs the grader,
-and prints JSON:
+Overlays `<dir>` onto the starter and grades it. JSON output:
 
 ```json
 {
   "task_id": "001-pagination-off-by-one",
-  "passed": 7,
-  "failed": 0,
-  "total": 7,
-  "score": 1.0,
-  "failing_tests": []
+  "passed": 7, "failed": 0, "total": 7,
+  "score": 1.0, "failing_tests": []
 }
 ```
 
 ---
 
-### `bench --model <name>` — benchmark a model on all tasks
+### `validate`
 
 ```bash
-# Mock run (uses solution files as the model response — no API call)
-python -m gradepack bench --model mock --mock --attempts 1 --parallel 4
+gradepack validate
+```
 
-# Real run (requires BASE_URL, API_KEY, MODEL env vars)
+Checks every task for required `task.json` fields (`version`, `tags`, `estimated_minutes`, `license`, etc.), matching id/directory, prompt length ≥ 200 chars, and existing starter/grader/solution directories.
+
+---
+
+### `bench --model <name>`
+
+```bash
+# Mock run (uses solution files, no API call)
+gradepack bench --model mock --mock --attempts 2 --parallel 4
+
+# Real run
 BASE_URL=https://api.openai.com/v1 \
-API_KEY=sk-... \
+API_KEY=sk-...  \
 MODEL=gpt-4o-mini \
-python -m gradepack bench --model gpt-4o-mini --attempts 3 --parallel 2
+gradepack bench --model gpt-4o-mini --attempts 3 --parallel 2
 ```
 
-Flags:
-- `--model <name>` — label for the results file (saved to `results/<name>.json`)
-- `--attempts N` — number of attempts per task (default: 1)
-- `--parallel M` — thread concurrency (default: 1)
-- `--mock` — use solution files instead of calling a model
-- `--mock-fail` — use starter files (simulates a fully broken model)
+Flags: `--attempts N`, `--parallel M`, `--mock`, `--mock-fail`.
 
-Environment variables (for real runs):
-| Variable | Default |
+Required env vars for real runs (`BASE_URL` and `API_KEY` have no defaults):
+
+| Variable | Description |
 |---|---|
-| `BASE_URL` | `https://api.openai.com/v1` |
-| `API_KEY` | *(required)* |
-| `MODEL` | `gpt-4o-mini` |
+| `BASE_URL` | Chat completions endpoint base URL |
+| `API_KEY` | API key (never logged) |
+| `MODEL` | Model name (default: `meta-models/muse-spark-open-1026`) |
+
+Records per attempt: `provider`, `model`, `date`, `elapsed_s`, `failure_reason`, `raw_output_path`. Computes `pass@1` and `pass@k` at the end.
 
 ---
 
-### `review <task-id>` — judge task quality
+### `review <task-id>`
 
 ```bash
-# Mock review
-python -m gradepack review 001-pagination-off-by-one --mock
-
-# Real review (uses BASE_URL / API_KEY / MODEL)
-python -m gradepack review 001-pagination-off-by-one
+gradepack review 001-pagination-off-by-one --mock
 ```
 
-Sends the prompt, starter, grader, and solution to the model and records a structured
-verdict (`fair`, `fully_specified`, `issues`, `summary`).
+Sends the task to the model for a fairness/specification review. Returns JSON with `verdict`, `fair`, `fully_specified`, `issues`, `summary`.
 
 ---
 
-### `serve` — read-only HTTP API
+### `factory --n N`
 
 ```bash
-python -m gradepack serve --port 8000
+# Mock (offline)
+gradepack factory --n 3 --mock
+
+# Real
+BASE_URL=... API_KEY=... gradepack factory --n 5
 ```
 
-Endpoints (no solution files are ever exposed):
+For each of N task ideas:
+1. Sends a drafting prompt (includes the last 10 lessons from `LESSONS.md`).
+2. Runs `verify` on the draft.
+3. Sends a **separate** review request (no shared history).
+4. Records `accepted` or `rejected` with the reason in `drafts/<id>/review.json`.
+5. Appends rejection reasons as lessons to `LESSONS.md`.
+
+**Accepted drafts stay in `drafts/` until you manually move them into `tasks/`.** They are never published automatically.
+
+---
+
+### `serve [--port N]`
+
+```bash
+gradepack serve --port 8000
+```
+
+Read-only HTTP API (no solution files exposed):
+
 - `GET /tasks` — list all tasks
-- `GET /tasks/<id>` — task detail with starter and grader file contents
+- `GET /tasks/<id>` — task detail with starter and grader files
 
 ---
 
-### `mcp` — MCP server (stdio)
+### `mcp`
 
 ```bash
-python -m gradepack mcp
+gradepack mcp
 ```
 
-Exposes three tools over the MCP stdio transport:
-- `list_tasks` — list all task IDs
-- `get_task(task_id)` — return prompt and starter files
-- `run_candidate(task_id, files)` — grade a dict of filename → content
+MCP stdio server with three tools: `list_tasks`, `get_task(task_id)`, `run_candidate(task_id, files)`.
 
 ---
 
-### `gen-registry` — regenerate index files
+### `gen-registry [--site]`
 
 ```bash
-python -m gradepack gen-registry
+gradepack gen-registry          # tasks/index.json + llms.txt
+gradepack gen-registry --site   # also writes docs/api/ for GitHub Pages
 ```
-
-Writes `tasks/index.json` and `llms.txt` from the current task set.
-
----
-
-## Leaderboard
-
-Open `docs/index.html` in a browser (served from the repo root, e.g. with
-`python -m http.server` in `docs/`). It reads `results/*.json` with plain
-JavaScript — no build step.
 
 ---
 
 ## Task format
 
-Each task lives under `tasks/<id>/`:
-
 ```
 tasks/<id>/
-  task.json          id, title, language, difficulty, prompt, grader
+  task.json          metadata (see fields below)
   starter/           one or more .py files with a deliberate bug
   grader/            pytest tests (test_*.py); never edit these
   solution/          corrected files that make all tests pass
@@ -169,18 +203,36 @@ tasks/<id>/
 
 `task.json` fields:
 
-| Field | Description |
-|---|---|
-| `id` | unique slug matching the directory name |
-| `title` | short human-readable title |
-| `language` | `python` |
-| `difficulty` | `easy`, `medium`, or `hard` |
-| `prompt` | full task description given to the agent; must describe everything the tests check |
-| `grader` | `pytest` |
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | unique slug matching directory name |
+| `title` | string | short human-readable title |
+| `language` | string | `"python"` |
+| `difficulty` | string | `"easy"`, `"medium"`, or `"hard"` |
+| `prompt` | string | full description (≥ 200 chars); must cover everything the tests check |
+| `grader` | string | `"pytest"` |
+| `version` | string | e.g. `"1.0"` |
+| `tags` | list | topic tags, e.g. `["datetime", "timezone"]` |
+| `estimated_minutes` | int | rough time for a competent developer |
+| `license` | string | `"MIT"` |
 
 ### Grader contract
 
-- The grader's `sys.path.insert(0, '../starter')` loads from starter.
+- The grader inserts `../starter` into `sys.path` and imports from there.
 - Tests are never edited.
-- The starter must fail ≥ 1 test; the solution must pass all tests.
-- Grading uses the temp-copy approach: copy the task dir, overlay candidate files onto `starter/`, run pytest.
+- Starter must fail ≥ 1 test; solution must pass all.
+- Grading uses the temp-copy approach: copy task dir, overlay candidate files onto `starter/`, run pytest.
+- Candidate filenames are validated: path separators, `..`, and `conftest.py` are all rejected.
+
+### Factory flow
+
+```
+gradepack factory --n N [--mock]
+    │
+    ├─ draft request  →  model  →  task.json + starter + grader + solution
+    ├─ verify locally (starter must fail, solution must pass)
+    ├─ review request  →  model (fresh, no shared history)  →  verdict
+    │
+    ├─ ACCEPTED → drafts/<id>/  (manual review required before moving to tasks/)
+    └─ REJECTED → lesson appended to LESSONS.md → included in next draft prompt
+```

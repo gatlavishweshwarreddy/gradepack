@@ -4,5 +4,13 @@
   "language": "python",
   "difficulty": "medium",
   "prompt": "The function retry(max_attempts, exceptions) in starter/retry.py is a decorator factory. It wraps a function so that if it raises one of the listed exception types it is retried up to max_attempts times total (not max_attempts extra times). After exhausting all attempts, the last exception is re-raised. The starter has two bugs: (1) it catches all BaseException instead of only the specified exception types, so unrelated exceptions are silently retried; and (2) the attempt counter starts at 0 but the loop condition is wrong, allowing max_attempts+1 total calls instead of max_attempts. Fix both. Do not edit the tests.",
-  "grader": "pytest"
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": [
+    "decorators",
+    "exceptions",
+    "state"
+  ],
+  "estimated_minutes": 20,
+  "license": "MIT"
 }

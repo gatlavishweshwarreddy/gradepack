@@ -3,6 +3,14 @@
   "title": "Fix the off-by-one error in pagination",
   "language": "python",
   "difficulty": "easy",
-  "prompt": "The function paginate(items, page, per_page) in starter/paginate.py returns the wrong items on the last page. Fix it so that all tests in the grader pass. Do not edit the tests.",
-  "grader": "pytest"
+  "prompt": "The function paginate(items, page, per_page) in starter/paginate.py returns a slice of items for a 1-indexed page. It returns the wrong result on the last page when len(items) is not an exact multiple of per_page. Fix the total_pages calculation so that paginate(list(range(1,11)), 4, 3) == [10] and all other grader tests pass. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": [
+    "pagination",
+    "off-by-one",
+    "arithmetic"
+  ],
+  "estimated_minutes": 15,
+  "license": "MIT"
 }

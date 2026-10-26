@@ -4,5 +4,13 @@
   "language": "python",
   "difficulty": "medium",
   "prompt": "The class MinStack in starter/min_stack.py supports push(val), pop(), and get_min() all in O(1) time. The bug is in pop(): it always pops from the min-stack, even when the popped value is not the current minimum, so get_min() returns wrong values after pops. Fix pop() so that it only removes from the min-stack when the value being popped equals the current minimum. Do not edit the tests.",
-  "grader": "pytest"
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": [
+    "data-structures",
+    "state",
+    "stack"
+  ],
+  "estimated_minutes": 20,
+  "license": "MIT"
 }

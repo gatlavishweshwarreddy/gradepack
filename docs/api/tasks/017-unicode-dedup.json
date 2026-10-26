@@ -1,0 +1,21 @@
+{
+  "id": "017-unicode-dedup",
+  "title": "Fix unicode deduplicator to normalise before comparing",
+  "difficulty": "hard",
+  "language": "python",
+  "tags": [
+    "unicode",
+    "normalization",
+    "strings"
+  ],
+  "estimated_minutes": 25,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/017-unicode-dedup.json",
+  "prompt": "The function dedup(strings) in starter/dedup.py removes duplicate strings from a list, preserving the first occurrence and the original ordering. The bug: it uses plain equality (==) for comparison, so strings that look identical visually but differ in Unicode normalisation form (e.g. NFC 'caf\\u00e9' vs NFD 'cafe\\u0301') are treated as different and both kept. Fix it by normalising each string to NFC (unicodedata.normalize('NFC', s)) before the seen-set lookup, while still returning the original (un-normalised) strings. The function must also handle an empty list. The grader uses parametrized cases including NFC/NFD pairs and seeded random sequences of mixed-form strings validated against a reference implementation. Do not edit the tests.",
+  "starter_files": {
+    "dedup.py": "def dedup(strings: list[str]) -> list[str]:\n    \"\"\"Return strings with duplicates removed, preserving first occurrence.\"\"\"\n    seen = set()\n    result = []\n    for s in strings:\n        # BUG: compares raw strings, misses NFD/NFC equivalents\n        if s not in seen:\n            seen.add(s)\n            result.append(s)\n    return result\n"
+  },
+  "grader_files": {
+    "test_dedup.py": "import os, sys, random, unicodedata\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nimport pytest\nfrom dedup import dedup\n\n# NFC 'caf\u00e9' and NFD 'caf\u00e9' look the same but differ in bytes\nNFC_CAFE = \"caf\\u00e9\"        # single composed character\nNFD_CAFE = \"cafe\\u0301\"       # base + combining accent\n\n\ndef _ref_dedup(strings):\n    \"\"\"Reference using NFC normalisation.\"\"\"\n    seen = set()\n    result = []\n    for s in strings:\n        key = unicodedata.normalize(\"NFC\", s)\n        if key not in seen:\n            seen.add(key)\n            result.append(s)\n    return result\n\n\ndef test_empty():\n    assert dedup([]) == []\n\n\ndef test_no_duplicates():\n    assert dedup([\"a\", \"b\", \"c\"]) == [\"a\", \"b\", \"c\"]\n\n\ndef test_ascii_duplicates():\n    assert dedup([\"a\", \"b\", \"a\"]) == [\"a\", \"b\"]\n\n\ndef test_nfc_nfd_treated_as_duplicate():\n    result = dedup([NFC_CAFE, NFD_CAFE])\n    assert len(result) == 1, \"NFC and NFD forms must be treated as duplicates\"\n\n\ndef test_nfd_first_kept():\n    \"\"\"When NFD appears first it should be returned (original form preserved).\"\"\"\n    result = dedup([NFD_CAFE, NFC_CAFE])\n    assert result == [NFD_CAFE]\n\n\ndef test_mixed_list():\n    result = dedup([\"a\", NFC_CAFE, \"b\", NFD_CAFE, \"a\"])\n    assert result == [\"a\", NFC_CAFE, \"b\"]\n\n\n@pytest.mark.parametrize(\"seed\", [0, 1, 7, 42, 123])\ndef test_seeded_random(seed):\n    rng = random.Random(seed)\n    pool = [\"a\", \"b\", NFC_CAFE, NFD_CAFE, \"x\", \"y\", NFC_CAFE, \"b\"]\n    strings = [rng.choice(pool) for _ in range(20)]\n    assert dedup(strings) == _ref_dedup(strings)\n"
+  }
+}

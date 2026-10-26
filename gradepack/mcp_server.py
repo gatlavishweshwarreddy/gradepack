@@ -75,8 +75,10 @@ def run_candidate(task_id: str, files: dict) -> str:
     tmp_task = core.make_temp_copy(task_id)
     tmp_parent = tmp_task.parent
     try:
-        for fname, content in files.items():
-            (tmp_task / "starter" / fname).write_text(content)
+        try:
+            core.overlay_dict(files, tmp_task / "starter")
+        except core.CandidateError as exc:
+            return json.dumps({"error": str(exc)})
         result = core.run_pytest(tmp_task / "grader")
         total  = result["total"]
         passed = result["passed"]

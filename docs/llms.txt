@@ -1,0 +1,134 @@
+# gradepack task registry
+
+Static API: https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/<id>.json
+
+A collection of realistic Python debugging tasks with automated graders.
+Each task has a starter file with a deliberate bug and a grader with pytest tests.
+
+## Tasks
+
+### 001-pagination-off-by-one
+Title: Fix the off-by-one error in pagination
+Difficulty: easy
+Tags: pagination, off-by-one, arithmetic
+Estimated minutes: 15
+Prompt: The function paginate(items, page, per_page) in starter/paginate.py returns a slice of items for a 1-indexed page. It returns the wrong result on the last page when len(items) is not an exact multiple of per_page. Fix the total_pages calculation so that paginate(list(range(1,11)), 4, 3) == [10] and all other grader tests pass. Do not edit the tests.
+
+### 002-csv-parse-strip
+Title: Fix CSV header and value whitespace stripping
+Difficulty: easy
+Tags: parsing, strings, csv
+Estimated minutes: 10
+Prompt: The function parse_csv(text) in starter/parse_csv.py parses a CSV string and returns a list of dicts mapping header names to values. It has two bugs: (1) header names are not stripped of leading/trailing whitespace, and (2) row values are not stripped of leading/trailing whitespace. Fix both so that parse_csv(' name , age\nAlice , 30\n Bob,25') returns [{'name': 'Alice', 'age': '30'}, {'name': 'Bob', 'age': '25'}]. The function must handle an empty string by returning an empty list. Do not edit the tests.
+
+### 003-date-diff
+Title: Fix elapsed days calculation to ignore time component
+Difficulty: medium
+Tags: datetime, stdlib
+Estimated minutes: 15
+Prompt: The function days_between(d1, d2) in starter/date_diff.py accepts two ISO-8601 date strings (YYYY-MM-DD) and returns the absolute number of days between them as an integer. The current implementation includes an off-by-one error caused by using datetime instead of date, and it fails when dates are passed in reverse order. Fix it so that days_between('2024-01-01', '2024-01-10') == 9, days_between('2024-01-10', '2024-01-01') == 9 (absolute), days_between('2023-12-31', '2024-01-01') == 1, and days_between('2024-02-28', '2024-03-01') == 2. Do not edit the tests.
+
+### 004-word-frequency
+Title: Fix word frequency counter to normalise case and strip punctuation
+Difficulty: easy
+Tags: strings, parsing, normalization
+Estimated minutes: 10
+Prompt: The function word_frequency(text) in starter/word_frequency.py returns a dict mapping each word to its count. It has two bugs: (1) it is case-sensitive so 'Hello' and 'hello' are counted separately, and (2) it does not strip punctuation so 'word.' and 'word' are counted separately. Fix it so that word_frequency('Hello, hello! World.') returns {'hello': 2, 'world': 1}. Words are separated by whitespace. Punctuation means any character that is not a letter or digit. An empty string returns {}. Do not edit the tests.
+
+### 005-lru-cache
+Title: Fix LRU cache eviction order
+Difficulty: medium
+Tags: data-structures, caching, state
+Estimated minutes: 20
+Prompt: The class LRUCache in starter/lru_cache.py implements a fixed-capacity least-recently-used cache with get(key) and put(key, value) methods. get returns the value or -1 if the key is not present, and accessing a key via get counts as a use. put inserts or updates; if the cache is at capacity the least-recently-used key must be evicted first. The bug is that get does not update the recency of the accessed key, so the eviction order is wrong. Fix get so that it moves the accessed key to the most-recently-used position. Do not edit the tests.
+
+### 006-stack-with-min
+Title: Fix constant-time minimum tracking in a stack
+Difficulty: medium
+Tags: data-structures, state, stack
+Estimated minutes: 20
+Prompt: The class MinStack in starter/min_stack.py supports push(val), pop(), and get_min() all in O(1) time. The bug is in pop(): it always pops from the min-stack, even when the popped value is not the current minimum, so get_min() returns wrong values after pops. Fix pop() so that it only removes from the min-stack when the value being popped equals the current minimum. Do not edit the tests.
+
+### 007-slug-generator
+Title: Fix URL slug generator
+Difficulty: easy
+Tags: strings, regex, normalization
+Estimated minutes: 10
+Prompt: The function slugify(text) in starter/slugify.py converts a string to a URL slug: lowercase, words joined by hyphens, all characters that are not letters or digits replaced by hyphens, consecutive hyphens collapsed to one, and leading/trailing hyphens removed. The starter has three bugs: (1) it does not lowercase the result, (2) it does not collapse consecutive hyphens, and (3) it does not strip leading/trailing hyphens. Fix all three. Examples: slugify('Hello World') == 'hello-world', slugify('  Hello   World  ') == 'hello-world', slugify('Hello, World!') == 'hello-world', slugify('Python 3.11') == 'python-3-11'. Do not edit the tests.
+
+### 008-run-length-encoding
+Title: Fix run-length encoding to merge consecutive identical characters
+Difficulty: easy
+Tags: encoding, strings, off-by-one
+Estimated minutes: 15
+Prompt: The function encode(s) in starter/rle.py returns a run-length encoded list of (char, count) tuples. The bug is that it starts a new run for every character instead of incrementing the count for a run of identical characters. Fix it so that encode('aaabbc') == [('a', 3), ('b', 2), ('c', 1)] and encode('') == []. Also fix decode(pairs) which reconstructs the original string from a list of (char, count) tuples — it currently has an off-by-one and repeats each character count-1 times instead of count times. Do not edit the tests.
+
+### 009-token-bucket
+Title: Fix token bucket rate limiter refill logic
+Difficulty: hard
+Tags: rate-limiting, state, arithmetic
+Estimated minutes: 25
+Prompt: The class TokenBucket in starter/token_bucket.py implements a token-bucket rate limiter. __init__(rate, capacity) sets the fill rate (tokens per second) and the maximum capacity. consume(n, now) attempts to consume n tokens at time `now` (a float, seconds). It must first refill tokens based on elapsed time since the last call (tokens = rate * elapsed, capped at capacity), then consume n tokens if available and return True, or return False without consuming if insufficient. The starter has two bugs: (1) it adds tokens without capping at capacity, and (2) it does not update self._last after a failed consume, so time keeps accumulating wrongly. Fix both. Do not edit the tests.
+
+### 010-json-flattener
+Title: Fix nested JSON flattener key path construction
+Difficulty: medium
+Tags: data-transformation, recursion, dicts
+Estimated minutes: 20
+Prompt: The function flatten(obj, sep='.') in starter/flatten.py flattens a nested dict into a single-level dict with dot-separated keys. The bug is that when recursing, it prepends the separator even for top-level keys, producing keys like '.a.b' instead of 'a.b'. Fix it so that flatten({'a': {'b': 1, 'c': 2}, 'd': 3}) == {'a.b': 1, 'a.c': 2, 'd': 3}. An empty dict returns {}. Lists are treated as leaf values and not recursed into. Do not edit the tests.
+
+### 011-iso-week
+Title: Fix ISO week number calculation at year boundaries
+Difficulty: medium
+Tags: datetime, stdlib, calendar
+Estimated minutes: 20
+Prompt: The function iso_week(date_str) in starter/iso_week.py accepts an ISO date string (YYYY-MM-DD) and returns a tuple (iso_year, week_number) using the ISO 8601 definition. The starter uses the wrong strftime directives: it uses %Y (calendar year) instead of %G (ISO year) and %W (Monday-based week, 0-indexed) instead of %V (ISO week number). This causes wrong results at year boundaries. Fix it so that iso_week('2024-12-30') == (2025, 1), iso_week('2025-01-01') == (2025, 1), iso_week('2023-01-01') == (2022, 52). Do not edit the tests.
+
+### 012-retry-decorator
+Title: Fix retry decorator to catch only the specified exception types
+Difficulty: medium
+Tags: decorators, exceptions, state
+Estimated minutes: 20
+Prompt: The function retry(max_attempts, exceptions) in starter/retry.py is a decorator factory. It wraps a function so that if it raises one of the listed exception types it is retried up to max_attempts times total (not max_attempts extra times). After exhausting all attempts, the last exception is re-raised. The starter has two bugs: (1) it catches all BaseException instead of only the specified exception types, so unrelated exceptions are silently retried; and (2) the attempt counter starts at 0 but the loop condition is wrong, allowing max_attempts+1 total calls instead of max_attempts. Fix both. Do not edit the tests.
+
+### 013-timezone-scheduler
+Title: Fix timezone-aware event scheduler
+Difficulty: hard
+Tags: datetime, timezone, state
+Estimated minutes: 30
+Prompt: The module starter/scheduler.py contains a class EventScheduler. add_event(name, utc_dt) stores an event with its UTC datetime. next_event_in(tz_name) returns a (name, timedelta) tuple for the next upcoming event converted into the named timezone (e.g. 'US/Eastern'), using the 'now' supplied by a clock() callable passed to the constructor. The module starter/clock.py provides UtcClock with a now() method returning the current UTC time as a timezone-aware datetime. The bug: add_event silently strips tzinfo when the caller passes a naive datetime (it should raise ValueError), AND next_event_in uses a naive 'now' for comparison instead of the aware datetime from clock.now(), so events in non-UTC timezones are compared incorrectly. Fix both bugs: (1) raise ValueError in add_event if utc_dt.tzinfo is None, (2) use clock.now() (which is already UTC-aware) directly for the comparison. Do not edit the tests.
+
+### 014-mutable-default
+Title: Fix mutable default argument leaking shared state
+Difficulty: hard
+Tags: gotchas, state, oop
+Estimated minutes: 20
+Prompt: The module starter/accumulator.py defines Accumulator(initial=[]). Each instance should have its own independent list of items. The bug is a classic mutable default argument: the default list is shared across all instances that do not pass an explicit initial value, so items added to one instance bleed into the next. Fix it by using None as the default and creating a new list inside __init__ when initial is None. The grader tests that two independently created Accumulator() instances do not share state, that adding to one does not affect the other, that the initial list is copied (not referenced), and checks correct behavior with seeded random sequences of add operations across multiple instances. Do not edit the tests.
+
+### 015-sliding-window-max
+Title: Fix off-by-one in sliding window maximum
+Difficulty: hard
+Tags: algorithms, deque, off-by-one
+Estimated minutes: 30
+Prompt: The function sliding_max(nums, k) in starter/window.py returns a list of the maximum value in each sliding window of size k over nums. The bug is an off-by-one: the deque holds indices, and the left-trim condition uses `>= i - k` instead of the correct `< i - k + 1`, so stale indices are not evicted and the wrong maximum is returned for windows that have moved past a previously large element. Fix the condition so that sliding_max([3,1,2,5,4], 3) == [3,5,5], sliding_max([1], 1) == [1], and sliding_max([], 3) == []. The grader uses parametrized cases and a seeded brute-force reference to validate random inputs. Do not edit the tests.
+
+### 016-decimal-money
+Title: Fix float rounding errors in monetary calculations
+Difficulty: hard
+Tags: arithmetic, decimal, rounding
+Estimated minutes: 25
+Prompt: The module starter/ledger.py defines a Ledger class for tracking monetary transactions. add(amount_str) records an amount (passed as a string like '0.10'), and balance() returns the running total as a string rounded to 2 decimal places. The bug: amounts are converted to float internally, causing accumulated floating-point error (e.g. 0.1 + 0.2 != 0.3 in float). Fix it by using Python's decimal.Decimal for all arithmetic. The constructor must accept an optional initial_balance string (default '0'). balance() must return a string with exactly 2 decimal places (e.g. '0.30', not '0.3'). add() must raise ValueError for non-numeric input. The grader tests exact cent-level accuracy with parametrized cases and seeded random cent sequences compared against a Decimal reference. Do not edit the tests.
+
+### 017-unicode-dedup
+Title: Fix unicode deduplicator to normalise before comparing
+Difficulty: hard
+Tags: unicode, normalization, strings
+Estimated minutes: 25
+Prompt: The function dedup(strings) in starter/dedup.py removes duplicate strings from a list, preserving the first occurrence and the original ordering. The bug: it uses plain equality (==) for comparison, so strings that look identical visually but differ in Unicode normalisation form (e.g. NFC 'caf\u00e9' vs NFD 'cafe\u0301') are treated as different and both kept. Fix it by normalising each string to NFC (unicodedata.normalize('NFC', s)) before the seen-set lookup, while still returning the original (un-normalised) strings. The function must also handle an empty list. The grader uses parametrized cases including NFC/NFD pairs and seeded random sequences of mixed-form strings validated against a reference implementation. Do not edit the tests.
+
+### 018-thread-safe-cache
+Title: Fix thread-safe memoize cache: wrong key and missing lock on write
+Difficulty: hard
+Tags: concurrency, threading, caching
+Estimated minutes: 35
+Prompt: The module starter/memo.py provides memoize(fn), a decorator that caches function results in a shared dict protected by a threading.Lock. It has two bugs: (1) it stores results under id(args) (the object identity of the tuple) instead of args (its value), so the cache never hits on a subsequent call because each call creates a new tuple with a different id; (2) the lock is released before writing, creating a race window. Fix both: (1) use args as the cache key, (2) hold the lock across the entire read-check-compute-write sequence (check under lock; release to compute; re-acquire; if another thread wrote it first return that value; otherwise store and return). The grader tests that the wrapped function is called exactly once per unique argument set (using a call counter and seeded random sequences), that the return value is always correct, and uses threading.Barrier to test concurrent access. Do not edit the tests.

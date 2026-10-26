@@ -1,0 +1,21 @@
+{
+  "id": "004-word-frequency",
+  "title": "Fix word frequency counter to normalise case and strip punctuation",
+  "difficulty": "easy",
+  "language": "python",
+  "tags": [
+    "strings",
+    "parsing",
+    "normalization"
+  ],
+  "estimated_minutes": 10,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/004-word-frequency.json",
+  "prompt": "The function word_frequency(text) in starter/word_frequency.py returns a dict mapping each word to its count. It has two bugs: (1) it is case-sensitive so 'Hello' and 'hello' are counted separately, and (2) it does not strip punctuation so 'word.' and 'word' are counted separately. Fix it so that word_frequency('Hello, hello! World.') returns {'hello': 2, 'world': 1}. Words are separated by whitespace. Punctuation means any character that is not a letter or digit. An empty string returns {}. Do not edit the tests.",
+  "starter_files": {
+    "word_frequency.py": "def word_frequency(text):\n    \"\"\"Return a dict of word -> count.\"\"\"\n    counts = {}\n    for word in text.split():\n        counts[word] = counts.get(word, 0) + 1\n    return counts\n"
+  },
+  "grader_files": {
+    "test_word_frequency.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom word_frequency import word_frequency\n\n\ndef test_empty():\n    assert word_frequency(\"\") == {}\n\n\ndef test_case_insensitive():\n    result = word_frequency(\"Hello hello\")\n    assert result == {\"Hello\": 2} or result == {\"hello\": 2}\n\n\ndef test_punctuation_stripped():\n    result = word_frequency(\"word. word\")\n    # both tokens should map to the same normalised key\n    total = sum(result.values())\n    assert total == 2\n    assert len(result) == 1\n\n\ndef test_mixed():\n    result = word_frequency(\"Hello, hello! World.\")\n    assert result.get(\"hello\") == 2 or result.get(\"Hello\") == 2\n    assert result.get(\"world\") == 1 or result.get(\"World\") == 1\n    assert len(result) == 2\n\n\ndef test_no_punctuation_unaffected():\n    assert word_frequency(\"a b a\") == {\"a\": 2, \"b\": 1}\n"
+  }
+}

@@ -3,6 +3,14 @@
   "title": "Fix run-length encoding to merge consecutive identical characters",
   "language": "python",
   "difficulty": "easy",
-  "prompt": "The function encode(s) in starter/rle.py returns a run-length encoded list of (char, count) tuples. The bug is that it starts a new run for every character instead of incrementing the count for a run of identical characters. Fix it so that encode('aaabbc') == [('a', 3), ('b', 2), ('c', 1)] and encode('') == []. Also fix decode(pairs) which reconstructs the original string from a list of (char, count) tuples — it currently has an off-by-one and repeats each character count-1 times instead of count times. Do not edit the tests.",
-  "grader": "pytest"
+  "prompt": "The function encode(s) in starter/rle.py returns a run-length encoded list of (char, count) tuples. The bug is that it starts a new run for every character instead of incrementing the count for a run of identical characters. Fix it so that encode('aaabbc') == [('a', 3), ('b', 2), ('c', 1)] and encode('') == []. Also fix decode(pairs) which reconstructs the original string from a list of (char, count) tuples \u2014 it currently has an off-by-one and repeats each character count-1 times instead of count times. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": [
+    "encoding",
+    "strings",
+    "off-by-one"
+  ],
+  "estimated_minutes": 15,
+  "license": "MIT"
 }

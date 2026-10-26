@@ -1,0 +1,21 @@
+{
+  "id": "011-iso-week",
+  "title": "Fix ISO week number calculation at year boundaries",
+  "difficulty": "medium",
+  "language": "python",
+  "tags": [
+    "datetime",
+    "stdlib",
+    "calendar"
+  ],
+  "estimated_minutes": 20,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/011-iso-week.json",
+  "prompt": "The function iso_week(date_str) in starter/iso_week.py accepts an ISO date string (YYYY-MM-DD) and returns a tuple (iso_year, week_number) using the ISO 8601 definition. The starter uses the wrong strftime directives: it uses %Y (calendar year) instead of %G (ISO year) and %W (Monday-based week, 0-indexed) instead of %V (ISO week number). This causes wrong results at year boundaries. Fix it so that iso_week('2024-12-30') == (2025, 1), iso_week('2025-01-01') == (2025, 1), iso_week('2023-01-01') == (2022, 52). Do not edit the tests.",
+  "starter_files": {
+    "iso_week.py": "from datetime import date\n\n\ndef iso_week(date_str):\n    \"\"\"Return (iso_year, week_number) for an ISO date string.\"\"\"\n    d = date.fromisoformat(date_str)\n    # BUG: %Y is calendar year, %W is 0-indexed Monday week \u2014 both wrong for ISO\n    return (int(d.strftime(\"%Y\")), int(d.strftime(\"%W\")))\n"
+  },
+  "grader_files": {
+    "test_iso_week.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom iso_week import iso_week\n\n\ndef test_year_boundary_end():\n    # 2024-12-30 is in ISO week 1 of 2025\n    assert iso_week(\"2024-12-30\") == (2025, 1)\n\n\ndef test_year_boundary_start():\n    # 2025-01-01 is in ISO week 1 of 2025\n    assert iso_week(\"2025-01-01\") == (2025, 1)\n\n\ndef test_prior_year_week():\n    # 2023-01-01 is in ISO week 52 of 2022\n    assert iso_week(\"2023-01-01\") == (2022, 52)\n\n\ndef test_midyear():\n    # 2024-07-15 is in ISO week 29 of 2024\n    assert iso_week(\"2024-07-15\") == (2024, 29)\n\n\ndef test_normal_start():\n    # 2024-01-08 is in ISO week 2 of 2024\n    assert iso_week(\"2024-01-08\") == (2024, 2)\n"
+  }
+}

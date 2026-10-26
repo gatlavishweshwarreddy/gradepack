@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gradepack"
+version = "0.1.0"
+description = "Registry of realistic Python tasks with automated graders for testing AI coding agents."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+dependencies = [
+    "pytest>=7",
+    "mcp>=2",
+]
+
+[project.scripts]
+gradepack = "gradepack.cli:main_entry"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["gradepack*"]
+
+[tool.setuptools.package-data]
+gradepack = ["py.typed"]

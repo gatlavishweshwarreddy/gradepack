@@ -1,0 +1,21 @@
+{
+  "id": "012-retry-decorator",
+  "title": "Fix retry decorator to catch only the specified exception types",
+  "difficulty": "medium",
+  "language": "python",
+  "tags": [
+    "decorators",
+    "exceptions",
+    "state"
+  ],
+  "estimated_minutes": 20,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/012-retry-decorator.json",
+  "prompt": "The function retry(max_attempts, exceptions) in starter/retry.py is a decorator factory. It wraps a function so that if it raises one of the listed exception types it is retried up to max_attempts times total (not max_attempts extra times). After exhausting all attempts, the last exception is re-raised. The starter has two bugs: (1) it catches all BaseException instead of only the specified exception types, so unrelated exceptions are silently retried; and (2) the attempt counter starts at 0 but the loop condition is wrong, allowing max_attempts+1 total calls instead of max_attempts. Fix both. Do not edit the tests.",
+  "starter_files": {
+    "retry.py": "import functools\n\n\ndef retry(max_attempts, exceptions=(Exception,)):\n    \"\"\"Decorator: retry the wrapped function on specified exceptions.\"\"\"\n    def decorator(func):\n        @functools.wraps(func)\n        def wrapper(*args, **kwargs):\n            attempt = 0\n            while True:\n                try:\n                    return func(*args, **kwargs)\n                except BaseException:   # BUG 1: catches everything\n                    attempt += 1\n                    if attempt >= max_attempts + 1:  # BUG 2: allows extra attempt\n                        raise\n        return wrapper\n    return decorator\n"
+  },
+  "grader_files": {
+    "test_retry.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nimport pytest\nfrom retry import retry\n\n\ndef test_success_no_retry():\n    calls = []\n\n    @retry(3, (ValueError,))\n    def ok():\n        calls.append(1)\n        return 42\n\n    assert ok() == 42\n    assert len(calls) == 1\n\n\ndef test_retries_then_succeeds():\n    calls = []\n\n    @retry(3, (ValueError,))\n    def flaky():\n        calls.append(1)\n        if len(calls) < 3:\n            raise ValueError(\"fail\")\n        return \"ok\"\n\n    assert flaky() == \"ok\"\n    assert len(calls) == 3\n\n\ndef test_exhausted_raises():\n    calls = []\n\n    @retry(3, (ValueError,))\n    def always_fail():\n        calls.append(1)\n        raise ValueError(\"always\")\n\n    with pytest.raises(ValueError):\n        always_fail()\n    assert len(calls) == 3\n\n\ndef test_exact_attempt_count():\n    \"\"\"max_attempts=1 means only one call, no retries.\"\"\"\n    calls = []\n\n    @retry(1, (ValueError,))\n    def fail_once():\n        calls.append(1)\n        raise ValueError(\"x\")\n\n    with pytest.raises(ValueError):\n        fail_once()\n    assert len(calls) == 1\n\n\ndef test_unspecified_exception_not_caught():\n    @retry(3, (ValueError,))\n    def wrong_exc():\n        raise TypeError(\"wrong type\")\n\n    with pytest.raises(TypeError):\n        wrong_exc()\n"
+  }
+}

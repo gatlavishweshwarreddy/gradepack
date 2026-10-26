@@ -1,0 +1,21 @@
+{
+  "id": "009-token-bucket",
+  "title": "Fix token bucket rate limiter refill logic",
+  "difficulty": "hard",
+  "language": "python",
+  "tags": [
+    "rate-limiting",
+    "state",
+    "arithmetic"
+  ],
+  "estimated_minutes": 25,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/009-token-bucket.json",
+  "prompt": "The class TokenBucket in starter/token_bucket.py implements a token-bucket rate limiter. __init__(rate, capacity) sets the fill rate (tokens per second) and the maximum capacity. consume(n, now) attempts to consume n tokens at time `now` (a float, seconds). It must first refill tokens based on elapsed time since the last call (tokens = rate * elapsed, capped at capacity), then consume n tokens if available and return True, or return False without consuming if insufficient. The starter has two bugs: (1) it adds tokens without capping at capacity, and (2) it does not update self._last after a failed consume, so time keeps accumulating wrongly. Fix both. Do not edit the tests.",
+  "starter_files": {
+    "token_bucket.py": "class TokenBucket:\n    def __init__(self, rate, capacity):\n        self.rate = rate\n        self.capacity = capacity\n        self._tokens = capacity\n        self._last = None\n\n    def consume(self, n, now):\n        if self._last is not None:\n            elapsed = now - self._last\n            # BUG 1: no cap at capacity\n            self._tokens += elapsed * self.rate\n        # BUG 2: _last updated even on failure, but also not updated on failure path below\n        self._last = now\n        if self._tokens >= n:\n            self._tokens -= n\n            return True\n        return False\n"
+  },
+  "grader_files": {
+    "test_token_bucket.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom token_bucket import TokenBucket\n\n\ndef test_initial_consume():\n    tb = TokenBucket(rate=1, capacity=10)\n    assert tb.consume(5, 0.0) is True\n\n\ndef test_exhaust_then_fail():\n    tb = TokenBucket(rate=1, capacity=5)\n    assert tb.consume(5, 0.0) is True\n    assert tb.consume(1, 0.0) is False\n\n\ndef test_refill_allows_consume():\n    tb = TokenBucket(rate=10, capacity=10)\n    tb.consume(10, 0.0)          # empty the bucket\n    assert tb.consume(5, 0.5)   # 0.5s * 10 rate = 5 tokens refilled\n\n\ndef test_cap_at_capacity():\n    tb = TokenBucket(rate=10, capacity=5)\n    tb.consume(0, 0.0)           # initialise _last\n    # after 100s worth of refill, tokens must not exceed capacity=5\n    assert tb.consume(5, 100.0) is True\n    assert tb.consume(1, 100.0) is False\n\n\ndef test_partial_refill_not_enough():\n    tb = TokenBucket(rate=1, capacity=10)\n    tb.consume(10, 0.0)          # empty\n    assert tb.consume(2, 1.0) is False   # only 1 token refilled\n"
+  }
+}
