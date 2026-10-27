@@ -18,19 +18,19 @@ Mock mode works fully offline.
 """
 import datetime
 import json
-import os
 import pathlib
 import re
 import shutil
 import sys
-import urllib.request
+import tempfile
 
+from gradepack import api as _api
 from gradepack import core
 
 _REPO = core._repo_root()
 _DRAFTS_DIR = _REPO / "drafts"
 _LESSONS_FILE = _REPO / "LESSONS.md"
-_DEFAULT_MODEL = "meta-models/muse-spark-open-1026"
+_DEFAULT_MODEL = _api._DEFAULT_MODEL
 
 # ---------------------------------------------------------------------------
 # Lessons
@@ -141,35 +141,12 @@ Reply with a JSON object ONLY (no markdown) with:
 """
 
 
-def _get_env_or_fail(key: str) -> str:
-    val = os.environ.get(key)
-    if not val:
-        print(f"ERROR: environment variable {key!r} is not set.", file=sys.stderr)
-        sys.exit(1)
-    return val
-
-
 def _chat(system: str, user: str) -> str:
-    base_url = _get_env_or_fail("BASE_URL")
-    api_key  = _get_env_or_fail("API_KEY")
-    model    = os.environ.get("MODEL", _DEFAULT_MODEL)
-    payload = json.dumps({
-        "model": model,
-        "messages": [
-            {"role": "system", "content": system},
-            {"role": "user",   "content": user},
-        ],
-        "temperature": 0.7,
-    }).encode()
-    req = urllib.request.Request(
-        f"{base_url.rstrip('/')}/chat/completions",
-        data=payload,
-        headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"},
-        method="POST",
-    )
-    with urllib.request.urlopen(req, timeout=120) as resp:
-        data = json.loads(resp.read())
-    return data["choices"][0]["message"]["content"]
+    resp_data = _api.chat(system, user, temperature=0.7, max_tokens=4096, timeout=180)
+    content = _api.extract_content(resp_data)
+    if not content:
+        raise RuntimeError("Model returned empty content")
+    return content
 
 
 def _parse_file_blocks(content: str) -> dict[str, str]:
@@ -267,8 +244,6 @@ def _run_factory_once(mock: bool, lessons: list[str]) -> dict:
             return {"status": "error", "stage": "draft", "reason": str(exc)}
 
     # 2. Materialise into a temp draft dir to run verify
-    tmp_dir = pathlib.Path(core.task_dir.__module__)  # just to get a path object
-    import tempfile
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = pathlib.Path(tmp)
         task_json_text = files.get("task.json", "{}")
@@ -298,7 +273,6 @@ def _run_factory_once(mock: bool, lessons: list[str]) -> dict:
             else:
                 # Overlay solution
                 sol_dir = tmp_task / "solution"
-                tmp_task2 = pathlib.Path(core.make_temp_copy.__module__)
                 tmp_grader_copy = pathlib.Path(tempfile.mkdtemp())
                 try:
                     shutil.copytree(str(tmp_task), str(tmp_grader_copy / task_id))

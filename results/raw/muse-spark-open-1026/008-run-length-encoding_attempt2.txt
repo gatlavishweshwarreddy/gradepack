@@ -1,0 +1,24 @@
+rle.py
+```python
+def encode(s):
+    """Return run-length encoding as list of (char, count) tuples."""
+    if not s:
+        return []
+    result = []
+    prev = s[0]
+    count = 1
+    for ch in s[1:]:
+        if ch == prev:
+            count += 1
+        else:
+            result.append((prev, count))
+            prev = ch
+            count = 1
+    result.append((prev, count))
+    return result
+
+
+def decode(pairs):
+    """Reconstruct string from (char, count) pairs."""
+    return "".join(ch * count for ch, count in pairs)
+```

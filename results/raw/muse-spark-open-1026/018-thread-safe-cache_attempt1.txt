@@ -1,0 +1,23 @@
+memo.py
+```python
+import threading
+
+
+def memoize(fn):
+    """Cache results of fn. Thread-safe read, but write is outside the lock (BUG)."""
+    cache = {}
+    lock = threading.Lock()
+
+    def wrapper(*args):
+        with lock:
+            if args in cache:
+                return cache[args]
+        result = fn(*args)
+        with lock:
+            if args in cache:
+                return cache[args]
+            cache[args] = result
+            return result
+
+    return wrapper
+```

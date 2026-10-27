@@ -1,0 +1,22 @@
+ledger.py
+```python
+from decimal import Decimal, InvalidOperation
+
+
+class Ledger:
+    def __init__(self, initial_balance="0"):
+        try:
+            self._balance = Decimal(initial_balance)
+        except (InvalidOperation, ValueError, TypeError):
+            raise ValueError(f"Invalid amount: {initial_balance!r}")
+
+    def add(self, amount_str: str) -> None:
+        try:
+            self._balance += Decimal(amount_str)
+        except (InvalidOperation, ValueError, TypeError, AttributeError):
+            raise ValueError(f"Invalid amount: {amount_str!r}")
+
+    def balance(self) -> str:
+        # quantize ensures exactly 2 decimal places and proper rounding
+        return format(self._balance.quantize(Decimal("0.00")), "f")
+```

@@ -1,0 +1,17 @@
+slugify.py
+```python
+import re
+
+
+def slugify(text):
+    """Convert text to a URL slug."""
+    # Lowercase the text
+    slug = text.lower()
+    # Replace non-alphanumeric characters with hyphens
+    slug = re.sub(r"[^a-z0-9]+", "-", slug)
+    # Collapse consecutive hyphens to one
+    slug = re.sub(r"-+", "-", slug)
+    # Remove leading/trailing hyphens
+    slug = slug.strip("-")
+    return slug
+```

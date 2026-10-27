@@ -1,0 +1,1713 @@
+[
+  {
+    "task_id": "001-pagination-off-by-one",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:24:01Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 11.27,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/001-pagination-off-by-one_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 3357,
+      "total_tokens": 3761,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2418,
+        "audio_tokens": 0,
+        "reasoning_tokens": 3250,
+        "rejected_prediction_tokens": 4162
+      }
+    }
+  },
+  {
+    "task_id": "001-pagination-off-by-one",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:11Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 3.67,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/001-pagination-off-by-one_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 703,
+      "total_tokens": 1107,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 526,
+        "audio_tokens": 0,
+        "reasoning_tokens": 596,
+        "rejected_prediction_tokens": 727
+      }
+    }
+  },
+  {
+    "task_id": "001-pagination-off-by-one",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:14Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 6.82,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/001-pagination-off-by-one_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 1560,
+      "total_tokens": 1964,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1170,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1458,
+        "rejected_prediction_tokens": 1560
+      }
+    }
+  },
+  {
+    "task_id": "002-csv-parse-strip",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:16Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 4.37,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/002-csv-parse-strip_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 451,
+      "completion_tokens": 1026,
+      "total_tokens": 1477,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 777,
+        "audio_tokens": 0,
+        "reasoning_tokens": 897,
+        "rejected_prediction_tokens": 966
+      }
+    }
+  },
+  {
+    "task_id": "002-csv-parse-strip",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:21Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 6.42,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/002-csv-parse-strip_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 451,
+      "completion_tokens": 1521,
+      "total_tokens": 1972,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1157,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1410,
+        "rejected_prediction_tokens": 1405
+      }
+    }
+  },
+  {
+    "task_id": "002-csv-parse-strip",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:21Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 5.29,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/002-csv-parse-strip_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 451,
+      "completion_tokens": 1222,
+      "total_tokens": 1673,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 911,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1093,
+        "rejected_prediction_tokens": 1266
+      }
+    }
+  },
+  {
+    "task_id": "003-date-diff",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:25Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 4.13,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/003-date-diff_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 474,
+      "completion_tokens": 863,
+      "total_tokens": 1337,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 639,
+        "audio_tokens": 0,
+        "reasoning_tokens": 784,
+        "rejected_prediction_tokens": 929
+      }
+    }
+  },
+  {
+    "task_id": "001-pagination-off-by-one",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:25Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 17.83,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/001-pagination-off-by-one_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 4117,
+      "total_tokens": 4521,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2989,
+        "audio_tokens": 0,
+        "reasoning_tokens": 4010,
+        "rejected_prediction_tokens": 4907
+      }
+    }
+  },
+  {
+    "task_id": "003-date-diff",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:27Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 5.22,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/003-date-diff_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 474,
+      "completion_tokens": 1250,
+      "total_tokens": 1724,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 909,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1171,
+        "rejected_prediction_tokens": 1478
+      }
+    }
+  },
+  {
+    "task_id": "003-date-diff",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:28Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.17,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/003-date-diff_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 474,
+      "completion_tokens": 492,
+      "total_tokens": 966,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 362,
+        "audio_tokens": 0,
+        "reasoning_tokens": 413,
+        "rejected_prediction_tokens": 548
+      }
+    }
+  },
+  {
+    "task_id": "004-word-frequency",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:36Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 10.59,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/004-word-frequency_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 413,
+      "completion_tokens": 3077,
+      "total_tokens": 3490,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2193,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2988,
+        "rejected_prediction_tokens": 3995
+      }
+    }
+  },
+  {
+    "task_id": "005-lru-cache",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:38Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 1.46,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/005-lru-cache_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 510,
+      "completion_tokens": 313,
+      "total_tokens": 823,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 245,
+        "audio_tokens": 0,
+        "reasoning_tokens": 168,
+        "rejected_prediction_tokens": 231
+      }
+    }
+  },
+  {
+    "task_id": "004-word-frequency",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:38Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 11.56,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/004-word-frequency_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 413,
+      "completion_tokens": 3308,
+      "total_tokens": 3721,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2334,
+        "audio_tokens": 0,
+        "reasoning_tokens": 3219,
+        "rejected_prediction_tokens": 4484
+      }
+    }
+  },
+  {
+    "task_id": "004-word-frequency",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:40Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 11.84,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/004-word-frequency_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 413,
+      "completion_tokens": 3490,
+      "total_tokens": 3903,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2477,
+        "audio_tokens": 0,
+        "reasoning_tokens": 3374,
+        "rejected_prediction_tokens": 4614
+      }
+    }
+  },
+  {
+    "task_id": "005-lru-cache",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:41Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.83,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/005-lru-cache_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 510,
+      "completion_tokens": 647,
+      "total_tokens": 1157,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 489,
+        "audio_tokens": 0,
+        "reasoning_tokens": 502,
+        "rejected_prediction_tokens": 617
+      }
+    }
+  },
+  {
+    "task_id": "006-stack-with-min",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:42Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.12,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/006-stack-with-min_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 453,
+      "completion_tokens": 437,
+      "total_tokens": 890,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 329,
+        "audio_tokens": 0,
+        "reasoning_tokens": 301,
+        "rejected_prediction_tokens": 434
+      }
+    }
+  },
+  {
+    "task_id": "005-lru-cache",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:42Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 4.1,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/005-lru-cache_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 510,
+      "completion_tokens": 944,
+      "total_tokens": 1454,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 685,
+        "audio_tokens": 0,
+        "reasoning_tokens": 799,
+        "rejected_prediction_tokens": 1128
+      }
+    }
+  },
+  {
+    "task_id": "006-stack-with-min",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:44Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.53,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/006-stack-with-min_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 453,
+      "completion_tokens": 545,
+      "total_tokens": 998,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 413,
+        "audio_tokens": 0,
+        "reasoning_tokens": 409,
+        "rejected_prediction_tokens": 518
+      }
+    }
+  },
+  {
+    "task_id": "007-slug-generator",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:45Z",
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 3.09,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/007-slug-generator_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 467,
+      "completion_tokens": 812,
+      "total_tokens": 1279,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 616,
+        "audio_tokens": 0,
+        "reasoning_tokens": 692,
+        "rejected_prediction_tokens": 756
+      }
+    }
+  },
+  {
+    "task_id": "006-stack-with-min",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:46Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 3.42,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/006-stack-with-min_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 453,
+      "completion_tokens": 849,
+      "total_tokens": 1302,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 644,
+        "audio_tokens": 0,
+        "reasoning_tokens": 713,
+        "rejected_prediction_tokens": 798
+      }
+    }
+  },
+  {
+    "task_id": "008-run-length-encoding",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:47Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 1.49,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/008-run-length-encoding_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 465,
+      "completion_tokens": 328,
+      "total_tokens": 793,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 256,
+        "audio_tokens": 0,
+        "reasoning_tokens": 173,
+        "rejected_prediction_tokens": 241
+      }
+    }
+  },
+  {
+    "task_id": "007-slug-generator",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:49Z",
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 4.38,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/007-slug-generator_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 467,
+      "completion_tokens": 1203,
+      "total_tokens": 1670,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 927,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1085,
+        "rejected_prediction_tokens": 1005
+      }
+    }
+  },
+  {
+    "task_id": "008-run-length-encoding",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:49Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 1.6,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/008-run-length-encoding_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 465,
+      "completion_tokens": 419,
+      "total_tokens": 884,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 338,
+        "audio_tokens": 0,
+        "reasoning_tokens": 269,
+        "rejected_prediction_tokens": 229
+      }
+    }
+  },
+  {
+    "task_id": "007-slug-generator",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:49Z",
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 3.87,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/007-slug-generator_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 467,
+      "completion_tokens": 976,
+      "total_tokens": 1443,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 730,
+        "audio_tokens": 0,
+        "reasoning_tokens": 854,
+        "rejected_prediction_tokens": 992
+      }
+    }
+  },
+  {
+    "task_id": "008-run-length-encoding",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:26:52Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.7,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/008-run-length-encoding_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 465,
+      "completion_tokens": 801,
+      "total_tokens": 1266,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 619,
+        "audio_tokens": 0,
+        "reasoning_tokens": 646,
+        "rejected_prediction_tokens": 648
+      }
+    }
+  },
+  {
+    "task_id": "009-token-bucket",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:02Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 12.29,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/009-token-bucket_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 538,
+      "completion_tokens": 3069,
+      "total_tokens": 3607,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2284,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2936,
+        "rejected_prediction_tokens": 3211
+      }
+    }
+  },
+  {
+    "task_id": "010-json-flattener",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:05Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.66,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/010-json-flattener_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 481,
+      "completion_tokens": 733,
+      "total_tokens": 1214,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 556,
+        "audio_tokens": 0,
+        "reasoning_tokens": 624,
+        "rejected_prediction_tokens": 683
+      }
+    }
+  },
+  {
+    "task_id": "009-token-bucket",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:05Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 13.19,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/009-token-bucket_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 538,
+      "completion_tokens": 3018,
+      "total_tokens": 3556,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2153,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2884,
+        "rejected_prediction_tokens": 3895
+      }
+    }
+  },
+  {
+    "task_id": "010-json-flattener",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:07Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 1.81,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/010-json-flattener_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 481,
+      "completion_tokens": 419,
+      "total_tokens": 900,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 324,
+        "audio_tokens": 0,
+        "reasoning_tokens": 307,
+        "rejected_prediction_tokens": 341
+      }
+    }
+  },
+  {
+    "task_id": "010-json-flattener",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:08Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.59,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/010-json-flattener_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 481,
+      "completion_tokens": 714,
+      "total_tokens": 1195,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 546,
+        "audio_tokens": 0,
+        "reasoning_tokens": 603,
+        "rejected_prediction_tokens": 630
+      }
+    }
+  },
+  {
+    "task_id": "009-token-bucket",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:10Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 20.04,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/009-token-bucket_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 538,
+      "completion_tokens": 5250,
+      "total_tokens": 5788,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 3805,
+        "audio_tokens": 0,
+        "reasoning_tokens": 5109,
+        "rejected_prediction_tokens": 6310
+      }
+    }
+  },
+  {
+    "task_id": "011-iso-week",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:10Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 3.62,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/011-iso-week_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 484,
+      "completion_tokens": 924,
+      "total_tokens": 1408,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 662,
+        "audio_tokens": 0,
+        "reasoning_tokens": 846,
+        "rejected_prediction_tokens": 1179
+      }
+    }
+  },
+  {
+    "task_id": "011-iso-week",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:11Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.85,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/011-iso-week_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 484,
+      "completion_tokens": 513,
+      "total_tokens": 997,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 384,
+        "audio_tokens": 0,
+        "reasoning_tokens": 443,
+        "rejected_prediction_tokens": 519
+      }
+    }
+  },
+  {
+    "task_id": "011-iso-week",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:12Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.05,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/011-iso-week_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 484,
+      "completion_tokens": 458,
+      "total_tokens": 942,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 338,
+        "audio_tokens": 0,
+        "reasoning_tokens": 380,
+        "rejected_prediction_tokens": 502
+      }
+    }
+  },
+  {
+    "task_id": "012-retry-decorator",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:16Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 5.46,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/012-retry-decorator_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 506,
+      "completion_tokens": 1246,
+      "total_tokens": 1752,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 921,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1129,
+        "rejected_prediction_tokens": 1354
+      }
+    }
+  },
+  {
+    "task_id": "012-retry-decorator",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:17Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 5.41,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/012-retry-decorator_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 506,
+      "completion_tokens": 1268,
+      "total_tokens": 1774,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 943,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1151,
+        "rejected_prediction_tokens": 1332
+      }
+    }
+  },
+  {
+    "task_id": "012-retry-decorator",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:17Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 5.38,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/012-retry-decorator_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 506,
+      "completion_tokens": 1362,
+      "total_tokens": 1868,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1020,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1245,
+        "rejected_prediction_tokens": 1381
+      }
+    }
+  },
+  {
+    "task_id": "013-timezone-scheduler",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:24Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 7.91,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/013-timezone-scheduler_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 821,
+      "completion_tokens": 2579,
+      "total_tokens": 3400,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1929,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2359,
+        "rejected_prediction_tokens": 2628
+      }
+    }
+  },
+  {
+    "task_id": "013-timezone-scheduler",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:25Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 8.45,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/013-timezone-scheduler_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 821,
+      "completion_tokens": 2745,
+      "total_tokens": 3566,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2056,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2525,
+        "rejected_prediction_tokens": 2767
+      }
+    }
+  },
+  {
+    "task_id": "013-timezone-scheduler",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:26Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 7.87,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/013-timezone-scheduler_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 821,
+      "completion_tokens": 2684,
+      "total_tokens": 3505,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2042,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2464,
+        "rejected_prediction_tokens": 2466
+      }
+    }
+  },
+  {
+    "task_id": "014-mutable-default",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:27Z",
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.29,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/014-mutable-default_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 457,
+      "completion_tokens": 348,
+      "total_tokens": 805,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 264,
+        "audio_tokens": 0,
+        "reasoning_tokens": 256,
+        "rejected_prediction_tokens": 324
+      }
+    }
+  },
+  {
+    "task_id": "014-mutable-default",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:28Z",
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.27,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/014-mutable-default_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 457,
+      "completion_tokens": 380,
+      "total_tokens": 837,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 277,
+        "audio_tokens": 0,
+        "reasoning_tokens": 288,
+        "rejected_prediction_tokens": 444
+      }
+    }
+  },
+  {
+    "task_id": "014-mutable-default",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:28Z",
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.18,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/014-mutable-default_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 457,
+      "completion_tokens": 491,
+      "total_tokens": 948,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 377,
+        "audio_tokens": 0,
+        "reasoning_tokens": 399,
+        "rejected_prediction_tokens": 421
+      }
+    }
+  },
+  {
+    "task_id": "015-sliding-window-max",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:30Z",
+    "passed": 12,
+    "failed": 0,
+    "total": 12,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 3.45,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/015-sliding-window-max_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 585,
+      "completion_tokens": 973,
+      "total_tokens": 1558,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 726,
+        "audio_tokens": 0,
+        "reasoning_tokens": 805,
+        "rejected_prediction_tokens": 996
+      }
+    }
+  },
+  {
+    "task_id": "015-sliding-window-max",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:31Z",
+    "passed": 12,
+    "failed": 0,
+    "total": 12,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.84,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/015-sliding-window-max_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 585,
+      "completion_tokens": 777,
+      "total_tokens": 1362,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 582,
+        "audio_tokens": 0,
+        "reasoning_tokens": 610,
+        "rejected_prediction_tokens": 776
+      }
+    }
+  },
+  {
+    "task_id": "015-sliding-window-max",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:33Z",
+    "passed": 12,
+    "failed": 0,
+    "total": 12,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 4.91,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/015-sliding-window-max_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 585,
+      "completion_tokens": 1677,
+      "total_tokens": 2262,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1295,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1515,
+        "rejected_prediction_tokens": 1372
+      }
+    }
+  },
+  {
+    "task_id": "016-decimal-money",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:45Z",
+    "passed": 12,
+    "failed": 1,
+    "total": 13,
+    "score": 0.9231,
+    "failing_tests": [
+      "test_parametrized_exact[amounts2-1.01]"
+    ],
+    "failure_reason": "test_failure_parametrized",
+    "finish_reason": "stop",
+    "elapsed_s": 13.64,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/016-decimal-money_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 524,
+      "completion_tokens": 3402,
+      "total_tokens": 3926,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2519,
+        "audio_tokens": 0,
+        "reasoning_tokens": 3228,
+        "rejected_prediction_tokens": 3662
+      }
+    }
+  },
+  {
+    "task_id": "016-decimal-money",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:46Z",
+    "passed": 12,
+    "failed": 1,
+    "total": 13,
+    "score": 0.9231,
+    "failing_tests": [
+      "test_parametrized_exact[amounts2-1.01]"
+    ],
+    "failure_reason": "test_failure_parametrized",
+    "finish_reason": "stop",
+    "elapsed_s": 13.2,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/016-decimal-money_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 524,
+      "completion_tokens": 3087,
+      "total_tokens": 3611,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2229,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2906,
+        "rejected_prediction_tokens": 3777
+      }
+    }
+  },
+  {
+    "task_id": "017-unicode-dedup",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:46Z",
+    "passed": 11,
+    "failed": 0,
+    "total": 11,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 1.57,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/017-unicode-dedup_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 480,
+      "completion_tokens": 350,
+      "total_tokens": 830,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 273,
+        "audio_tokens": 0,
+        "reasoning_tokens": 255,
+        "rejected_prediction_tokens": 266
+      }
+    }
+  },
+  {
+    "task_id": "016-decimal-money",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:48Z",
+    "passed": 12,
+    "failed": 1,
+    "total": 13,
+    "score": 0.9231,
+    "failing_tests": [
+      "test_parametrized_exact[amounts2-1.01]"
+    ],
+    "failure_reason": "test_failure_parametrized",
+    "finish_reason": "stop",
+    "elapsed_s": 17.11,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/016-decimal-money_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 524,
+      "completion_tokens": 4113,
+      "total_tokens": 4637,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2956,
+        "audio_tokens": 0,
+        "reasoning_tokens": 3932,
+        "rejected_prediction_tokens": 5143
+      }
+    }
+  },
+  {
+    "task_id": "017-unicode-dedup",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:49Z",
+    "passed": 11,
+    "failed": 0,
+    "total": 11,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.1,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/017-unicode-dedup_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 480,
+      "completion_tokens": 389,
+      "total_tokens": 869,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 306,
+        "audio_tokens": 0,
+        "reasoning_tokens": 294,
+        "rejected_prediction_tokens": 275
+      }
+    }
+  },
+  {
+    "task_id": "017-unicode-dedup",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:51Z",
+    "passed": 11,
+    "failed": 0,
+    "total": 11,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 4.2,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/017-unicode-dedup_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 480,
+      "completion_tokens": 1040,
+      "total_tokens": 1520,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 779,
+        "audio_tokens": 0,
+        "reasoning_tokens": 945,
+        "rejected_prediction_tokens": 1048
+      }
+    }
+  },
+  {
+    "task_id": "018-thread-safe-cache",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:56Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 8.4,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/018-thread-safe-cache_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 592,
+      "completion_tokens": 2042,
+      "total_tokens": 2634,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1477,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1925,
+        "rejected_prediction_tokens": 2485
+      }
+    }
+  },
+  {
+    "task_id": "018-thread-safe-cache",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:27:57Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 5.65,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/018-thread-safe-cache_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 592,
+      "completion_tokens": 1645,
+      "total_tokens": 2237,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1197,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1539,
+        "rejected_prediction_tokens": 1932
+      }
+    }
+  },
+  {
+    "task_id": "018-thread-safe-cache",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T10:28:08Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 18.97,
+    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/018-thread-safe-cache_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 592,
+      "completion_tokens": 5410,
+      "total_tokens": 6002,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 3854,
+        "audio_tokens": 0,
+        "reasoning_tokens": 5304,
+        "rejected_prediction_tokens": 7031
+      }
+    }
+  }
+]

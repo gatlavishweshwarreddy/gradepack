@@ -178,19 +178,8 @@ def main(argv: list[str]) -> None:
 
     elif command == "bench":
         from gradepack import bench as _bench
-        rest = argv[1:]
-        model = _get_flag(rest, "--model") or "mock"
-        attempts = int(_get_flag(rest, "--attempts") or "1")
-        parallel = int(_get_flag(rest, "--parallel") or "1")
-        mock = "--mock" in rest
-        mock_pass = "--mock-fail" not in rest
-        _bench.cmd_bench(
-            model=model,
-            attempts=attempts,
-            parallel=parallel,
-            mock=mock,
-            mock_pass=mock_pass,
-        )
+        # Delegate to argparse-based parser (supports --help)
+        _bench.cmd_bench_argv(argv[1:])
 
     elif command == "review":
         if len(argv) < 2:
@@ -225,6 +214,22 @@ def main(argv: list[str]) -> None:
         n = int(_get_flag(rest, "--n") or "1")
         mock = "--mock" in rest
         _factory.cmd_factory(n=n, mock=mock)
+
+    elif command == "report":
+        from gradepack import report as _report
+        rest = argv[1:]
+        model = _get_flag(rest, "--model")
+        _report.cmd_report(model_filter=model)
+
+    elif command == "demo":
+        if len(argv) < 2:
+            print("Usage: python -m gradepack demo <task-id> [--mock]")
+            sys.exit(1)
+        from gradepack import demo as _demo
+        task_id = argv[1]
+        rest = argv[2:]
+        mock = "--mock" in rest
+        _demo.cmd_demo(task_id, mock=mock)
 
     else:
         print(f"Unknown command: {command!r}")

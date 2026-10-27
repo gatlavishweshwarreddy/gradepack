@@ -1,0 +1,19 @@
+accumulator.py
+```python
+class Accumulator:
+    def __init__(self, initial=None):
+        if initial is None:
+            self.items = []
+        else:
+            self.items = list(initial)
+
+    def add(self, value):
+        self.items.append(value)
+        return self
+
+    def total(self):
+        return sum(self.items)
+
+    def values(self):
+        return list(self.items)
+```

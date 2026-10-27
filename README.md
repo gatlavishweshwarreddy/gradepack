@@ -101,7 +101,7 @@ Checks every task for required `task.json` fields (`version`, `tags`, `estimated
 
 ---
 
-### `bench --model <name>`
+### `bench --model <name>` — benchmark + publish
 
 ```bash
 # Mock run (uses solution files, no API call)
@@ -109,12 +109,33 @@ gradepack bench --model mock --mock --attempts 2 --parallel 4
 
 # Real run
 BASE_URL=https://api.openai.com/v1 \
-API_KEY=sk-...  \
+API_KEY=sk-... \
 MODEL=gpt-4o-mini \
 gradepack bench --model gpt-4o-mini --attempts 3 --parallel 2
+
+# Publish results to docs/results/ (for GitHub Pages leaderboard)
+gradepack bench --model gpt-4o-mini ... --publish
+# Mock files are skipped unless --include-mock is added
+
+# Help
+gradepack bench --help
 ```
 
-Flags: `--attempts N`, `--parallel M`, `--mock`, `--mock-fail`.
+All flags:
+
+| Flag | Default | Description |
+|---|---|---|
+| `--model` | *(required)* | Label for `results/<model>.json` |
+| `--attempts N` | 1 | Attempts per task |
+| `--parallel M` | 1 | Thread concurrency |
+| `--mock` | off | Use solution files, no API call |
+| `--mock-fail` | off | Use starter files (simulates broken model) |
+| `--task <id>` | all | Restrict to one task (repeatable) |
+| `--max-tokens N` | 8192 | API max_tokens |
+| `--temperature F` | 0.7 | Sampling temperature |
+| `--provider-label` | auto | Human-readable label stored in records |
+| `--publish` | off | Copy results to `docs/results/` |
+| `--include-mock` | off | Allow publishing mock result files |
 
 Required env vars for real runs (`BASE_URL` and `API_KEY` have no defaults):
 
@@ -124,7 +145,9 @@ Required env vars for real runs (`BASE_URL` and `API_KEY` have no defaults):
 | `API_KEY` | API key (never logged) |
 | `MODEL` | Model name (default: `meta-models/muse-spark-open-1026`) |
 
-Records per attempt: `provider`, `model`, `date`, `elapsed_s`, `failure_reason`, `raw_output_path`. Computes `pass@1` and `pass@k` at the end.
+Records per attempt: `provider`, `model`, `date`, `elapsed_s`, `finish_reason`, `failure_reason`, `token_usage`, `raw_output_path`. Computes `pass@1` and `pass@k`. Retries HTTP 429/5xx with exponential backoff (max 4 tries). File names from model responses are normalised (leading `starter/` stripped) before the integrity check.
+
+`failure_reason` values: `none` · `wrong_answer` · `test_failure_parametrized` · `invalid_output` · `no_answer` · `timeout` · `runner_error` · `api_error`
 
 ---
 
@@ -135,6 +158,28 @@ gradepack review 001-pagination-off-by-one --mock
 ```
 
 Sends the task to the model for a fairness/specification review. Returns JSON with `verdict`, `fair`, `fully_specified`, `issues`, `summary`.
+
+---
+
+### `report [--model <name>]`
+
+```bash
+gradepack report              # all models
+gradepack report --model mock
+```
+
+Prints a plain-text table per model: `pass@1`, `pass@k`, breakdown by difficulty, failure reason counts, and the five hardest tasks.
+
+---
+
+### `demo <task-id> [--mock]`
+
+```bash
+gradepack demo 001-pagination-off-by-one --mock   # offline, uses solution
+gradepack demo 001-pagination-off-by-one           # real model call
+```
+
+Prints the task prompt, the failing starter tests, the model's response, and the graded result. Designed for screen recordings and demos.
 
 ---
 
