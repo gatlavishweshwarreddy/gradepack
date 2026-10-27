@@ -1,12 +1,1 @@
-{
-  "id": "030-expr-parser",
-  "title": "Expression parser gives wrong result for mixed addition and multiplication",
-  "language": "python",
-  "difficulty": "hard",
-  "prompt": "The package in starter/ implements an arithmetic expression parser. tokenizer.py provides tokenize(expr) which splits a string like '3 + 4 * 2' into a list of tokens. parser.py provides parse(tokens) which builds an AST, and eval_ast(node) which evaluates it. The public API in expr.py provides evaluate(expr_str) (one argument) which must continue to work as before (backward compatibility). A new two-argument form evaluate(expr_str, variables) was added to support variable substitution. The expression evaluator gives the wrong result for expressions that mix addition and multiplication — it evaluates left to right without respecting operator precedence, so '3 + 4 * 2' returns 14 instead of 11. All existing single-argument calls must continue to return the same values they did before. The grader tests both the new two-argument form and old single-argument calls including regression tests. Do not edit the tests.",
-  "grader": "pytest",
-  "version": "1.0",
-  "tags": ["parsing", "precedence", "backward-compat"],
-  "estimated_minutes": 35,
-  "license": "MIT"
-}
+{"id": "030-expr-parser", "title": "Expression parser gives wrong result for mixed addition and multiplication", "language": "python", "difficulty": "hard", "prompt": "The package in starter/ implements an arithmetic expression parser. tokenizer.py provides tokenize(expr), which splits a string like '3 + 4 * 2' into a list of tokens. parser.py provides parse(tokens), which builds an AST, and eval_ast(node), which evaluates it. The public API in expr.py provides evaluate(expr_str) and a newer evaluate(expr_str, variables) that supports variable substitution. The evaluator currently ignores operator precedence: it evaluates strictly left to right, so '3 + 4 * 2' returns 14 instead of 11. Fix it so that multiplication and division bind tighter than addition and subtraction, and parentheses override precedence, in both the one-argument and the two-argument forms. Expressions whose result does not depend on precedence (for example '5 + 5', '2 * 2 * 2', '10 - 3', '8 / 4') must keep returning the same values as before. The grader tests both forms, including regression tests. Do not edit the tests.", "grader": "pytest", "version": "1.0", "tags": ["parsing", "precedence", "backward-compat"], "estimated_minutes": 35, "license": "MIT"}

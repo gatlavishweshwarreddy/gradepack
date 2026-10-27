@@ -74,7 +74,7 @@ def cmd_demo(task_id: str, mock: bool = False) -> None:
                 _api._SYSTEM_CODING,
                 user_msg,
                 temperature=0.7,
-                max_tokens=8192,
+                max_tokens=24000,
                 timeout=180,
             )
             raw_response  = _api.extract_content(resp_data)
