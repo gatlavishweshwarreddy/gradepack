@@ -1,0 +1,15 @@
+{
+  "verdict": "accept",
+  "fair": true,
+  "fully_specified": true,
+  "issues": [],
+  "summary": "Task is well-specified via docstring invariants, starter contains intentional bugs for each invariant, grader covers token capping, concurrency, state-machine, dependency blocking, priority ordering and O(N) performance, and reference solution correctly fixes all issues deterministically.",
+  "date": "2026-10-27T15:47:48Z",
+  "task_id": "045-concurrent-rate-limited-scheduler",
+  "probe_results": [
+    false,
+    false,
+    false
+  ],
+  "classification": "discriminating"
+}

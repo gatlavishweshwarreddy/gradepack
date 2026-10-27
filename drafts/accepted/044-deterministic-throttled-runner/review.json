@@ -1,0 +1,15 @@
+{
+  "verdict": "accept",
+  "fair": true,
+  "fully_specified": true,
+  "issues": [],
+  "summary": "Deterministic throttling task is fully specified via docstring, fairly tests all contract rules, and has a correct solution covering concurrency, token bucket, priority, and lifecycle bugs.",
+  "date": "2026-10-27T15:48:05Z",
+  "task_id": "044-deterministic-throttled-runner",
+  "probe_results": [
+    false,
+    true,
+    true
+  ],
+  "classification": "discriminating"
+}

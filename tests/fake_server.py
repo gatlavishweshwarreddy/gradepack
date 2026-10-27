@@ -59,16 +59,17 @@ _VALID_DRAFT_META = json.dumps({
     "license": "MIT",
 }, indent=2)
 
-_ADDER_STARTER = "def add(a, b):\n    return a - b  # BUG\n"
+_ADDER_STARTER = "def add(a, b):\n    return a - b\n"
 _ADDER_GRADER = (
-    "import os, sys, pytest\n"
+    "import os, sys\n"
     "sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'starter'))\n"
     "from adder import add\n\n"
-    "@pytest.mark.parametrize('a,b,expected', [\n"
-    "    (1, 2, 3), (0, 0, 0), (-1, 5, 4),\n"
-    "])\n"
-    "def test_add(a, b, expected):\n"
-    "    assert add(a, b) == expected\n"
+    "def test_add_basic():\n    assert add(1, 2) == 3\n\n"
+    "def test_add_zeros():\n    assert add(0, 0) == 0\n\n"
+    "def test_add_negative():\n    assert add(-1, 5) == 4\n\n"
+    "def test_add_large():\n    assert add(100, 200) == 300\n\n"
+    "def test_add_both_neg():\n    assert add(-3, -7) == -10\n\n"
+    "def test_add_identity():\n    assert add(999, 1) == 1000\n"
 )
 _ADDER_SOLUTION = "def add(a, b):\n    return a + b\n"
 

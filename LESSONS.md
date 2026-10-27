@@ -7,3 +7,4 @@ automatically included in the next drafting prompt.
 
 - Starter leaks bug locations and grader misses key invariants (RUNNING non-cancellable, token cap, FAILED) allowing spec-violating solution to pass.
 - Task 040-throttled-workflow-engine was too easy: model solved all 3 probes — full specification lets the model rewrite from scratch; shorten the prompt, add interacting constraints, or use a performance limit.
+- Well-designed invariants and comprehensive grader, but starter leaks solutions via BUG annotations and performance requirement is enforced via undocumented instrumentation.

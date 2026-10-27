@@ -37,6 +37,7 @@ def _make_temp_accepted_draft(tmp_path: pathlib.Path, task_id: str) -> pathlib.P
     """
     Write a minimal valid draft into tmp_path/drafts/accepted/<task_id>/.
     Returns the draft directory path.
+    Uses 6 test functions (≥ 6 required by lint) and no BUG comments.
     """
     draft_dir = tmp_path / "drafts" / "accepted" / task_id
     draft_dir.mkdir(parents=True)
@@ -60,18 +61,19 @@ def _make_temp_accepted_draft(tmp_path: pathlib.Path, task_id: str) -> pathlib.P
     (draft_dir / "task.json").write_text(json.dumps(meta, indent=2))
     (draft_dir / "starter").mkdir()
     (draft_dir / "starter" / "adder.py").write_text(
-        "def add(a, b):\n    return a - b  # BUG\n"
+        "def add(a, b):\n    return a - b\n"
     )
     (draft_dir / "grader").mkdir()
     (draft_dir / "grader" / "test_adder.py").write_text(
-        "import os, sys, pytest\n"
+        "import os, sys\n"
         "sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'starter'))\n"
         "from adder import add\n\n"
-        "@pytest.mark.parametrize('a,b,expected', [\n"
-        "    (1, 2, 3), (0, 0, 0), (-1, 5, 4), (100, 200, 300), (-3, -7, -10)\n"
-        "])\n"
-        "def test_add(a, b, expected):\n"
-        "    assert add(a, b) == expected\n"
+        "def test_add_basic():\n    assert add(1, 2) == 3\n\n"
+        "def test_add_zeros():\n    assert add(0, 0) == 0\n\n"
+        "def test_add_negative():\n    assert add(-1, 5) == 4\n\n"
+        "def test_add_large():\n    assert add(100, 200) == 300\n\n"
+        "def test_add_both_neg():\n    assert add(-3, -7) == -10\n\n"
+        "def test_add_identity():\n    assert add(999, 1) == 1000\n"
     )
     (draft_dir / "solution").mkdir()
     (draft_dir / "solution" / "adder.py").write_text(
@@ -346,10 +348,11 @@ class TestStats:
         """A draft whose verify fails increments failed_verify."""
         stats_file = tmp_path / "factory_stats.json"
         # Inject a draft that will fail verify (starter has no failing tests)
+        # Use a title ≥ 8 chars, 6 test funcs (to pass lint), but correct starter (verify fails)
         bad_files = {
             "task.json": json.dumps({
-                "id": "000-bad",
-                "title": "bad",
+                "id": "000-bad-verify",
+                "title": "Fix broken adder task",
                 "language": "python",
                 "difficulty": "hard",
                 "prompt": "x" * 210,
@@ -364,7 +367,12 @@ class TestStats:
                 "import os, sys\n"
                 "sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'starter'))\n"
                 "from adder import add\n\n"
-                "def test_add():\n    assert add(1, 2) == 3\n"
+                "def test_add_basic():\n    assert add(1, 2) == 3\n\n"
+                "def test_add_zeros():\n    assert add(0, 0) == 0\n\n"
+                "def test_add_neg():\n    assert add(-1, 5) == 4\n\n"
+                "def test_add_large():\n    assert add(100, 200) == 300\n\n"
+                "def test_add_both_neg():\n    assert add(-3, -7) == -10\n\n"
+                "def test_add_id():\n    assert add(999, 1) == 1000\n"
             ),
             "solution/adder.py": "def add(a, b):\n    return a + b\n",
         }
@@ -446,16 +454,19 @@ class TestPromote:
         captured = capsys.readouterr()
         assert "not found" in captured.out.lower() or "fail" in captured.out.lower()
 
-    def test_promote_refuses_id_mismatch(self, tmp_path, capsys):
-        """Promote must fail if task.json id ≠ directory name."""
+    def test_promote_renames_id_on_mismatch(self, tmp_path, capsys):
+        """
+        When task.json id ≠ directory name, promote auto-renames the id
+        to the next free number (rather than hard-failing).
+        """
         task_id = "099-mismatch"
-        # cmd_promote looks at repo/drafts/accepted/<id>
-        draft_dir = tmp_path / "drafts" / "accepted" / task_id
-        draft_dir.mkdir(parents=True)
-        # Write task.json with wrong id
-        meta = {"id": "099-wrong-id", "title": "t"}
-        (draft_dir / "task.json").write_text(json.dumps(meta))
-        (draft_dir / "solution").mkdir()
+        # Use the full helper (has 6 test funcs, no BUG comment) but swap the id
+        draft_dir = _make_temp_accepted_draft(tmp_path, task_id)
+        # Overwrite task.json with a mismatched id
+        import json as _json
+        meta = _json.loads((draft_dir / "task.json").read_text())
+        meta["id"] = "099-wrong-id"
+        (draft_dir / "task.json").write_text(_json.dumps(meta, indent=2))
 
         fake_tasks = tmp_path / "tasks"
         fake_tasks.mkdir()
@@ -465,12 +476,17 @@ class TestPromote:
                                   return_value=tmp_path),
             unittest.mock.patch("gradepack.cli.core.tasks_dir",
                                   return_value=fake_tasks),
-            pytest.raises(SystemExit) as exc_info,
+            unittest.mock.patch("gradepack.factory._verify_draft_files",
+                                  return_value=(True, "")),
+            # Also patch _existing_numbers so numbering is deterministic
+            unittest.mock.patch.object(_factory, "_existing_numbers",
+                                        return_value=set(range(1, 99))),
         ):
             _cli.cmd_promote(task_id)
-        assert exc_info.value.code == 1
+
         captured = capsys.readouterr()
-        assert "does not match" in captured.out
+        # Should show INFO rename and PROMOTED
+        assert "INFO" in captured.out or "PROMOTED" in captured.out
 
     def test_promote_refuses_if_verify_fails(self, tmp_path, capsys):
         """Promote must fail if verify returns (False, reason)."""

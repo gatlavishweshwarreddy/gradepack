@@ -1,0 +1,17 @@
+{
+  "id": "concurrent-rate-limited-scheduler",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "Fix the workflow engine in `starter/engine.py` so it satisfies all invariants described in the module docstring. The prompt is intentionally brief \u2014 you must read the code to understand the contract.\n\nThe engine schedules tasks with dependencies under concurrency and token-bucket rate limits and has strict state-machine, ordering, and performance requirements.",
+  "grader": "grader/test_engine.py",
+  "version": "1.0.0",
+  "tags": [
+    "state-machine",
+    "concurrency",
+    "rate-limiting",
+    "scheduling",
+    "performance"
+  ],
+  "estimated_minutes": 90,
+  "license": "MIT"
+}

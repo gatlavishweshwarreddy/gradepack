@@ -1,0 +1,14 @@
+{
+  "verdict": "reject",
+  "fair": false,
+  "fully_specified": false,
+  "issues": [
+    "starter/scheduler.py contains explicit '# BUG:' comments and 'intentionally unused' hints that reveal all 6 required fixes, trivializing the task and must be stripped for a fair benchmark",
+    "Performance contract is under-specified: docstring says 'amortized O(ready+completions) not O(N^2)' but grader enforces it via hidden instrumentation of _dependencies_met call count <2000, which is not documented to the candidate",
+    "Prompt is brief by design and defers entirely to code docstring ('See scheduler.py for details' with wrong path) - prompt should be self-contained or explicitly incorporate the docstring contract",
+    "Estimated 60 minutes is inflated for a fix-the-bugs task when hints are present; without hints difficulty is appropriate but current form misrepresents difficulty"
+  ],
+  "summary": "Well-designed invariants and comprehensive grader, but starter leaks solutions via BUG annotations and performance requirement is enforced via undocumented instrumentation.",
+  "date": "2026-10-27T15:50:04Z",
+  "task_id": "046-hierarchical-throttled-scheduler"
+}

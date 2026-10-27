@@ -1,0 +1,17 @@
+{
+  "id": "042-hierarchical-throttled-scheduler",
+  "title": "Hierarchical Throttled Scheduler with Resource Caps",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "Fix `starter/scheduler.py` so `Scheduler` satisfies the invariants in its docstrings/comments. Prompt is brief by design \u2014 read the code for the full contract. Must handle: state-machine (RUNNING is non-cancellable), global resource caps, per-tick start rate-limit, priority+FIFO ordering, transitive failure/cancel propagation, and O(N) tick performance. See `scheduler.py` for details.",
+  "grader": "grader/test_scheduler.py",
+  "version": "1.0.0",
+  "tags": [
+    "scheduling",
+    "state-machine",
+    "resource-management",
+    "performance"
+  ],
+  "estimated_minutes": 60,
+  "license": "MIT"
+}

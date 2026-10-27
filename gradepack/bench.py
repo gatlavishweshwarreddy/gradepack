@@ -258,7 +258,7 @@ def _bench_task(
         "attempt":         attempt,
         "provider":        provider,
         "model":           model_name,
-        "date":            datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "date":            datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "passed":          passed,
         "failed":          failed,
         "total":           result.get("total", 0),
@@ -512,7 +512,7 @@ def _bench_task_agentic(
         "attempt":          attempt,
         "provider":         provider,
         "model":            model_name,
-        "date":             datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "date":             datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "passed":           passed,
         "failed":           failed,
         "total":            result.get("total", 0),
@@ -543,9 +543,28 @@ def _publish(results_file: pathlib.Path, include_mock: bool) -> None:
     """Copy results_file to docs/results/ and update docs/results/index.json."""
     name = results_file.name  # e.g. "mock.json" or "gpt-4o.json"
     stem = results_file.stem  # model name
+
+    # File-name guard: skip mock-named files unless --include-mock
     if stem.startswith("mock") and not include_mock:
         print(f"  Skipping {name} (mock file; pass --include-mock to publish)")
         return
+
+    # Record-level guard: refuse publishing if ANY record has a mock model/provider
+    # unless --include-mock is passed
+    if not include_mock:
+        try:
+            records = json.loads(results_file.read_text())
+            for rec in records:
+                model_label = (rec.get("model", "") or "").lower()
+                provider_label = (rec.get("provider", "") or "").lower()
+                if "mock" in model_label or "mock" in provider_label:
+                    print(
+                        f"  Refusing to publish {name}: records contain mock model/provider "
+                        f"(pass --include-mock to override)"
+                    )
+                    return
+        except Exception:
+            pass
 
     docs_results = core._repo_root() / "docs" / "results"
     docs_results.mkdir(parents=True, exist_ok=True)
@@ -651,7 +670,7 @@ def cmd_bench(
         model_name = _api.get_model()
 
     # B: run_id = UTC timestamp for this run
-    run_id = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+    run_id = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
     # E: --dry-run: print first request body and exit
     if dry_run:
@@ -679,6 +698,13 @@ def cmd_bench(
                               "API_KEY": "(redacted)" if os.environ.get("API_KEY") else "(not set)",
                               "request_body_preview": body}, indent=2))
         return
+
+    # Mock-data guard: results from --mock runs must be named mock-*
+    if (mock or mock_agentic) and not model.startswith("mock"):
+        print(
+            f"  WARNING: --mock run but model label {model!r} does not start with 'mock'. "
+            f"Rename to 'mock-{model}' to keep mock data separate."
+        )
 
     raw_output_dir = results_dir / "raw" / model
     results_file   = results_dir / f"{model}.json"
@@ -739,7 +765,7 @@ def cmd_bench(
                     "task_id": tid, "attempt": attempt,
                     "error": str(exc), "failure_reason": "runner_error",
                     "provider": provider, "model": model_name,
-                    "date": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                    "date": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                     "score": 0.0, "passed": 0, "failed": 0, "total": 0,
                 }
             record["run_id"] = run_id

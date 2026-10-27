@@ -1,0 +1,18 @@
+{
+  "id": "000-priority-rate-scheduler",
+  "title": "Priority Task Scheduler with Rate Limiting and Dependencies",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "Fix `starter/scheduler.py` so that all documented invariants hold. The scheduler must respect dependency ordering, priority with FIFO tie-break, token-bucket rate limiting with burst cap, and the state-machine rules (RUNNING is non-cancellable, FAILED propagates). It must also meet the performance requirement (heap-based ready queue, no expensive sorts). See the code for the full contract \u2014 the prompt is intentionally brief.",
+  "grader": "pytest grader/test_scheduler.py -v",
+  "version": "1.0.0",
+  "tags": [
+    "state-machine",
+    "priority-queue",
+    "rate-limiting",
+    "concurrency",
+    "performance"
+  ],
+  "estimated_minutes": 60,
+  "license": "MIT"
+}

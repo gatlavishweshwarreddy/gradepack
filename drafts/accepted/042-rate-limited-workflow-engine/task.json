@@ -1,0 +1,18 @@
+{
+  "id": "041-rate-limited-workflow-engine",
+  "title": "Rate-Limited Workflow Engine with Cancellation and Retry Semantics",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "Fix the WorkflowEngine in starter/engine.py to satisfy its documented contract. The engine must correctly handle DAG dependencies, per-group token-bucket rate limiting (with cap), max concurrency, cancellation (RUNNING steps are non-cancellable), retries with exponential backoff, timeouts, and workflow failure propagation. It must also meet the performance invariant (linear dependency checks). See the file's docstrings for the full contract. Do not change the public API.",
+  "grader": "pytest grader/test_engine.py",
+  "version": "1.0.0",
+  "tags": [
+    "state-machine",
+    "concurrency",
+    "rate-limiting",
+    "scheduling",
+    "performance"
+  ],
+  "estimated_minutes": 90,
+  "license": "MIT"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "000-deterministic-throttled-runner",
+  "title": "Deterministic Throttled Runner",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "Fix ThrottledRunner in starter/throttler.py. Time only moves via tick(now). The runner must enforce max concurrency, token-bucket rate limiting, priority ordering, and lifecycle rules. Read the module docstring and code for the full contract \u2014 this summary is intentionally incomplete. Do not change the public API.",
+  "grader": "pytest grader/test_throttler.py",
+  "version": "1.0.0",
+  "tags": [
+    "concurrency",
+    "rate-limiting",
+    "state-machine",
+    "priority-queue"
+  ],
+  "estimated_minutes": 45,
+  "license": "MIT"
+}

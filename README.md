@@ -248,27 +248,31 @@ All flags:
 | `--draft-max-tokens N` | 24000 | `max_tokens` for the draft API call; retry doubles this (cap 32768) |
 | `--mock` | off | Use mock drafts (offline); mock probes always pass → too_easy |
 | `--mock-probe-fail` | off | Mock probes always fail → discriminating (for offline testing) |
+| `--resume` | off | Resume a stopped run from `drafts/_progress.json` |
 
 **Pipeline per draft:**
 1. Reads the last 10 lessons from `LESSONS.md` (rejections *and* too-easy lessons).
-2. Sends a drafting prompt with `--draft-max-tokens` tokens. If `finish_reason==length` and content is empty, retries **once** with `min(tokens×2, 32768)`. Records `draft_retried=true` per draft.
+2. Assigns a domain **round-robin** from 14 domains and sends a drafting prompt with `--draft-max-tokens` tokens. If `finish_reason==length` and content is empty, retries **once** with `min(tokens×2, 32768)`. Records `draft_retried=true` per draft.
 3. Parses the response robustly: strips markdown code fences from `task.json`, finds the largest top-level JSON object, and classifies failures as `empty_content` | `truncated_json` | `invalid_json`.
-4. Runs `verify` on the draft locally (each call uses its own unique temp directory; parallel runs cannot collide).
-5. Sends a **separate** review request (no shared history) → judge verdict.
-6. **Probe stage**: runs the model against the draft `--probe-attempts` times (each probe uses its own unique temp directory).
+4. **Lint gate** (`lint_draft`): rejects drafts that have revealing bug hints in the starter, access private attributes not mentioned in the prompt/docstrings, use timing assertions, have a title shorter than 8 chars, a prompt over 1500 chars, or fewer than 6 test functions.
+5. Runs `verify` on the draft locally (each call uses its own unique temp directory; parallel runs cannot collide).
+6. Sends a **separate** review request (no shared history) → judge verdict.
+7. **Probe stage**: runs the model against the draft `--probe-attempts` times (each probe uses its own unique temp directory).
    - All probes pass → `too_easy` → saved under `drafts/too_easy/`, lesson appended.
    - ≥ 1 probe fails → `discriminating` → saved under `drafts/accepted/`.
    - Judge rejected → saved under `drafts/rejected/`.
-7. Writes `factory_stats.json` after each draft.
-8. Prints a funnel summary at the end.
+8. Writes `factory_stats.json` after each draft.
+9. Writes `drafts/_progress.json` after each draft (used by `--resume`).
+10. Prints a funnel summary at the end.
 
 **Drafts are never promoted automatically.** Use `gradepack promote <id>` to move a discriminating draft into `tasks/`.
 
 #### `factory_stats.json`
 
-Written after each draft run with counts: `drafted`, `failed_draft_stage`, `failed_verify`, `judge_rejected`, `judge_accepted`, `probed`, `too_easy`, `discriminating`, plus:
+Written after each draft run with counts: `drafted`, `failed_draft_stage`, `lint_rejected`, `failed_verify`, `judge_rejected`, `judge_accepted`, `probed`, `too_easy`, `discriminating`, plus:
 - `draft_fail_reasons`: breakdown of draft-stage failures (`empty_content`, `truncated_json`, `invalid_json`, `other`)
-- Per-draft entry: `probe_results`, `probe_solve_count`, `draft_retried`
+- `lint_fail_reasons`: breakdown of lint rejections by reason
+- Per-draft entry: `probe_results`, `probe_solve_count`, `draft_retried`, `domain`
 
 ---
 
@@ -279,11 +283,13 @@ gradepack promote 037-my-task
 ```
 
 Moves a discriminating draft from `drafts/accepted/<id>/` into `tasks/<id>/`:
-1. Verifies that `task.json`'s `id` matches the directory name.
-2. Runs `verify` (starter must fail ≥ 1 test; solution must pass all). Refuses on failure.
-3. Copies the draft into `tasks/<id>/`.
-4. Moves `review.json` to `reviews/<id>.json`.
-5. Removes the draft from `drafts/accepted/`.
+1. Checks that `task.json` has a non-empty title.
+2. If the id in `task.json` doesn't match the directory name, renames the id to the next free number.
+3. Runs `lint_draft` — refuses if any lint problem is found.
+4. Runs `verify` (starter must fail ≥ 1 test; solution must pass all). Refuses on failure.
+5. Copies the draft into `tasks/<id>/`.
+6. Moves `review.json` to `reviews/<id>.json`.
+7. Removes the draft from `drafts/accepted/`.
 
 ---
 
@@ -386,12 +392,25 @@ tasks/<id>/
 - Grading uses the temp-copy approach: copy task dir, overlay candidate files onto `starter/`, run pytest.
 - Candidate filenames are validated: path separators, `..`, and `conftest.py` are all rejected.
 
+### `lint-drafts`
+
+```bash
+gradepack lint-drafts
+```
+
+Read-only scan of every directory under `drafts/accepted/` and `drafts/too_easy/`. Prints `PASS` or the list of problems per draft. Same checks as the factory lint gate.
+
+---
+
 ### Factory flow
 
 ```
-gradepack factory --n N [--mock] [--probe-attempts K]
+gradepack factory --n N [--mock] [--probe-attempts K] [--resume]
     │
+    ├─ assign domain round-robin (14 domains)
     ├─ draft request  →  model  →  task.json + starter + grader + solution
+    ├─ lint gate (bug hints, private attrs, title, timing, prompt length, test count)
+    │     └─ REJECTED (lint) → stats: lint_rejected   + lesson → LESSONS.md
     ├─ auto-assign id (next free NNN- number, never collides with tasks/ or drafts/)
     ├─ verify locally (starter must fail, solution must pass)
     ├─ review request  →  model (fresh, no shared history)  →  verdict
@@ -401,11 +420,48 @@ gradepack factory --n N [--mock] [--probe-attempts K]
     │     ├─ all pass  → TOO EASY → drafts/too_easy/<id>/  + lesson → LESSONS.md
     │     └─ ≥1 fails  → DISCRIMINATING → drafts/accepted/<id>/
     │
-    └─ factory_stats.json updated after every draft
+    ├─ factory_stats.json updated after every draft
+    └─ drafts/_progress.json updated (--resume continues from here)
 
 gradepack promote <id>
     │
+    ├─ check title present
+    ├─ auto-rename id if mismatch → next free number
+    ├─ lint gate (refuses if problems found)
     ├─ verify (refuses if fails)
     ├─ move drafts/accepted/<id>/ → tasks/<id>/
     └─ move review.json → reviews/<id>.json
+```
+
+---
+
+## Quick demo
+
+Run all quality checks in one command:
+
+```bash
+cd gradepack
+bash scripts/check_all.sh
+```
+
+Offline smoke test — no API calls needed:
+
+```bash
+# 1. Validate all 37 tasks
+gradepack validate
+
+# 2. Verify one task end-to-end
+gradepack verify 001-pagination-off-by-one
+
+# 3. Score a mock bench run (uses solution files as the "model")
+gradepack bench --model mock-smoke --mock --mock-probe-fail
+
+# 4. Generate two discriminating draft tasks (offline)
+gradepack factory --n 2 --mock --mock-probe-fail
+
+# 5. Lint all accepted drafts
+gradepack lint-drafts
+
+# 6. Run full test suite
+python -m pytest tests/ -q --ignore=tests/test_clean_install.py
 ```

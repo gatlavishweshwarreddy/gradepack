@@ -1,12 +1,12 @@
 {
-  "drafted": 19,
+  "drafted": 27,
   "failed_draft_stage": 10,
-  "failed_verify": 6,
-  "judge_rejected": 1,
-  "judge_accepted": 2,
-  "probed": 2,
+  "failed_verify": 7,
+  "judge_rejected": 2,
+  "judge_accepted": 8,
+  "probed": 8,
   "too_easy": 1,
-  "discriminating": 1,
+  "discriminating": 7,
   "drafts": {
     "039-token-gated-orchestrator": {
       "classification": "discriminating",
@@ -25,6 +25,72 @@
         true
       ],
       "probe_solve_count": 3
+    },
+    "041-dag-throttled-executor": {
+      "classification": "discriminating",
+      "probe_results": [
+        false,
+        false,
+        false
+      ],
+      "probe_solve_count": 0,
+      "draft_retried": false
+    },
+    "042-rate-limited-workflow-engine": {
+      "classification": "discriminating",
+      "probe_results": [
+        false,
+        false,
+        false
+      ],
+      "probe_solve_count": 0,
+      "draft_retried": false
+    },
+    "043-priority-rate-scheduler": {
+      "classification": "discriminating",
+      "probe_results": [
+        false,
+        true,
+        false
+      ],
+      "probe_solve_count": 1,
+      "draft_retried": false
+    },
+    "044-deterministic-throttled-runner": {
+      "classification": "discriminating",
+      "probe_results": [
+        false,
+        true,
+        true
+      ],
+      "probe_solve_count": 2,
+      "draft_retried": false
+    },
+    "045-concurrent-rate-limited-scheduler": {
+      "classification": "discriminating",
+      "probe_results": [
+        false,
+        false,
+        false
+      ],
+      "probe_solve_count": 0,
+      "draft_retried": false
+    },
+    "047-deterministic-workflow-scheduler": {
+      "classification": "discriminating",
+      "probe_results": [
+        false,
+        false,
+        false
+      ],
+      "probe_solve_count": 0,
+      "draft_retried": false
     }
+  },
+  "draft_fail_reasons": {
+    "empty_content": 0,
+    "truncated_json": 0,
+    "invalid_json": 0,
+    "other": 0
   }
 }

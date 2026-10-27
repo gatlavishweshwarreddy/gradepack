@@ -1,0 +1,18 @@
+{
+  "id": "000-deterministic-workflow-scheduler",
+  "title": "Deterministic Resource-Aware Workflow Scheduler",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "Fix the buggy workflow scheduler in starter/scheduler.py so it satisfies its documented contract. The scheduler must handle dependencies, priorities, resource caps, concurrency limits, and cancellation with deterministic ordering. See the module and Scheduler docstrings for full semantics and the performance requirement for tick(). Do not change the public API.",
+  "grader": "grader/test_scheduler.py",
+  "version": "1.0.0",
+  "tags": [
+    "scheduling",
+    "state-machine",
+    "resource-management",
+    "concurrency",
+    "determinism"
+  ],
+  "estimated_minutes": 90,
+  "license": "MIT"
+}

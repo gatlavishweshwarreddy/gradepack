@@ -1,0 +1,15 @@
+{
+  "verdict": "accept",
+  "fair": true,
+  "fully_specified": true,
+  "issues": [],
+  "summary": "Task is well-specified via invariants in starter file, grader covers all invariants and performance requirement, and solution correctly fixes all intentional bugs.",
+  "date": "2026-10-27T15:45:40Z",
+  "task_id": "043-priority-rate-scheduler",
+  "probe_results": [
+    false,
+    true,
+    false
+  ],
+  "classification": "discriminating"
+}

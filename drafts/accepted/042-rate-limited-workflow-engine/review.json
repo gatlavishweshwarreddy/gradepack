@@ -1,0 +1,15 @@
+{
+  "verdict": "accept",
+  "fair": true,
+  "fully_specified": true,
+  "issues": [],
+  "summary": "Well-specified tick-based WorkflowEngine task; starter contains intentional bugs for all contract invariants and grader provides deterministic coverage of token-bucket capping, concurrency, DAG dependencies, FIFO ordering, cancellation, failure propagation, retries/backoff, timeouts, and O(E) performance via _check_count.",
+  "date": "2026-10-27T15:42:51Z",
+  "task_id": "042-rate-limited-workflow-engine",
+  "probe_results": [
+    false,
+    false,
+    false
+  ],
+  "classification": "discriminating"
+}

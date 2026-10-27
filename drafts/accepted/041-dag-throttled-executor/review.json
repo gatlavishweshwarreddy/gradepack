@@ -1,0 +1,15 @@
+{
+  "verdict": "accept",
+  "fair": true,
+  "fully_specified": true,
+  "issues": [],
+  "summary": "Task contract is fully defined in docstring, grader covers token bucket, concurrency, priority, dependency promotion, cancellation/failure cascades, cycle detection and performance, and reference solution passes all checks efficiently.",
+  "date": "2026-10-27T15:42:29Z",
+  "task_id": "041-dag-throttled-executor",
+  "probe_results": [
+    false,
+    false,
+    false
+  ],
+  "classification": "discriminating"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "000-dag-throttled-executor",
+  "title": "DAG Throttled Executor",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "Fix the DAGExecutor in executor.py to satisfy its intended contract. The executor manages dependency-aware scheduling under a token-bucket rate limiter (burst cap) and a max concurrency limit, advancing via tick(). Tasks have priorities and dependencies. Cancellation and failure must propagate correctly. Refer to the docstrings and code structure for the full contract. The implementation must also handle large graphs efficiently (avoid per-edge linear scans).",
+  "grader": "grader/test_executor.py",
+  "version": "1.0.0",
+  "tags": [
+    "scheduling",
+    "state-machine",
+    "rate-limiting",
+    "graph"
+  ],
+  "estimated_minutes": 60,
+  "license": "MIT"
+}

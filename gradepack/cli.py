@@ -7,6 +7,7 @@ Usage:
     python -m gradepack run <task-id> --candidate <dir>
     python -m gradepack bench --model <name> [--attempts N] [--parallel M] [--mock]
     python -m gradepack factory [--help]
+    python -m gradepack lint-drafts
     python -m gradepack promote <draft-id> [--help]
     python -m gradepack review <task-id> [--mock]
     python -m gradepack serve [--port N]
@@ -186,42 +187,70 @@ def cmd_promote(draft_id: str) -> None:
         sys.exit(1)
 
     task_id = meta.get("id", "")
+    # 1a. Title must be present
+    title = meta.get("title", "")
+    if not title or not title.strip():
+        print(f"FAIL: task.json has no title")
+        sys.exit(1)
+
     if task_id != draft_id:
-        print(f"FAIL: id in task.json ({task_id!r}) does not match directory name ({draft_id!r})")
-        sys.exit(1)
+        # Rename the id to the next free number and update task.json
+        files_for_renumber = {"task.json": task_json_path.read_text()}
+        for subdir in ("starter", "grader", "solution"):
+            d = draft_dir / subdir
+            if d.exists():
+                for f in d.iterdir():
+                    if f.is_file():
+                        files_for_renumber[f"{subdir}/{f.name}"] = f.read_text()
+        files_for_renumber, new_id = _factory._assign_id(files_for_renumber)
+        task_json_path.write_text(files_for_renumber["task.json"])
+        new_dir = draft_dir.parent / new_id
+        draft_dir.rename(new_dir)
+        draft_dir = new_dir
+        task_id = new_id
+        task_json_path = draft_dir / "task.json"
+        meta = json.loads(task_json_path.read_text())
+        print(f"INFO: id renamed to {task_id!r}")
 
-    # 2. Run verify on the draft
-    solution_dir = draft_dir / "solution"
-    if not solution_dir.exists():
-        print(f"FAIL: no solution/ directory found in draft {draft_id}")
-        sys.exit(1)
-
-    # Use _verify_draft_files to verify without touching tasks/
-    files = {}
-    files["task.json"] = task_json_path.read_text()
+    # 2. Run lint_draft first
+    lint_files: dict[str, str] = {}
+    lint_files["task.json"] = task_json_path.read_text()
     for subdir in ("starter", "grader", "solution"):
         d = draft_dir / subdir
         if d.exists():
             for f in d.iterdir():
                 if f.is_file():
-                    files[f"{subdir}/{f.name}"] = f.read_text()
+                    lint_files[f"{subdir}/{f.name}"] = f.read_text()
 
-    ok, reason = _factory._verify_draft_files(files, task_id)
+    lint_problems = _factory.lint_draft(lint_files)
+    if lint_problems:
+        print(f"FAIL: lint checks failed:")
+        for p in lint_problems:
+            print(f"  {p}")
+        sys.exit(1)
+
+    # 3. Run verify on the draft
+    solution_dir = draft_dir / "solution"
+    if not solution_dir.exists():
+        print(f"FAIL: no solution/ directory found in draft {task_id}")
+        sys.exit(1)
+
+    ok, reason = _factory._verify_draft_files(lint_files, task_id)
     if not ok:
         print(f"FAIL: verify failed — {reason}")
         sys.exit(1)
 
-    # 3. Check target directory does not already exist
+    # 4. Check target directory does not already exist
     dest = core.tasks_dir() / task_id
     if dest.exists():
         print(f"FAIL: tasks/{task_id} already exists; cannot overwrite")
         sys.exit(1)
 
-    # 4. Move draft into tasks/
+    # 5. Move draft into tasks/
     shutil.copytree(str(draft_dir), str(dest))
     shutil.rmtree(str(draft_dir), ignore_errors=True)
 
-    # 5. Move review.json to reviews/
+    # 6. Move review.json to reviews/
     reviews_dir = repo / "reviews"
     reviews_dir.mkdir(exist_ok=True)
     review_src = dest / "review.json"
@@ -315,6 +344,10 @@ def main(argv: list[str]) -> None:
         from gradepack import factory as _factory
         _factory.cmd_factory_argv(argv[1:])
 
+    elif command == "lint-drafts":
+        from gradepack import factory as _factory
+        _factory.cmd_lint_drafts()
+
     elif command == "promote":
         cmd_promote_argv(argv[1:])
 
@@ -361,6 +394,7 @@ def _usage() -> None:
         "  python -m gradepack run <task-id> --candidate <dir>\n"
         "  python -m gradepack bench --model <name> [--help]\n"
         "  python -m gradepack factory [--help]\n"
+        "  python -m gradepack lint-drafts\n"
         "  python -m gradepack promote <draft-id> [--help]\n"
         "  python -m gradepack review <task-id> [--mock]\n"
         "  python -m gradepack serve [--port N]\n"

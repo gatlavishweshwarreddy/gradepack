@@ -8,19 +8,22 @@ Usage (--help for full options):
 
 Pipeline per draft:
   1. Reads the last 10 lessons from LESSONS.md (including too-easy lessons).
-  2. Sends a drafting prompt to the model (one call per task idea).
+  2. Assigns a domain round-robin (14 domains) and sends a drafting prompt.
      - If finish_reason=="length" and content is empty/truncated, retries once
        with max_tokens doubled (cap 32768); records retried=true in stats.
   3. Extracts file blocks robustly: strips code fences, finds the largest
      top-level JSON object, falls back gracefully on truncated/invalid JSON.
-  4. Runs verify on the draft (each run uses its own unique temp directory).
-  5. Sends a separate review prompt to the model (fresh request, no shared history).
-  6. Records verdict + reason in drafts/<category>/<id>/review.json.
-  7. Probe stage: runs the model against the draft --probe-attempts times.
+  4. Runs lint_draft() — rejects drafts that leak bugs in comments/strings,
+     use time assertions, access private attributes, etc.
+  5. Runs verify on the draft (each run uses its own unique temp directory).
+  6. Sends a separate review prompt to the model (fresh request, no shared history).
+  7. Records verdict + reason in drafts/<category>/<id>/review.json.
+  8. Probe stage: runs the model against the draft --probe-attempts times.
      - All probes pass  → "too_easy" → saved under drafts/too_easy/  + lesson appended
      - ≥1 probe fails   → "discriminating" → saved under drafts/accepted/
      - Judge rejected   → saved under drafts/rejected/
-  8. Writes factory_stats.json after each draft.
+  9. Writes factory_stats.json after each draft.
+ 10. Writes drafts/_progress.json after each draft (--resume skips finished ids).
 
 Draft-stage failure reasons tracked in stats:
   empty_content   — finish_reason length, content empty even after retry
@@ -28,12 +31,21 @@ Draft-stage failure reasons tracked in stats:
   invalid_json    — task.json present but not valid JSON
   other           — any other draft-stage error
 
+Lint-stage failure reasons (lint_rejected stage):
+  private_attr    — grader accesses private attr not in prompt/starter docstrings
+  bug_comment     — starter contains revealing bug hints (BUG, FIXME, TODO fix, etc.)
+  short_title     — title missing or shorter than 8 characters
+  time_assertion  — grader uses time.time() / time.sleep() for assertions
+  prompt_too_long — prompt exceeds 1500 characters
+  few_tests       — fewer than 6 test functions in the grader
+
 Accepted (discriminating) drafts stay in drafts/accepted/ until promoted via:
     python -m gradepack promote <draft-id>
 
 Mock mode works fully offline. --parallel N drafts concurrently (default 2).
 """
 import argparse
+import ast
 import concurrent.futures
 import datetime
 import json
@@ -54,6 +66,9 @@ _REJECTED_DIR    = _DRAFTS_DIR / "rejected"
 _TOO_EASY_DIR    = _DRAFTS_DIR / "too_easy"
 _LESSONS_FILE    = _REPO / "LESSONS.md"
 _STATS_FILE      = _REPO / "factory_stats.json"
+# _PROGRESS_FILE is computed at call time so tests can patch _DRAFTS_DIR
+def _get_progress_file() -> pathlib.Path:
+    return _DRAFTS_DIR / "_progress.json"
 _DEFAULT_MODEL   = _api._DEFAULT_MODEL
 
 _DEFAULT_DRAFT_MAX_TOKENS = 24000
@@ -61,6 +76,222 @@ _DEFAULT_DRAFT_MAX_TOKENS = 24000
 # Protects the final save step (assign id + copytree + stats update)
 # so parallel workers don't race on numbering or stat writes.
 _SAVE_LOCK = _threading.Lock()
+
+# ---------------------------------------------------------------------------
+# Domain rotation — 14 domains, round-robin
+# ---------------------------------------------------------------------------
+
+_DOMAINS = [
+    "string processing",
+    "date and time arithmetic",
+    "data structures (trees, graphs)",
+    "file I/O and parsing",
+    "numerical algorithms",
+    "sorting and searching",
+    "state machines",
+    "caching and memoisation",
+    "serialisation / deserialisation",
+    "iterator and generator protocols",
+    "class invariants and object lifecycle",
+    "recursion and dynamic programming",
+    "concurrency primitives (locks, semaphores)",
+    "cryptographic utilities (hashing, encoding)",
+]
+
+_DOMAIN_COUNTER_LOCK = _threading.Lock()
+_domain_counter = 0   # module-level counter; protected by _DOMAIN_COUNTER_LOCK
+
+
+def _next_domain() -> str:
+    global _domain_counter
+    with _DOMAIN_COUNTER_LOCK:
+        domain = _DOMAINS[_domain_counter % len(_DOMAINS)]
+        _domain_counter += 1
+    return domain
+
+
+# ---------------------------------------------------------------------------
+# Lint gate — runs before verify, before judge
+# ---------------------------------------------------------------------------
+
+_BUG_HINT_PATTERN = re.compile(
+    r"\b(BUG|bug here|intentionally|FIXME|TODO fix|wrong|should be)\b",
+    re.IGNORECASE,
+)
+
+_FORBIDDEN_DOMAINS_IN_PROMPT = [
+    "rate limiter", "rate-limiter", "token bucket", "scheduler",
+    "workflow engine", "workflow-engine",
+]
+
+
+def _collect_docstring_names(source: str) -> set[str]:
+    """
+    Return all identifiers mentioned in any docstring in the source.
+    We tokenise words from docstrings so the grader can legitimately access
+    a private attr if it is documented in the starter.
+    """
+    names: set[str] = set()
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return names
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Module)):
+            docstring = ast.get_docstring(node)
+            if docstring:
+                for word in re.findall(r"[A-Za-z_]\w*", docstring):
+                    names.add(word)
+    return names
+
+
+def _grader_private_attrs(grader_source: str) -> set[str]:
+    """
+    Return all private (underscore-prefixed, non-dunder) attribute/method
+    names accessed in the grader source via attribute lookup.
+    """
+    attrs: set[str] = set()
+    try:
+        tree = ast.parse(grader_source)
+    except SyntaxError:
+        return attrs
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Attribute):
+            name = node.attr
+            if name.startswith("_") and not (name.startswith("__") and name.endswith("__")):
+                attrs.add(name)
+    return attrs
+
+
+def lint_draft(files: dict[str, str]) -> list[str]:
+    """
+    Lint a draft files dict.  Returns a list of problem strings.
+    Empty list means the draft passes all checks.
+
+    Checks (each with a short reason prefix for stats):
+    1. private_attr  — grader accesses private attr not in prompt/starter docstrings
+    2. bug_comment   — starter has revealing hints (BUG, bug here, intentionally, ...)
+    3. short_title   — task.json title missing or < 8 chars
+    4. time_assertion — grader uses time.time() / time.sleep() in assertions
+    5. prompt_too_long — prompt > 1500 chars
+    6. few_tests     — grader has < 6 test functions
+    """
+    problems: list[str] = []
+
+    # Parse task.json for metadata
+    meta: dict = {}
+    raw_task = files.get("task.json", "")
+    if raw_task:
+        parsed, _ = _extract_json_robust(raw_task)
+        if parsed:
+            meta = parsed
+
+    prompt: str = meta.get("prompt", "")
+    title: str = meta.get("title", "")
+
+    # ── 3. short_title ───────────────────────────────────────────────────────
+    if not title or len(title.strip()) < 8:
+        problems.append(
+            f"short_title: title is missing or shorter than 8 characters (got {len(title.strip())} chars)"
+        )
+
+    # ── 5. prompt_too_long ───────────────────────────────────────────────────
+    if len(prompt) > 1500:
+        problems.append(
+            f"prompt_too_long: prompt is {len(prompt)} chars (max 1500)"
+        )
+
+    # Collect starter sources and docstring-mentioned names
+    starter_sources: list[str] = []
+    for path, content in files.items():
+        if path.startswith("starter/") and path.endswith(".py"):
+            starter_sources.append(content)
+
+    # Names mentioned in prompt words + starter docstrings
+    allowed_private: set[str] = set()
+    for word in re.findall(r"[A-Za-z_]\w*", prompt):
+        if word.startswith("_") and not (word.startswith("__") and word.endswith("__")):
+            allowed_private.add(word)
+    for src in starter_sources:
+        allowed_private |= _collect_docstring_names(src)
+
+    # ── 2. bug_comment ───────────────────────────────────────────────────────
+    for path, content in files.items():
+        if path.startswith("starter/") and path.endswith(".py"):
+            if _BUG_HINT_PATTERN.search(content):
+                problems.append(
+                    f"bug_comment: starter file {path!r} contains a revealing hint "
+                    f"(BUG/bug here/intentionally/FIXME/TODO fix/wrong/should be)"
+                )
+                break  # one report per draft is enough
+
+    # Collect grader sources
+    grader_sources: dict[str, str] = {}
+    for path, content in files.items():
+        if path.startswith("grader/") and path.endswith(".py"):
+            grader_sources[path] = content
+
+    # ── 1. private_attr ──────────────────────────────────────────────────────
+    for gpath, gsrc in grader_sources.items():
+        private_attrs = _grader_private_attrs(gsrc)
+        leaking = private_attrs - allowed_private
+        if leaking:
+            problems.append(
+                f"private_attr: grader {gpath!r} accesses private attributes "
+                f"not in prompt/docstrings: {sorted(leaking)}"
+            )
+
+    # ── 4. time_assertion ────────────────────────────────────────────────────
+    for gpath, gsrc in grader_sources.items():
+        if re.search(r"\btime\.(time|sleep)\s*\(", gsrc):
+            problems.append(
+                f"time_assertion: grader {gpath!r} uses time.time() or time.sleep() "
+                f"which creates flaky timing-dependent assertions"
+            )
+            break
+
+    # ── 6. few_tests ─────────────────────────────────────────────────────────
+    test_count = 0
+    for gsrc in grader_sources.values():
+        try:
+            tree = ast.parse(gsrc)
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef) and node.name.startswith("test_"):
+                    test_count += 1
+        except SyntaxError:
+            pass
+    if test_count < 6:
+        problems.append(
+            f"few_tests: grader has only {test_count} test function(s), need ≥ 6"
+        )
+
+    return problems
+
+
+# ---------------------------------------------------------------------------
+# Lint reason taxonomy
+# ---------------------------------------------------------------------------
+
+_LINT_REASONS = ("private_attr", "bug_comment", "short_title",
+                 "time_assertion", "prompt_too_long", "few_tests")
+
+_LINT_LESSONS = {
+    "private_attr":    "Do not access private attributes of the object under test unless they are named in the prompt or starter docstrings",
+    "bug_comment":     "Never put BUG/FIXME/TODO fix/intentionally/wrong/should be comments or strings in the starter — they reveal the bug location",
+    "short_title":     "Task title must be at least 8 characters long",
+    "time_assertion":  "Do not use time.time() or time.sleep() in grader assertions — they are inherently flaky",
+    "prompt_too_long": "Keep the prompt under 1500 characters so the model must read the code rather than rewrite from spec",
+    "few_tests":       "Include at least 6 test functions in the grader for adequate coverage",
+}
+
+
+def _extract_lint_reason(problem: str) -> str:
+    """Extract the reason prefix from a lint problem string."""
+    for r in _LINT_REASONS:
+        if problem.startswith(r + ":"):
+            return r
+    return "other"
+
 
 # ---------------------------------------------------------------------------
 # Lessons
@@ -143,7 +374,8 @@ def _assign_id(files: dict[str, str]) -> tuple[dict[str, str], str]:
 _MOCK_TASK_SLUG = "example"
 
 
-def _mock_draft() -> dict:
+def _mock_draft(domain: str | None = None) -> dict:
+    used_domain = domain or "arithmetic"
     return {
         "task.json": json.dumps({
             "id": f"000-{_MOCK_TASK_SLUG}",   # will be renumbered by _assign_id
@@ -159,20 +391,21 @@ def _mock_draft() -> dict:
             ),
             "grader": "pytest",
             "version": "1.0",
-            "tags": ["arithmetic", "mock"],
+            "tags": [used_domain, "mock"],
             "estimated_minutes": 5,
             "license": "MIT",
         }, indent=2),
-        "starter/adder.py": "def add(a, b):\n    return a - b  # BUG\n",
+        "starter/adder.py": "def add(a, b):\n    return a - b\n",
         "grader/test_adder.py": (
-            "import os, sys, pytest\n"
+            "import os, sys\n"
             "sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'starter'))\n"
             "from adder import add\n\n"
-            "@pytest.mark.parametrize('a,b,expected', [\n"
-            "    (1, 2, 3), (0, 0, 0), (-1, 5, 4), (100, 200, 300), (-3, -7, -10)\n"
-            "])\n"
-            "def test_add(a, b, expected):\n"
-            "    assert add(a, b) == expected\n"
+            "def test_add_basic():\n    assert add(1, 2) == 3\n\n"
+            "def test_add_zeros():\n    assert add(0, 0) == 0\n\n"
+            "def test_add_negative():\n    assert add(-1, 5) == 4\n\n"
+            "def test_add_large():\n    assert add(100, 200) == 300\n\n"
+            "def test_add_both_negative():\n    assert add(-3, -7) == -10\n\n"
+            "def test_add_identity():\n    assert add(999, 1) == 1000\n"
         ),
         "solution/adder.py": "def add(a, b):\n    return a + b\n",
     }
@@ -204,6 +437,9 @@ Rules:
 - starter must fail ≥ 1 grader test, solution must pass ALL grader tests
 - no network calls, no external dependencies beyond Python stdlib + pytest
 - id must be a unique slug like "000-your-title" (the system will assign a real number)
+- the grader must include at least 6 test functions
+- do NOT add BUG, FIXME, TODO, or "intentionally wrong" comments to the starter
+- do NOT use time.time() or time.sleep() in the grader
 
 Guidance for making hard, discriminating tasks that a model cannot easily solve:
 - Do NOT enumerate the expected behaviour exhaustively in the prompt; keep the prompt
@@ -214,6 +450,7 @@ Guidance for making hard, discriminating tasks that a model cannot easily solve:
 - Use operation-count or asymptotic performance limits (the grader instruments calls)
 - Do NOT list every test case in the prompt — the model should not be able to rewrite
   from scratch using only the prompt
+- Do NOT add rate limiters, token buckets, schedulers, or workflow engines
 """
 
 _REVIEW_SYSTEM = """\
@@ -336,6 +573,7 @@ def _extract_task_json(files: dict[str, str]) -> tuple[dict | None, str]:
 
 def _model_draft(
     lessons: list[str],
+    domain: str | None = None,
     max_tokens: int = _DEFAULT_DRAFT_MAX_TOKENS,
 ) -> tuple[dict[str, str], bool, str]:
     """
@@ -346,8 +584,9 @@ def _model_draft(
       empty_content | truncated_json | invalid_json | other
     """
     lesson_text = "\n".join(f"- {l}" for l in lessons) if lessons else "(none yet)"
+    domain_line = f"\nUse the domain: **{domain}**." if domain else ""
     user = (
-        "Create a new hard Python debugging task.\n\n"
+        f"Create a new hard Python debugging task.{domain_line}\n\n"
         f"Lessons from previous drafts (avoid these mistakes):\n{lesson_text}"
     )
     try:
@@ -465,6 +704,9 @@ def _verify_draft_files(files: dict[str, str], task_id: str) -> tuple[bool, str]
         try:
             shutil.copytree(str(tmp_task), str(tmp2 / task_id))
             task_copy = tmp2 / task_id
+            # Remove stale __pycache__ so the solution .py files are compiled fresh
+            for pycache in (task_copy / "starter").rglob("__pycache__"):
+                shutil.rmtree(pycache, ignore_errors=True)
             for f in sol_dir.iterdir():
                 if f.is_file():
                     shutil.copy2(f, task_copy / "starter" / f.name)
@@ -601,6 +843,7 @@ def _load_stats() -> dict:
     base = {
         "drafted": 0,
         "failed_draft_stage": 0,
+        "lint_rejected": 0,
         "failed_verify": 0,
         "judge_rejected": 0,
         "judge_accepted": 0,
@@ -608,6 +851,7 @@ def _load_stats() -> dict:
         "too_easy": 0,
         "discriminating": 0,
         "draft_fail_reasons": {r: 0 for r in _DRAFT_FAIL_REASONS},
+        "lint_fail_reasons": {r: 0 for r in _LINT_REASONS},
         "drafts": {},
     }
     return base
@@ -617,6 +861,10 @@ def _ensure_draft_fail_reasons(stats: dict) -> None:
     """Back-fill draft_fail_reasons key on old stats files."""
     if "draft_fail_reasons" not in stats:
         stats["draft_fail_reasons"] = {r: 0 for r in _DRAFT_FAIL_REASONS}
+    if "lint_fail_reasons" not in stats:
+        stats["lint_fail_reasons"] = {r: 0 for r in _LINT_REASONS}
+    if "lint_rejected" not in stats:
+        stats["lint_rejected"] = 0
 
 
 def _save_stats(stats: dict) -> None:
@@ -625,12 +873,19 @@ def _save_stats(stats: dict) -> None:
 
 def _print_funnel(stats: dict) -> None:
     dfr = stats.get("draft_fail_reasons", {})
+    lfr = stats.get("lint_fail_reasons", {})
     print("\n── Factory funnel ──────────────────────────────")
     print(f"  drafted            : {stats['drafted']}")
     print(f"  failed draft stage : {stats['failed_draft_stage']}")
     if dfr:
         for reason in _DRAFT_FAIL_REASONS:
             count = dfr.get(reason, 0)
+            if count:
+                print(f"    {reason:<18s}: {count}")
+    print(f"  lint rejected      : {stats.get('lint_rejected', 0)}")
+    if lfr:
+        for reason in _LINT_REASONS:
+            count = lfr.get(reason, 0)
             if count:
                 print(f"    {reason:<18s}: {count}")
     print(f"  failed verify      : {stats['failed_verify']}")
@@ -643,6 +898,76 @@ def _print_funnel(stats: dict) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Progress file (resume support)
+# ---------------------------------------------------------------------------
+
+def _load_progress() -> dict:
+    """Load _progress.json; returns empty dict on failure."""
+    p = _get_progress_file()
+    if p.exists():
+        try:
+            return json.loads(p.read_text())
+        except Exception:
+            pass
+    return {"completed": [], "kept": 0}
+
+
+def _save_progress(progress: dict) -> None:
+    _DRAFTS_DIR.mkdir(parents=True, exist_ok=True)
+    _get_progress_file().write_text(json.dumps(progress, indent=2))
+
+
+# ---------------------------------------------------------------------------
+# Lint a draft already saved on disk (for lint-drafts command)
+# ---------------------------------------------------------------------------
+
+def lint_draft_dir(draft_dir: pathlib.Path) -> list[str]:
+    """
+    Read files from an on-disk draft directory and run lint_draft.
+    Returns list of problem strings.
+    """
+    files: dict[str, str] = {}
+    task_json_path = draft_dir / "task.json"
+    if task_json_path.exists():
+        files["task.json"] = task_json_path.read_text()
+    for subdir in ("starter", "grader", "solution"):
+        d = draft_dir / subdir
+        if d.is_dir():
+            for f in d.iterdir():
+                if f.is_file():
+                    files[f"{subdir}/{f.name}"] = f.read_text()
+    return lint_draft(files)
+
+
+def cmd_lint_drafts() -> None:
+    """
+    Lint every directory under drafts/accepted and drafts/too_easy.
+    Prints PASS or the list of problems per draft. Read-only.
+    """
+    checked = 0
+    failed = 0
+    for base in (_ACCEPTED_DIR, _TOO_EASY_DIR):
+        if not base.exists():
+            continue
+        for d in sorted(base.iterdir()):
+            if not d.is_dir():
+                continue
+            problems = lint_draft_dir(d)
+            if problems:
+                print(f"FAIL  {d.name}")
+                for p in problems:
+                    print(f"      {p}")
+                failed += 1
+            else:
+                print(f"PASS  {d.name}")
+            checked += 1
+    if checked == 0:
+        print("No drafts found in drafts/accepted/ or drafts/too_easy/")
+    else:
+        print(f"\n{checked} draft(s) checked, {failed} with problems.")
+
+
+# ---------------------------------------------------------------------------
 # Single draft pipeline
 # ---------------------------------------------------------------------------
 
@@ -652,16 +977,19 @@ def _run_factory_once(
     probe_attempts: int,
     mock_probe_fail: bool = False,
     draft_max_tokens: int = _DEFAULT_DRAFT_MAX_TOKENS,
+    domain: str | None = None,
 ) -> dict:
-    """Draft one task, verify, review, probe. Returns a result record."""
+    """Draft one task, lint, verify, review, probe. Returns a result record."""
 
     # 1. Draft ----------------------------------------------------------------
     retried_draft = False
     if mock:
-        files = _mock_draft()
+        files = _mock_draft(domain=domain)
         fail_reason = ""
     else:
-        files, retried_draft, fail_reason = _model_draft(lessons, max_tokens=draft_max_tokens)
+        files, retried_draft, fail_reason = _model_draft(
+            lessons, domain=domain, max_tokens=draft_max_tokens
+        )
 
     if fail_reason:
         with _SAVE_LOCK:
@@ -687,7 +1015,44 @@ def _run_factory_once(
             _save_stats(stats)
         return {"status": "error", "stage": "draft", "reason": "no file blocks in response"}
 
-    # 2. Verify — uses a unique temp dir internally; no shared name
+    # Embed domain into task.json tags if not already there
+    if domain:
+        try:
+            meta = json.loads(files.get("task.json", "{}"))
+            tags = meta.get("tags", [])
+            if domain not in tags:
+                tags = [domain] + [t for t in tags if t != domain]
+                meta["tags"] = tags
+            files["task.json"] = json.dumps(meta, indent=2)
+        except Exception:
+            pass
+
+    # 2. Lint gate ─────────────────────────────────────────────────────────────
+    lint_problems = lint_draft(files)
+    if lint_problems:
+        with _SAVE_LOCK:
+            stats = _load_stats()
+            _ensure_draft_fail_reasons(stats)
+            stats["drafted"] += 1
+            stats["lint_rejected"] += 1
+            lfr = stats.setdefault("lint_fail_reasons", {r: 0 for r in _LINT_REASONS})
+            seen_reasons: set[str] = set()
+            for prob in lint_problems:
+                r = _extract_lint_reason(prob)
+                lfr[r] = lfr.get(r, 0) + 1
+                if r not in seen_reasons:
+                    seen_reasons.add(r)
+                    lesson = _LINT_LESSONS.get(r, prob[:120])
+                    _append_lesson(lesson)
+            _save_stats(stats)
+        return {
+            "status": "rejected_lint",
+            "stage": "lint",
+            "problems": lint_problems,
+            "reason": "; ".join(lint_problems[:2]),
+        }
+
+    # 3. Verify — uses a unique temp dir internally; no shared name
     tmp_task_id = "000-tmp-verify"
     verify_ok, verify_reason = _verify_draft_files(files, tmp_task_id)
 
@@ -700,13 +1065,13 @@ def _run_factory_once(
             _save_stats(stats)
         return {"status": "rejected_verify", "task_id": tmp_task_id, "reason": verify_reason}
 
-    # 3. Staging: materialise + review + probe (all unlocked, run in parallel)
+    # 4. Staging: materialise + review + probe (all unlocked, run in parallel)
     staging_base = pathlib.Path(tempfile.mkdtemp())
     try:
         staging_dir = staging_base / "draft"
         _materialise_draft(files, staging_dir)
 
-        # 4. Review -----------------------------------------------------------
+        # 5. Review -----------------------------------------------------------
         if mock:
             review = {
                 "verdict": "accept",
@@ -721,9 +1086,11 @@ def _run_factory_once(
             except Exception as exc:
                 review = {"verdict": "reject", "issues": [str(exc)], "summary": str(exc)}
 
-        review["date"] = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+        review["date"] = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         if retried_draft:
             review["draft_retried"] = True
+        if domain:
+            review["domain"] = domain
 
         verdict = review.get("verdict", "reject")
 
@@ -744,6 +1111,8 @@ def _run_factory_once(
                 _ensure_draft_fail_reasons(stats)
                 stats["drafted"] += 1
                 stats["judge_rejected"] += 1
+                if domain:
+                    stats["drafts"][task_id] = {"domain": domain, "classification": "rejected"}
                 _save_stats(stats)
             return {
                 "status": "rejected_review",
@@ -758,7 +1127,7 @@ def _run_factory_once(
             files, probe_attempts, mock=mock, mock_probe_fail=mock_probe_fail
         )
 
-        # 5. Save result under the lock ---------------------------------------
+        # 6. Save result under the lock ---------------------------------------
         with _SAVE_LOCK:
             files, task_id = _assign_id(files)
             review["task_id"] = task_id
@@ -789,6 +1158,7 @@ def _run_factory_once(
                     "probe_results": probe_results,
                     "probe_solve_count": sum(probe_results),
                     "draft_retried": retried_draft,
+                    "domain": domain,
                 }
                 _save_stats(stats)
 
@@ -811,6 +1181,7 @@ def _run_factory_once(
                     "probe_results": probe_results,
                     "probe_solve_count": sum(probe_results),
                     "draft_retried": retried_draft,
+                    "domain": domain,
                 }
                 _save_stats(stats)
 
@@ -820,12 +1191,14 @@ def _run_factory_once(
                 "task_id": task_id,
                 "probe_results": probe_results,
                 "draft_dir": str(dest),
+                "domain": domain,
             }
         return {
             "status": "accepted",
             "task_id": task_id,
             "probe_results": probe_results,
             "draft_dir": str(dest),
+            "domain": domain,
         }
     finally:
         shutil.rmtree(str(staging_base), ignore_errors=True)
@@ -841,7 +1214,7 @@ def build_parser() -> argparse.ArgumentParser:
         description="Draft, verify, review, and probe new task candidates.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
-            "Draft pipeline: draft → verify → judge review → probe → accepted/too_easy/rejected\n"
+            "Draft pipeline: draft → lint → verify → judge review → probe → accepted/too_easy/rejected\n"
             "Accepted (discriminating) drafts go to drafts/accepted/.\n"
             "Promote with: python -m gradepack promote <draft-id>"
         ),
@@ -863,6 +1236,8 @@ def build_parser() -> argparse.ArgumentParser:
                    help="Use mock drafts (offline); mock probes always pass → too_easy")
     p.add_argument("--mock-probe-fail",  action="store_true",
                    help="Mock probes always fail → discriminating (for testing)")
+    p.add_argument("--resume",           action="store_true",
+                   help="Resume a stopped run using drafts/_progress.json")
     return p
 
 
@@ -886,6 +1261,7 @@ def cmd_factory_argv(argv: list[str]) -> None:
         draft_max_tokens=args.draft_max_tokens,
         mock=args.mock,
         mock_probe_fail=args.mock_probe_fail,
+        resume=args.resume,
     )
 
 
@@ -897,12 +1273,16 @@ def cmd_factory(
     draft_max_tokens: int = _DEFAULT_DRAFT_MAX_TOKENS,
     mock: bool = False,
     mock_probe_fail: bool = False,
+    resume: bool = False,
 ) -> None:
     for d in (_ACCEPTED_DIR, _REJECTED_DIR, _TOO_EASY_DIR):
         d.mkdir(parents=True, exist_ok=True)
 
     lessons = _load_last_lessons(10)
-    kept    = 0
+
+    # Resume: load progress and skip already-completed drafts
+    progress = _load_progress() if resume else {"completed": [], "kept": 0}
+    kept    = progress.get("kept", 0)
     drafted = 0
 
     print(
@@ -914,17 +1294,26 @@ def cmd_factory(
         print(f"  Stopping when {target_kept} discriminating draft(s) found")
     if lessons:
         print(f"  Using {len(lessons)} lesson(s) from LESSONS.md")
+    if resume and progress.get("completed"):
+        print(f"  Resuming: {len(progress['completed'])} draft(s) already completed, kept={kept}")
 
-    def _one_draft(_: int) -> dict:
+    # Domain counter: start after any already-completed drafts
+    global _domain_counter
+    with _DOMAIN_COUNTER_LOCK:
+        _domain_counter = len(progress.get("completed", []))
+
+    def _one_draft(draft_index: int) -> dict:
+        domain = _next_domain()
         return _run_factory_once(
             mock=mock,
             lessons=_load_last_lessons(10),
             probe_attempts=probe_attempts,
             mock_probe_fail=mock_probe_fail,
             draft_max_tokens=draft_max_tokens,
+            domain=domain,
         )
 
-    remaining = n
+    remaining = n - len(progress.get("completed", []))
     while remaining > 0:
         batch = min(remaining, parallel)
         with concurrent.futures.ThreadPoolExecutor(max_workers=batch) as pool:
@@ -947,6 +1336,7 @@ def cmd_factory(
                     print(
                         f"  DISCRIMINATING  {task_id}  "
                         f"probe_solved={solved}/{len(probes)}"
+                        + (f"  domain={result.get('domain','?')}" if result.get("domain") else "")
                     )
                     print(f"    Draft → {result['draft_dir']}")
                 elif status == "too_easy":
@@ -964,8 +1354,22 @@ def cmd_factory(
                 elif status == "rejected_verify":
                     print(f"  REJECTED (verify) {task_id}")
                     print(f"    Reason: {result['reason']}")
+                elif status == "rejected_lint":
+                    print(f"  REJECTED (lint)")
+                    for prob in result.get("problems", [])[:3]:
+                        print(f"    {prob}")
                 else:
                     print(f"  ERROR  stage={result.get('stage','?')}: {result.get('reason','?')}")
+
+                # Update progress after each draft
+                progress_entry = {
+                    "status": status,
+                    "task_id": task_id,
+                }
+                progress["completed"].append(progress_entry)
+                progress["kept"] = kept
+                with _SAVE_LOCK:
+                    _save_progress(progress)
 
                 if target_kept is not None and kept >= target_kept:
                     for f in futures:

@@ -1,0 +1,15 @@
+{
+  "verdict": "accept",
+  "fair": true,
+  "fully_specified": true,
+  "issues": [],
+  "summary": "Task has clear contract in docstrings, comprehensive deterministic grader covering ordering, resources, concurrency, dependencies, cancellation and performance, and solution correctly fixes all documented bugs with incremental heap tracking.",
+  "date": "2026-10-27T15:50:28Z",
+  "task_id": "047-deterministic-workflow-scheduler",
+  "probe_results": [
+    false,
+    false,
+    false
+  ],
+  "classification": "discriminating"
+}
