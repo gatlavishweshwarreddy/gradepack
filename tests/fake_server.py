@@ -123,6 +123,45 @@ class _Handler(http.server.BaseHTTPRequestHandler):
             self._respond_json(resp)
             return
 
+        # ── Agentic-specific modes ────────────────────────────────────────────
+
+        if mode == "agentic_length_then_ok":
+            # Turn 1 (call 1): length + empty content
+            # Turn 1 retry (call 2): normal answer
+            # Tests Fix 1 — intra-turn retry on length
+            count = server_state.setdefault("aglen_count", 0)
+            server_state["aglen_count"] = count + 1
+            if count == 0:
+                resp = _make_response(content="", finish_reason="length")
+            else:
+                resp = _make_response(
+                    f"paginate.py\n```python\n{_FIXED_PAGINATE}\n```"
+                )
+            self._respond_json(resp)
+            return
+
+        if mode == "agentic_invalid_then_ok":
+            # Call 1: garbled (no fenced block) — triggers format correction
+            # Call 2: normal answer after correction prompt
+            # Tests Fix 2 — format-correction turn
+            count = server_state.setdefault("aginv_count", 0)
+            server_state["aginv_count"] = count + 1
+            if count == 0:
+                resp = _make_response("Here is my answer: sorry I forgot the fences.")
+            else:
+                resp = _make_response(
+                    f"paginate.py\n```python\n{_FIXED_PAGINATE}\n```"
+                )
+            self._respond_json(resp)
+            return
+
+        if mode == "agentic_exhaust":
+            # Always garbled — all turns exhaust without solving
+            # Tests Fix 3 — exhaustion of all turns
+            resp = _make_response("I'm not sure how to format this, sorry.")
+            self._respond_json(resp)
+            return
+
         # default: normal
         resp = _make_response(f"paginate.py\n```python\n{_FIXED_PAGINATE}\n```")
         self._respond_json(resp)

@@ -237,3 +237,80 @@ def test_bench_record_has_run_id(tmp_path):
             assert "run_id" in rec, f"Missing run_id in record: {rec}"
     finally:
         results_file.unlink(missing_ok=True)
+
+
+# ---------------------------------------------------------------------------
+# Agentic: Fix 1 — length+empty within a turn retries and succeeds
+# ---------------------------------------------------------------------------
+
+def _run_agentic_task(server, model_mode, *, max_turns=3):
+    """Run _bench_task_agentic with env pointing at the fake server."""
+    with unittest.mock.patch.dict(os.environ, {
+        "BASE_URL": server.base_url,
+        "API_KEY":  "fake-key",
+        "MODEL":    model_mode,
+    }):
+        with unittest.mock.patch("gradepack.api.time.sleep"):
+            return _bench._bench_task_agentic(
+                TASK_001, 1,
+                mock=False, mock_agentic=False, mock_pass=True,
+                raw_output_dir=pathlib.Path(tempfile.mkdtemp()) / "raw",
+                provider="test", model_name=model_mode,
+                max_tokens=512, temperature=0.0,
+                max_turns=max_turns,
+            )
+
+
+def test_agentic_length_then_ok_retries_in_same_turn():
+    """Fix 1: length+empty on call 1, normal on retry call 2 — solved in turn 1."""
+    with FakeServer() as srv:
+        record = _run_agentic_task(srv, "agentic_length_then_ok")
+    assert record["score"] == 1.0, f"Expected score=1.0, got {record['score']}"
+    assert record["solved_at_turn"] == 1, (
+        f"Expected solved_at_turn=1 (intra-turn retry), got {record['solved_at_turn']}"
+    )
+    # The turn log should record retried=True for turn 1
+    turn1 = next((t for t in record.get("turn_log", []) if t["turn"] == 1), None)
+    assert turn1 is not None, "turn_log should have an entry for turn 1"
+    assert turn1.get("retried") is True, f"Expected retried=True in turn 1 log: {turn1}"
+
+
+# ---------------------------------------------------------------------------
+# Agentic: Fix 2 — invalid output triggers format-correction, next turn succeeds
+# ---------------------------------------------------------------------------
+
+def test_agentic_invalid_then_corrected():
+    """Fix 2: garbled call 1 sends correction prompt, call 2 produces valid answer."""
+    with FakeServer() as srv:
+        record = _run_agentic_task(srv, "agentic_invalid_then_ok", max_turns=3)
+    assert record["score"] == 1.0, (
+        f"Expected score=1.0 after correction, got {record['score']}; "
+        f"failure_reason={record['failure_reason']}"
+    )
+    # Should have used at most 2 turns (turn 1 = garbled, turn 2 = correct)
+    assert record["turns_used"] <= 2, (
+        f"Expected turns_used<=2, got {record['turns_used']}"
+    )
+    # The first turn log entry should show had_candidate=False
+    first = record.get("turn_log", [{}])[0]
+    assert first.get("had_candidate") is False, (
+        f"Turn 1 should have had_candidate=False: {first}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Agentic: Fix 3 — all turns exhausted → score 0, failure_reason set
+# ---------------------------------------------------------------------------
+
+def test_agentic_all_turns_exhausted():
+    """Fix 3: always garbled, all 3 turns exhausted, score=0."""
+    with FakeServer() as srv:
+        record = _run_agentic_task(srv, "agentic_exhaust", max_turns=3)
+    assert record["score"] == 0.0
+    assert record["turns_used"] == 3
+    assert record["solved_at_turn"] is None
+    # Every turn_log entry must have had_candidate=False
+    for entry in record.get("turn_log", []):
+        assert entry.get("had_candidate") is False, (
+            f"Expected all turns to have had_candidate=False: {entry}"
+        )

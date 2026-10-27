@@ -113,6 +113,19 @@ Pytest output (last 40 lines):
 {pytest_tail}
 """
 
+_FORMAT_CORRECTION_TEMPLATE = """\
+Your previous reply could not be parsed as a code submission. Reason: {reason}
+
+Reply with ONLY the corrected file(s) in this exact format — bare filename on \
+its own line, then a fenced Python block, one block per file:
+
+paginate.py
+```python
+<full corrected file content>
+```
+
+No other prose. Repeat the block for every file that needs changing."""
+
 
 def _build_feedback_prompt(result: dict, pytest_output: str) -> str:
     failures = result.get("failures", [])
@@ -121,6 +134,10 @@ def _build_feedback_prompt(result: dict, pytest_output: str) -> str:
         failing_tests="\n".join(f"  - {f}" for f in failures) or "  (none listed)",
         pytest_tail="\n".join(lines),
     )
+
+
+def _build_format_correction(reason: str) -> str:
+    return _FORMAT_CORRECTION_TEMPLATE.format(reason=reason)
 
 
 # ---------------------------------------------------------------------------
@@ -280,10 +297,19 @@ def _bench_task_agentic(
     max_turns: int,
 ) -> dict:
     """
-    Run a task agentically: up to max_turns turns, feeding back failing test
-    names + last 40 lines of pytest output after each failed turn.
+    Run a task agentically: up to max_turns turns.
 
-    --mock-agentic: turn 1 returns starter (fails), turn 2 returns solution (passes).
+    Each turn:
+      1. Get model response.
+         - Fix 1: if finish_reason=="length" and content empty, retry once
+           with max_tokens doubled (cap 32768); record retried=True for that turn.
+      2. Parse response into candidate files.
+         - Fix 2: if output is unparseable (normal finish), send a format-
+           correction message and continue to the next turn instead of giving up.
+      3. Run grader; if all pass → solved.  If some fail → send feedback prompt.
+
+    Per-turn metadata stored in turn_log.
+    --mock-agentic: turn 1 returns starter (fails), turn 2+ returns solution.
     """
     meta = core.load_task_json(task_id)
     prompt = meta.get("prompt", "")
@@ -298,16 +324,17 @@ def _bench_task_agentic(
 
     t0 = time.monotonic()
 
-    # Current candidate files start as None (no submission yet)
     candidate_files: dict[str, str] = {}
-    conversation: list[dict] = []  # [{"role": ..., "content": ...}]
+    conversation: list[dict] = []
     solved_at_turn: int | None = None
     turns_used = 0
     error_msg: str | None = None
     finish_reason: str = ""
     token_usage: dict | None = None
     raw_response: str = ""
-    result: dict = {"passed": 0, "failed": 0, "total": 0, "failures": [], "error": None, "_raw_output": ""}
+    result: dict = {"passed": 0, "failed": 0, "total": 0, "failures": [],
+                    "error": None, "_raw_output": ""}
+    turn_log: list[dict] = []  # per-turn metadata
 
     # Build initial user message
     initial_msg = _api.build_coding_prompt(prompt, starter_files)
@@ -315,16 +342,26 @@ def _bench_task_agentic(
 
     for turn in range(1, max_turns + 1):
         turns_used = turn
+        turn_retried = False
+        turn_finish_reason = ""
+        turn_had_candidate = False
 
-        # --- Get model response ---
+        # ── Get model response ────────────────────────────────────────────────
         if mock or mock_agentic:
             if mock_agentic:
-                # turn 1 fails (starter), turn 2+ succeeds (solution)
-                candidate_files = _mock_broken_files(task_id) if turn == 1 else _mock_fixed_files(task_id)
+                # turn 1: broken (fails grader); turn 2+: fixed (passes)
+                candidate_files = (
+                    _mock_broken_files(task_id) if turn == 1
+                    else _mock_fixed_files(task_id)
+                )
             else:
-                candidate_files = _mock_fixed_files(task_id) if mock_pass else _mock_broken_files(task_id)
+                candidate_files = (
+                    _mock_fixed_files(task_id) if mock_pass
+                    else _mock_broken_files(task_id)
+                )
             raw_response = f"[mock turn={turn}]"
             finish_reason = "stop"
+            turn_finish_reason = "stop"
         else:
             try:
                 resp_data = _api.chat(
@@ -336,8 +373,25 @@ def _bench_task_agentic(
                 )
                 raw_response  = _api.extract_content(resp_data)
                 finish_reason = _api.extract_finish_reason(resp_data)
+                turn_finish_reason = finish_reason
                 if turn == 1:
                     token_usage = _api.extract_usage(resp_data)
+
+                # Fix 1: retry within this turn if truncated
+                if finish_reason in ("length", "max_tokens") and not raw_response:
+                    doubled = min(max_tokens * 2, 32768)
+                    resp2  = _api.chat(
+                        _api._SYSTEM_CODING,
+                        conversation[-1]["content"],
+                        temperature=temperature,
+                        max_tokens=doubled,
+                        timeout=180,
+                    )
+                    raw_response  = _api.extract_content(resp2)
+                    finish_reason = _api.extract_finish_reason(resp2)
+                    turn_finish_reason = finish_reason
+                    turn_retried = True
+
                 if raw_response:
                     candidate_files = _api.parse_coding_response(raw_response, allowed)
                 conversation.append({"role": "assistant", "content": raw_response})
@@ -345,15 +399,44 @@ def _bench_task_agentic(
                 error_msg = str(exc)
                 break
 
-        # --- Save raw output ---
+        # ── Save raw output ───────────────────────────────────────────────────
         if raw_response:
             raw_output_dir.mkdir(parents=True, exist_ok=True)
             safe_id = task_id.replace("/", "_")
             raw_file = raw_output_dir / f"{safe_id}_attempt{attempt}_turn{turn}.txt"
             raw_file.write_text(raw_response)
 
-        # --- Run grader ---
+        # ── Check for unparseable output (Fix 2) ─────────────────────────────
+        if not candidate_files and not (mock or mock_agentic):
+            # Normal finish but no parseable files — send format correction
+            if turn_finish_reason not in ("length", "max_tokens") and turn < max_turns:
+                reason_str = (
+                    "no fenced code blocks with a filename label were found"
+                    if raw_response
+                    else "response was empty"
+                )
+                correction = _build_format_correction(reason_str)
+                conversation.append({"role": "user", "content": correction})
+                turn_log.append({
+                    "turn": turn, "finish_reason": turn_finish_reason,
+                    "retried": turn_retried, "had_candidate": False,
+                    "passed": 0, "failed": 0,
+                })
+                continue  # consume this turn for the correction prompt
+
+            # No turns remain or was a length truncation → break
+            turn_log.append({
+                "turn": turn, "finish_reason": turn_finish_reason,
+                "retried": turn_retried, "had_candidate": False,
+                "passed": 0, "failed": 0,
+            })
+            break
+
+        # ── Run grader ────────────────────────────────────────────────────────
         had_candidate = bool(candidate_files)
+        turn_had_candidate = had_candidate
+        rejection_msg: str | None = None
+
         tmp_task = core.make_temp_copy(task_id)
         tmp_parent = tmp_task.parent
         try:
@@ -361,11 +444,26 @@ def _bench_task_agentic(
                 try:
                     core.overlay_dict(candidate_files, tmp_task / "starter")
                 except core.CandidateError as exc:
-                    error_msg = str(exc)
+                    rejection_msg = str(exc)
                     had_candidate = False
             result = core.run_pytest(tmp_task / "grader")
         finally:
             shutil.rmtree(tmp_parent, ignore_errors=True)
+
+        turn_log.append({
+            "turn": turn,
+            "finish_reason": turn_finish_reason,
+            "retried": turn_retried,
+            "had_candidate": had_candidate,
+            "passed": result.get("passed", 0),
+            "failed": result.get("failed", 0),
+        })
+
+        # Fix 2 (continued): rejected files → send format correction
+        if not had_candidate and rejection_msg and turn < max_turns and not (mock or mock_agentic):
+            correction = _build_format_correction(rejection_msg)
+            conversation.append({"role": "user", "content": correction})
+            continue
 
         if not had_candidate:
             break
@@ -376,14 +474,14 @@ def _bench_task_agentic(
             solved_at_turn = turn
             break
 
-        # Failed — build feedback for next turn (if turns remain)
+        # Some tests failed — send feedback for next turn
         if turn < max_turns:
             feedback = _build_feedback_prompt(result, result.get("_raw_output", ""))
             conversation.append({"role": "user", "content": feedback})
 
     elapsed = round(time.monotonic() - t0, 2)
 
-    # Final scoring
+    # ── Final scoring ─────────────────────────────────────────────────────────
     had_candidate = bool(candidate_files) and not error_msg
     if not had_candidate or error_msg:
         score = 0.0
@@ -395,7 +493,8 @@ def _bench_task_agentic(
         failed = result["failed"]
         score  = round(passed / total, 4) if total else 0.0
 
-    reason = _categorise(result, error_msg, finish_reason, had_candidate)
+    reason = _categorise(result, error_msg, finish_reason,
+                         had_candidate and not error_msg)
 
     # Save raw path relative to repo root
     raw_path: str | None = None
@@ -427,6 +526,7 @@ def _bench_task_agentic(
         "turns_used":       turns_used,
         "solved_at_turn":   solved_at_turn,
         "max_turns":        max_turns,
+        "turn_log":         turn_log,
     }
     if token_usage:
         record["token_usage"] = token_usage
