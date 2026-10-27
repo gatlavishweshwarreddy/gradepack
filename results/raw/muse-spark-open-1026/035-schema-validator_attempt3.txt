@@ -1,0 +1,43 @@
+schema.py
+```python
+import copy
+
+
+class Schema:
+    def __init__(self):
+        self._definitions = {}
+        self._definition = {}
+
+    def load(self, definition):
+        """Store a schema definition dict."""
+        self._definition = definition
+
+    def define(self, name, sub_schema):
+        """Register a named sub-schema for $ref resolution."""
+        self._definitions[name] = sub_schema
+
+    def expand(self):
+        """
+        Resolve $ref references.
+        Returns a deep copy with references inlined without mutating
+        the original definition.
+        """
+        expanded = copy.deepcopy(self._definition)
+        self._resolve(expanded)
+        return expanded
+
+    def _resolve(self, node):
+        if isinstance(node, dict):
+            if "$ref" in node:
+                ref_name = node["$ref"]
+                if ref_name in self._definitions:
+                    # deepcopy to avoid sharing/mutating original definitions
+                    ref_copy = copy.deepcopy(self._definitions[ref_name])
+                    node.update(ref_copy)
+                    del node["$ref"]
+            for v in list(node.values()):
+                self._resolve(v)
+        elif isinstance(node, list):
+            for item in node:
+                self._resolve(item)
+```

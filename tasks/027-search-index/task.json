@@ -1,0 +1,12 @@
+{
+  "id": "027-search-index",
+  "title": "Search index returns correct results but is too slow on large inputs",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The package in starter/ implements a text search index. index.py provides SearchIndex with add(doc_id, text) which adds a document and build() which finalises the index. search(query) returns a list of doc_ids whose text contains the query term. The results are correct for small inputs, but the number of string comparisons performed during search grows quadratically with the number of documents. The grader instruments the index to count comparisons and asserts that searching N documents requires at most O(N) comparisons — specifically at most 2*N — not O(N^2). The grader also checks correctness for several query and document combinations. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": ["search", "performance", "data-structures"],
+  "estimated_minutes": 30,
+  "license": "MIT"
+}

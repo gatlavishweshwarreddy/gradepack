@@ -12,10 +12,7 @@ def memoize(fn):
         with lock:
             if args in cache:
                 return cache[args]
-        result = fn(*args)
-        with lock:
-            if args in cache:
-                return cache[args]
+            result = fn(*args)
             cache[args] = result
             return result
 

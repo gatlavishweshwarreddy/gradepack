@@ -1,6 +1,7 @@
 memo.py
 ```python
 import threading
+import functools
 
 
 def memoize(fn):
@@ -8,15 +9,20 @@ def memoize(fn):
     cache = {}
     lock = threading.Lock()
 
-    def wrapper(*args):
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        # Build a hashable cache key from args and kwargs
+        if kwargs:
+            # Use tuple of sorted items to make key deterministic and hashable
+            key = (args, tuple(sorted(kwargs.items())))
+        else:
+            key = args
+
         with lock:
-            if args in cache:
-                return cache[args]
-        result = fn(*args)
-        with lock:
-            if args in cache:
-                return cache[args]
-            cache[args] = result
+            if key in cache:
+                return cache[key]
+            result = fn(*args, **kwargs)
+            cache[key] = result
             return result
 
     return wrapper

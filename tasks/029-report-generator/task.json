@@ -1,0 +1,12 @@
+{
+  "id": "029-report-generator",
+  "title": "Sales report grand total is roughly double the expected value",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The package in starter/ is a multi-layer sales report generator. loader.py reads raw sales records (list of dicts with 'product', 'region', 'amount'). normaliser.py converts amounts from strings to floats and fills missing regions. aggregator.py provides group_by(records, key) which groups records by a field, and sum_field(group, field) which totals a numeric field within a group. formatter.py provides format_table(rows) which converts a list of dicts to a plain-text table. report.py provides generate(records) which produces a dict with 'by_region' and 'by_product' subtotals and a 'grand_total'. The grand_total is substantially larger than the sum of all amounts in the input records — for a dataset where the correct total is X, the reported grand_total is significantly higher. The grader feeds in seeded random sales records and asserts that grand_total equals the sum of all input amounts rounded to two decimal places. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": ["aggregation", "reporting", "multi-layer"],
+  "estimated_minutes": 35,
+  "license": "MIT"
+}

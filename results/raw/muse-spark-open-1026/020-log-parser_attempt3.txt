@@ -1,0 +1,23 @@
+stats.py
+```python
+import datetime
+
+
+def duration_seconds(entries):
+    """
+    Return elapsed seconds between first and last entry.
+    Returns 0 if fewer than 2 entries.
+    Handles logs that span midnight by adding 24h when the
+    last time is earlier than the first time.
+    """
+    if len(entries) < 2:
+        return 0
+    base = datetime.date(2000, 1, 1)
+    first = datetime.datetime.combine(base, entries[0].time)
+    last = datetime.datetime.combine(base, entries[-1].time)
+    delta = last - first
+    seconds = delta.total_seconds()
+    if seconds < 0:
+        seconds += 24 * 3600
+    return seconds
+```

@@ -1,0 +1,24 @@
+{
+  "id": "028-order-pipeline",
+  "title": "Order total is wrong for discounted orders above the bulk threshold",
+  "difficulty": "hard",
+  "language": "python",
+  "tags": [
+    "pipeline",
+    "arithmetic",
+    "two-bugs"
+  ],
+  "estimated_minutes": 30,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/028-order-pipeline.json",
+  "prompt": "The package in starter/ implements an order processing pipeline. order.py provides Order with add_item(name, price, qty) and Order.total(). pricer.py provides apply_bulk_discount(subtotal) which applies a 10% discount when subtotal >= 100.0, and 5% when subtotal >= 50.0. tax.py provides calculate_tax(amount) which returns amount * 0.08. pipeline.py provides process(order) which returns the final charged amount: subtotal \u2192 apply_bulk_discount \u2192 calculate_tax. The final amount is wrong for orders above $100: the discount tier selection is off by one boundary, AND the tax is applied to the undiscounted subtotal rather than the discounted total. Both bugs must be fixed for the grader to pass. The grader checks process() against a reference computation for orders at several price points. Do not edit the tests.",
+  "starter_files": {
+    "order.py": "class Order:\n    def __init__(self):\n        self._items = []\n\n    def add_item(self, name, price, qty):\n        self._items.append((name, price, qty))\n\n    def total(self):\n        return sum(p * q for _, p, q in self._items)\n",
+    "pipeline.py": "from order import Order\nfrom pricer import apply_bulk_discount\nfrom tax import calculate_tax\n\n\ndef process(order):\n    \"\"\"\n    BUG 2: tax applied to original subtotal, not discounted total.\n    \"\"\"\n    subtotal = order.total()\n    discounted = apply_bulk_discount(subtotal)\n    # BUG: should be calculate_tax(discounted), not calculate_tax(subtotal)\n    return round(discounted + calculate_tax(subtotal), 2)\n",
+    "pricer.py": "def apply_bulk_discount(subtotal):\n    \"\"\"\n    Apply bulk discount.\n    BUG: wrong tier boundaries \u2014 uses > instead of >=, so subtotal==100 only\n    gets 5% discount instead of 10%.\n    \"\"\"\n    if subtotal > 100.0:\n        return subtotal * 0.90\n    elif subtotal > 50.0:\n        return subtotal * 0.95\n    return subtotal\n",
+    "tax.py": "def calculate_tax(amount):\n    return round(amount * 0.08, 4)\n"
+  },
+  "grader_files": {
+    "test_order_pipeline.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom order import Order\nfrom pipeline import process\nimport pytest\n\n\ndef _ref_process(subtotal):\n    if subtotal >= 100.0:\n        disc = subtotal * 0.90\n    elif subtotal >= 50.0:\n        disc = subtotal * 0.95\n    else:\n        disc = subtotal\n    return round(disc * 1.08, 2)\n\n\n@pytest.mark.parametrize(\"subtotal,expected\", [\n    (40.0,  round(40.0 * 1.08, 2)),\n    (50.0,  round(50.0 * 0.95 * 1.08, 2)),\n    (75.0,  round(75.0 * 0.95 * 1.08, 2)),\n    (100.0, round(100.0 * 0.90 * 1.08, 2)),\n    (150.0, round(150.0 * 0.90 * 1.08, 2)),\n    (200.0, round(200.0 * 0.90 * 1.08, 2)),\n])\ndef test_process_matches_reference(subtotal, expected):\n    o = Order()\n    o.add_item(\"X\", subtotal, 1)\n    result = process(o)\n    assert result == expected, (\n        f\"subtotal={subtotal}: expected {expected}, got {result}\"\n    )\n\n\ndef test_no_discount_below_50():\n    o = Order()\n    o.add_item(\"A\", 10.0, 3)  # subtotal=30\n    assert process(o) == round(30.0 * 1.08, 2)\n\n\ndef test_multi_item_order():\n    o = Order()\n    o.add_item(\"A\", 60.0, 1)\n    o.add_item(\"B\", 50.0, 1)\n    result = process(o)\n    expected = _ref_process(110.0)\n    assert result == expected\n"
+  }
+}

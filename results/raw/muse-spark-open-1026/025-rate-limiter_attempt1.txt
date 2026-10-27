@@ -1,0 +1,43 @@
+limiter.py
+```python
+from store import RequestStore
+
+
+class RateLimiter:
+    def __init__(self, max_requests, window_seconds):
+        self._max = max_requests
+        self._window = window_seconds
+        self._store = RequestStore()
+
+    def allow(self, key, now):
+        """
+        Return True and record the request if the key has made fewer than
+        max_requests in the last window_seconds. Return False otherwise.
+        """
+        since = now - self._window
+        recent = self._store.get_since(key, since)
+        if len(recent) < self._max:
+            self._store.add(key, now)
+            return True
+        return False
+```
+
+store.py
+```python
+class RequestStore:
+    """Stores per-key request timestamps."""
+
+    def __init__(self):
+        self._data = {}
+
+    def add(self, key, timestamp):
+        self._data.setdefault(key, []).append(timestamp)
+
+    def get_since(self, key, since):
+        """Return timestamps for key that are >= since."""
+        return [t for t in self._data.get(key, []) if t >= since]
+
+    def prune(self, key, since):
+        """Remove timestamps older than since."""
+        self._data[key] = self.get_since(key, since)
+```

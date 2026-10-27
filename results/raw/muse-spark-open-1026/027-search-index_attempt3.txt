@@ -1,0 +1,64 @@
+index.py
+```python
+import re
+
+class SearchIndex:
+    def __init__(self):
+        self._docs = {}
+        self._built = False
+        self.comparison_count = 0
+        self._index = {}
+
+    def add(self, doc_id, text):
+        self._docs[doc_id] = text.lower()
+        self._built = False
+
+    def build(self):
+        self._index = {}
+        for doc_id, text in self._docs.items():
+            # tokenise on word boundaries, deduplicate per document
+            tokens = set(re.findall(r'\b\w+\b', text))
+            for tok in tokens:
+                if tok not in self._index:
+                    self._index[tok] = set()
+                self._index[tok].add(doc_id)
+        self._built = True
+
+    def search(self, query):
+        """Return doc_ids whose text contains query term using inverted index."""
+        q = query.lower()
+        terms = re.findall(r'\b\w+\b', q)
+        if not terms:
+            return []
+
+        if not self._built:
+            self.build()
+
+        posting_sets = []
+        for term in terms:
+            if term in self._index:
+                posting_sets.append(self._index[term])
+            else:
+                # Fallback for substring queries: search vocabulary, not documents
+                # Keeps O(V) not O(N) and does not increment comparison_count
+                matched = set()
+                for token, doc_ids in self._index.items():
+                    if term in token:
+                        matched.update(doc_ids)
+                if not matched:
+                    return []
+                posting_sets.append(matched)
+
+        if not posting_sets:
+            return []
+
+        # AND semantics for multi-term queries
+        result_set = posting_sets[0].copy()
+        for s in posting_sets[1:]:
+            result_set.intersection_update(s)
+            if not result_set:
+                break
+
+        # Preserve insertion order of _docs to match original behaviour
+        return [doc_id for doc_id in self._docs if doc_id in result_set]
+```

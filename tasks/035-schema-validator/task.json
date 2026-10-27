@@ -1,0 +1,12 @@
+{
+  "id": "035-schema-validator",
+  "title": "Schema validator modifies the schema dict when expanding nested definitions",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The package in starter/ implements a JSON schema validator. schema.py provides Schema with load(definition) which stores a schema definition, and expand() which resolves $ref references in nested schemas by inlining the referenced definition. validator.py provides validate(data, schema) which checks that a data dict matches the schema. The bug: expand() mutates the original definition dict in place when resolving $ref, so calling expand() twice on different data with the same base schema produces wrong results on the second call. The grader calls validate() with the same base schema for two different data dicts and asserts both give correct results. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": ["schema", "mutation", "deep-copy"],
+  "estimated_minutes": 30,
+  "license": "MIT"
+}

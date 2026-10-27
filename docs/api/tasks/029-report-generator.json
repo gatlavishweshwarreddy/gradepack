@@ -1,0 +1,25 @@
+{
+  "id": "029-report-generator",
+  "title": "Sales report grand total is roughly double the expected value",
+  "difficulty": "hard",
+  "language": "python",
+  "tags": [
+    "aggregation",
+    "reporting",
+    "multi-layer"
+  ],
+  "estimated_minutes": 35,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/029-report-generator.json",
+  "prompt": "The package in starter/ is a multi-layer sales report generator. loader.py reads raw sales records (list of dicts with 'product', 'region', 'amount'). normaliser.py converts amounts from strings to floats and fills missing regions. aggregator.py provides group_by(records, key) which groups records by a field, and sum_field(group, field) which totals a numeric field within a group. formatter.py provides format_table(rows) which converts a list of dicts to a plain-text table. report.py provides generate(records) which produces a dict with 'by_region' and 'by_product' subtotals and a 'grand_total'. The grand_total is substantially larger than the sum of all amounts in the input records \u2014 for a dataset where the correct total is X, the reported grand_total is significantly higher. The grader feeds in seeded random sales records and asserts that grand_total equals the sum of all input amounts rounded to two decimal places. Do not edit the tests.",
+  "starter_files": {
+    "aggregator.py": "def group_by(records, key):\n    \"\"\"Group records by field `key`. Returns dict: key_value -> list of records.\"\"\"\n    groups = {}\n    for r in records:\n        groups.setdefault(r[key], []).append(r)\n    return groups\n\n\ndef sum_field(group, field):\n    \"\"\"Sum a numeric field across records in a group.\"\"\"\n    return sum(r[field] for r in group)\n",
+    "formatter.py": "def format_table(rows):\n    \"\"\"Convert list of dicts to a plain-text table string.\"\"\"\n    if not rows:\n        return \"\"\n    headers = list(rows[0].keys())\n    lines = [\"\\t\".join(headers)]\n    for row in rows:\n        lines.append(\"\\t\".join(str(row.get(h, \"\")) for h in headers))\n    return \"\\n\".join(lines)\n",
+    "loader.py": "def load_records(data):\n    \"\"\"Accept a list of dicts with 'product', 'region', 'amount'.\"\"\"\n    return list(data)\n",
+    "normaliser.py": "def normalise(records):\n    \"\"\"Convert amount to float; fill missing region with 'unknown'.\"\"\"\n    result = []\n    for r in records:\n        result.append({\n            \"product\": r.get(\"product\", \"\"),\n            \"region\":  r.get(\"region\", \"unknown\"),\n            \"amount\":  float(r.get(\"amount\", 0)),\n        })\n    return result\n",
+    "report.py": "from loader import load_records\nfrom normaliser import normalise\nfrom aggregator import group_by, sum_field\n\n\ndef generate(raw_records):\n    records = normalise(load_records(raw_records))\n\n    by_region_groups  = group_by(records, \"region\")\n    by_product_groups = group_by(records, \"product\")\n\n    by_region  = {k: sum_field(v, \"amount\") for k, v in by_region_groups.items()}\n    by_product = {k: sum_field(v, \"amount\") for k, v in by_product_groups.items()}\n\n    # BUG: sums the product subtotals AND region subtotals (double counting)\n    grand_total = sum(by_region.values()) + sum(by_product.values())\n\n    return {\n        \"by_region\":   by_region,\n        \"by_product\":  by_product,\n        \"grand_total\": round(grand_total, 2),\n    }\n"
+  },
+  "grader_files": {
+    "test_report_generator.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom report import generate\nimport pytest\nimport random\n\n\ndef _make_records(n, seed):\n    rng = random.Random(seed)\n    regions = [\"north\", \"south\", \"east\", \"west\"]\n    products = [\"alpha\", \"beta\", \"gamma\"]\n    return [\n        {\n            \"product\": rng.choice(products),\n            \"region\":  rng.choice(regions),\n            \"amount\":  str(round(rng.uniform(1.0, 999.99), 2)),\n        }\n        for _ in range(n)\n    ]\n\n\ndef _expected_total(records):\n    return round(sum(float(r[\"amount\"]) for r in records), 2)\n\n\n@pytest.mark.parametrize(\"seed,n\", [(0, 10), (1, 20), (42, 50), (7, 5)])\ndef test_grand_total_matches_sum(seed, n):\n    records = _make_records(n, seed)\n    result = generate(records)\n    expected = _expected_total(records)\n    assert abs(result[\"grand_total\"] - expected) < 0.01, (\n        f\"seed={seed} n={n}: grand_total={result['grand_total']} expected={expected}\"\n    )\n\n\ndef test_by_region_keys_present():\n    records = _make_records(10, 99)\n    result = generate(records)\n    assert \"by_region\" in result\n    assert len(result[\"by_region\"]) > 0\n\n\ndef test_by_product_keys_present():\n    records = _make_records(10, 99)\n    result = generate(records)\n    assert \"by_product\" in result\n\n\ndef test_empty_input():\n    result = generate([])\n    assert result[\"grand_total\"] == 0.0\n"
+  }
+}

@@ -1,22 +1,29 @@
 ledger.py
 ```python
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 
 
 class Ledger:
     def __init__(self, initial_balance="0"):
         try:
-            self._balance = Decimal(initial_balance)
-        except (InvalidOperation, ValueError, TypeError):
+            if isinstance(initial_balance, float):
+                self._balance = Decimal(str(initial_balance))
+            else:
+                self._balance = Decimal(initial_balance)
+        except (InvalidOperation, ValueError, TypeError, AttributeError):
             raise ValueError(f"Invalid amount: {initial_balance!r}")
 
     def add(self, amount_str: str) -> None:
         try:
-            self._balance += Decimal(amount_str)
+            if isinstance(amount_str, float):
+                amount = Decimal(str(amount_str))
+            else:
+                amount = Decimal(amount_str)
         except (InvalidOperation, ValueError, TypeError, AttributeError):
             raise ValueError(f"Invalid amount: {amount_str!r}")
+        self._balance += amount
 
     def balance(self) -> str:
-        # quantize ensures exactly 2 decimal places and proper rounding
-        return format(self._balance.quantize(Decimal("0.00")), "f")
+        quantized = self._balance.quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
+        return format(quantized, "f")
 ```

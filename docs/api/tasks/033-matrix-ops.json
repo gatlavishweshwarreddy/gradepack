@@ -1,0 +1,22 @@
+{
+  "id": "033-matrix-ops",
+  "title": "Matrix multiplication silently truncates fractional values",
+  "difficulty": "hard",
+  "language": "python",
+  "tags": [
+    "matrix",
+    "dtype",
+    "precision"
+  ],
+  "estimated_minutes": 25,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/033-matrix-ops.json",
+  "prompt": "The package in starter/ implements basic matrix operations without NumPy. matrix.py provides Matrix(rows) where rows is a list of lists. It supports Matrix.__matmul__ (the @ operator) for matrix multiplication and Matrix.scale(factor). dtype.py provides coerce_element(v) which converts each element to an appropriate numeric type. The bug: when two integer matrices are multiplied and the result contains fractional intermediate values, coerce_element silently truncates to int, so Matrix([[1,2],[3,4]]) @ Matrix([[1,1],[1,2]]) returns wrong integer values instead of correct float results. The grader checks matrix multiplication results against a reference computation and verifies that fractional results are preserved. Do not edit the tests.",
+  "starter_files": {
+    "dtype.py": "def coerce_element(v):\n    \"\"\"\n    Convert v to an appropriate numeric type.\n    BUG: always converts to int, silently truncating fractional values.\n    \"\"\"\n    try:\n        return int(v)\n    except (TypeError, ValueError):\n        return float(v)\n",
+    "matrix.py": "from dtype import coerce_element\n\n\nclass Matrix:\n    def __init__(self, rows):\n        self.rows = [[coerce_element(v) for v in row] for row in rows]\n        self.nrows = len(rows)\n        self.ncols = len(rows[0]) if rows else 0\n\n    def __matmul__(self, other):\n        if self.ncols != other.nrows:\n            raise ValueError(\"incompatible shapes\")\n        result = []\n        for i in range(self.nrows):\n            row = []\n            for j in range(other.ncols):\n                s = sum(self.rows[i][k] * other.rows[k][j]\n                        for k in range(self.ncols))\n                row.append(coerce_element(s))\n            result.append(row)\n        return Matrix(result)\n\n    def scale(self, factor):\n        return Matrix([[coerce_element(v * factor) for v in row]\n                       for row in self.rows])\n\n    def __eq__(self, other):\n        return self.rows == other.rows\n\n    def __repr__(self):\n        return f\"Matrix({self.rows!r})\"\n"
+  },
+  "grader_files": {
+    "test_matrix_ops.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom matrix import Matrix\nimport pytest\nimport random\n\n\ndef _ref_matmul(a, b):\n    nr, nc, nk = len(a), len(b[0]), len(b)\n    return [[sum(a[i][k] * b[k][j] for k in range(nk)) for j in range(nc)]\n            for i in range(nr)]\n\n\ndef test_integer_matmul_exact():\n    a = Matrix([[1, 0], [0, 1]])\n    b = Matrix([[3, 4], [5, 6]])\n    result = (a @ b).rows\n    assert result == [[3, 4], [5, 6]]\n\n\ndef test_fractional_result_preserved():\n    a = Matrix([[1, 1], [1, 2]])\n    b = Matrix([[1, 1], [1, 1]])\n    result = (a @ b).rows\n    expected = _ref_matmul([[1, 1], [1, 2]], [[1, 1], [1, 1]])\n    assert result == expected\n\n\ndef test_scale_with_float_factor():\n    m = Matrix([[2, 4], [6, 8]])\n    scaled = m.scale(0.5).rows\n    assert scaled[0][0] == pytest.approx(1.0)\n    assert scaled[0][1] == pytest.approx(2.0)\n\n\ndef test_matmul_fractional_intermediate():\n    a = Matrix([[1, 2], [3, 4]])\n    b = Matrix([[1, 1], [1, 2]])\n    result = (a @ b).rows\n    expected = _ref_matmul([[1, 2], [3, 4]], [[1, 1], [1, 2]])\n    for i in range(2):\n        for j in range(2):\n            assert result[i][j] == pytest.approx(expected[i][j]), \\\n                f\"[{i}][{j}]: got {result[i][j]}, expected {expected[i][j]}\"\n\n\n@pytest.mark.parametrize(\"seed\", [0, 1, 7])\ndef test_random_float_matmul(seed):\n    rng = random.Random(seed)\n    a_data = [[rng.uniform(-5, 5) for _ in range(3)] for _ in range(3)]\n    b_data = [[rng.uniform(-5, 5) for _ in range(3)] for _ in range(3)]\n    a = Matrix(a_data)\n    b = Matrix(b_data)\n    result = (a @ b).rows\n    expected = _ref_matmul(a_data, b_data)\n    for i in range(3):\n        for j in range(3):\n            assert result[i][j] == pytest.approx(expected[i][j], rel=1e-5)\n"
+  }
+}

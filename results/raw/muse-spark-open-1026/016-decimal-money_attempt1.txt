@@ -1,11 +1,13 @@
 ledger.py
 ```python
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+
 
 class Ledger:
     def __init__(self, initial_balance="0"):
         try:
-            self._balance = Decimal(initial_balance)
+            # Use Decimal for exact decimal arithmetic; str() handles int/float/Decimal inputs safely
+            self._balance = Decimal(str(initial_balance))
         except (InvalidOperation, ValueError, TypeError, AttributeError):
             raise ValueError(f"Invalid amount: {initial_balance!r}")
 
@@ -16,7 +18,7 @@ class Ledger:
             raise ValueError(f"Invalid amount: {amount_str!r}")
 
     def balance(self) -> str:
-        # quantize to exactly 2 decimal places
-        quantized = self._balance.quantize(Decimal("0.00"))
+        # Quantize to two decimal places with financial rounding (half up)
+        quantized = self._balance.quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
         return format(quantized, "f")
 ```

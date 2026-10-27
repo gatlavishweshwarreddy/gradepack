@@ -26,3 +26,4 @@ results/raw/mock*/
 results/raw/smoke*/
 results/mock*.json
 results/smoke*.json
+results/history/

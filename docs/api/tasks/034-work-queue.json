@@ -1,0 +1,22 @@
+{
+  "id": "034-work-queue",
+  "title": "Work queue loses items when multiple workers consume concurrently",
+  "difficulty": "hard",
+  "language": "python",
+  "tags": [
+    "threading",
+    "queue",
+    "race-condition"
+  ],
+  "estimated_minutes": 30,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/034-work-queue.json",
+  "prompt": "The package in starter/ implements a thread-safe work queue. queue.py provides WorkQueue with put(item) and get() which returns the next item or None if empty, and a done() method. worker.py provides Worker(queue, results) which calls queue.get() in a loop and appends processed items to results. The grader tests that when N items are enqueued and K workers drain the queue concurrently, all N items appear in results (no items are lost or duplicated) using threading.Barrier to ensure all workers start simultaneously. With the current implementation some items are lost under concurrent access. Do not edit the tests.",
+  "starter_files": {
+    "worker.py": "class Worker:\n    def __init__(self, queue, results):\n        self._queue = queue\n        self._results = results\n\n    def run(self):\n        while not self._queue.is_done():\n            item = self._queue.get()\n            if item is not None:\n                self._results.append(item * 2)\n",
+    "workqueue.py": "import threading\n# workqueue.py (not queue.py \u2014 avoids shadowing stdlib queue)\n\n\nclass WorkQueue:\n    def __init__(self):\n        self._items = []\n        self._lock = threading.Lock()\n        self._done = False\n\n    def put(self, item):\n        with self._lock:\n            self._items.append(item)\n\n    def get(self):\n        with self._lock:\n            if self._items:\n                return self._items.pop(0)\n            return None\n\n    def done(self):\n        self._done = True\n\n    def is_done(self):\n        # BUG: returns True as soon as _done is set, even if _items is non-empty\n        # Workers stop consuming before the queue is drained.\n        return self._done\n"
+  },
+  "grader_files": {
+    "test_work_queue.py": "import os\nimport sys\nimport threading\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom workqueue import WorkQueue\nfrom worker import Worker\nimport pytest\n\n\ndef _run_concurrent(n_items, n_workers, seed=0):\n    import random\n    rng = random.Random(seed)\n    items = [rng.randint(1, 100) for _ in range(n_items)]\n    expected = sorted(x * 2 for x in items)\n\n    q = WorkQueue()\n    results = []\n    results_lock = threading.Lock()\n\n    barrier = threading.Barrier(n_workers)\n\n    def worker_func():\n        barrier.wait()\n        w = Worker(q, [])\n        w.run()\n        with results_lock:\n            results.extend(w._results)\n\n    for item in items:\n        q.put(item)\n    q.done()\n\n    threads = [threading.Thread(target=worker_func) for _ in range(n_workers)]\n    for t in threads:\n        t.start()\n    for t in threads:\n        t.join(timeout=5)\n\n    return sorted(results), expected\n\n\ndef test_single_worker_all_items():\n    got, expected = _run_concurrent(10, 1, seed=1)\n    assert got == expected\n\n\ndef test_two_workers_all_items():\n    got, expected = _run_concurrent(20, 2, seed=2)\n    assert got == expected, f\"Lost items: expected {len(expected)}, got {len(got)}\"\n\n\ndef test_four_workers_all_items():\n    got, expected = _run_concurrent(40, 4, seed=7)\n    assert got == expected, f\"Lost items: expected {len(expected)}, got {len(got)}\"\n\n\ndef test_no_duplicates():\n    got, expected = _run_concurrent(30, 3, seed=42)\n    assert len(got) == len(expected), (\n        f\"Count mismatch: expected {len(expected)}, got {len(got)}\"\n    )\n"
+  }
+}

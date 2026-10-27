@@ -188,3 +188,73 @@ Difficulty: hard
 Tags: http, retry, backoff
 Estimated minutes: 25
 Prompt: The package in starter/ implements an HTTP client with retry logic. client.py provides HttpClient(transport, max_retries, backoff_base) with get(url) which calls transport.request(url) and retries on transient failures. transport.py provides FakeTransport, a controllable test double that returns pre-configured responses. backoff.py provides wait_seconds(attempt, base) returning the backoff delay for a given attempt number. The client retries on some error status codes but not others that should also be retried, and the backoff delay for the second and subsequent retries is wrong — it does not grow exponentially from the base. The grader checks that the client retries on all required 5xx status codes, that the number of calls to transport matches expectations, and that wait_seconds returns the correct exponential series. Do not edit the tests.
+
+### 027-search-index
+Title: Search index returns correct results but is too slow on large inputs
+Difficulty: hard
+Tags: search, performance, data-structures
+Estimated minutes: 30
+Prompt: The package in starter/ implements a text search index. index.py provides SearchIndex with add(doc_id, text) which adds a document and build() which finalises the index. search(query) returns a list of doc_ids whose text contains the query term. The results are correct for small inputs, but the number of string comparisons performed during search grows quadratically with the number of documents. The grader instruments the index to count comparisons and asserts that searching N documents requires at most O(N) comparisons — specifically at most 2*N — not O(N^2). The grader also checks correctness for several query and document combinations. Do not edit the tests.
+
+### 028-order-pipeline
+Title: Order total is wrong for discounted orders above the bulk threshold
+Difficulty: hard
+Tags: pipeline, arithmetic, two-bugs
+Estimated minutes: 30
+Prompt: The package in starter/ implements an order processing pipeline. order.py provides Order with add_item(name, price, qty) and Order.total(). pricer.py provides apply_bulk_discount(subtotal) which applies a 10% discount when subtotal >= 100.0, and 5% when subtotal >= 50.0. tax.py provides calculate_tax(amount) which returns amount * 0.08. pipeline.py provides process(order) which returns the final charged amount: subtotal → apply_bulk_discount → calculate_tax. The final amount is wrong for orders above $100: the discount tier selection is off by one boundary, AND the tax is applied to the undiscounted subtotal rather than the discounted total. Both bugs must be fixed for the grader to pass. The grader checks process() against a reference computation for orders at several price points. Do not edit the tests.
+
+### 029-report-generator
+Title: Sales report grand total is roughly double the expected value
+Difficulty: hard
+Tags: aggregation, reporting, multi-layer
+Estimated minutes: 35
+Prompt: The package in starter/ is a multi-layer sales report generator. loader.py reads raw sales records (list of dicts with 'product', 'region', 'amount'). normaliser.py converts amounts from strings to floats and fills missing regions. aggregator.py provides group_by(records, key) which groups records by a field, and sum_field(group, field) which totals a numeric field within a group. formatter.py provides format_table(rows) which converts a list of dicts to a plain-text table. report.py provides generate(records) which produces a dict with 'by_region' and 'by_product' subtotals and a 'grand_total'. The grand_total is substantially larger than the sum of all amounts in the input records — for a dataset where the correct total is X, the reported grand_total is significantly higher. The grader feeds in seeded random sales records and asserts that grand_total equals the sum of all input amounts rounded to two decimal places. Do not edit the tests.
+
+### 030-expr-parser
+Title: Expression parser gives wrong result for mixed addition and multiplication
+Difficulty: hard
+Tags: parsing, precedence, backward-compat
+Estimated minutes: 35
+Prompt: The package in starter/ implements an arithmetic expression parser. tokenizer.py provides tokenize(expr) which splits a string like '3 + 4 * 2' into a list of tokens. parser.py provides parse(tokens) which builds an AST, and eval_ast(node) which evaluates it. The public API in expr.py provides evaluate(expr_str) (one argument) which must continue to work as before (backward compatibility). A new two-argument form evaluate(expr_str, variables) was added to support variable substitution. The expression evaluator gives the wrong result for expressions that mix addition and multiplication — it evaluates left to right without respecting operator precedence, so '3 + 4 * 2' returns 14 instead of 11. All existing single-argument calls must continue to return the same values they did before. The grader tests both the new two-argument form and old single-argument calls including regression tests. Do not edit the tests.
+
+### 031-graph-paths
+Title: Shortest path finder returns suboptimal distances for some graphs
+Difficulty: hard
+Tags: graph, dijkstra, shortest-path
+Estimated minutes: 30
+Prompt: The package in starter/ implements Dijkstra's algorithm for finding shortest paths. graph.py provides Graph with add_edge(u, v, weight) and shortest_path(source, target) returning the path cost as a float, or None if unreachable. heap.py provides a MinHeap used internally. The algorithm returns wrong distances for graphs where the shortest path requires relaxing an edge that was already settled (due to a wrong relaxation condition). For example in a graph A→B(10), A→C(1), C→B(2), shortest_path('A','B') should return 3.0 but may return 10.0. The grader tests several graph topologies including seeded random graphs verified against a reference BFS-based implementation. Do not edit the tests.
+
+### 032-pipeline-cache
+Title: Data pipeline cache returns stale results when input list is modified
+Difficulty: hard
+Tags: caching, mutable-key, pipeline
+Estimated minutes: 30
+Prompt: The package in starter/ implements a data processing pipeline with caching. transform.py provides Transform with apply(data) which processes a list and caches the result. cache.py provides ResultCache with get(key) and set(key, value). pipeline.py provides Pipeline(transforms) with run(data) which applies each transform in sequence, caching results per transform per input. The pipeline returns a cached result even when the input list has been modified since the cache entry was stored, because the cache key does not capture the full contents of the list. The grader calls run() twice with a list that is mutated between calls and asserts that both results match the independently computed reference output for each input. Do not edit the tests.
+
+### 033-matrix-ops
+Title: Matrix multiplication silently truncates fractional values
+Difficulty: hard
+Tags: matrix, dtype, precision
+Estimated minutes: 25
+Prompt: The package in starter/ implements basic matrix operations without NumPy. matrix.py provides Matrix(rows) where rows is a list of lists. It supports Matrix.__matmul__ (the @ operator) for matrix multiplication and Matrix.scale(factor). dtype.py provides coerce_element(v) which converts each element to an appropriate numeric type. The bug: when two integer matrices are multiplied and the result contains fractional intermediate values, coerce_element silently truncates to int, so Matrix([[1,2],[3,4]]) @ Matrix([[1,1],[1,2]]) returns wrong integer values instead of correct float results. The grader checks matrix multiplication results against a reference computation and verifies that fractional results are preserved. Do not edit the tests.
+
+### 034-work-queue
+Title: Work queue loses items when multiple workers consume concurrently
+Difficulty: hard
+Tags: threading, queue, race-condition
+Estimated minutes: 30
+Prompt: The package in starter/ implements a thread-safe work queue. queue.py provides WorkQueue with put(item) and get() which returns the next item or None if empty, and a done() method. worker.py provides Worker(queue, results) which calls queue.get() in a loop and appends processed items to results. The grader tests that when N items are enqueued and K workers drain the queue concurrently, all N items appear in results (no items are lost or duplicated) using threading.Barrier to ensure all workers start simultaneously. With the current implementation some items are lost under concurrent access. Do not edit the tests.
+
+### 035-schema-validator
+Title: Schema validator modifies the schema dict when expanding nested definitions
+Difficulty: hard
+Tags: schema, mutation, deep-copy
+Estimated minutes: 30
+Prompt: The package in starter/ implements a JSON schema validator. schema.py provides Schema with load(definition) which stores a schema definition, and expand() which resolves $ref references in nested schemas by inlining the referenced definition. validator.py provides validate(data, schema) which checks that a data dict matches the schema. The bug: expand() mutates the original definition dict in place when resolving $ref, so calling expand() twice on different data with the same base schema produces wrong results on the second call. The grader calls validate() with the same base schema for two different data dicts and asserts both give correct results. Do not edit the tests.
+
+### 036-event-sourcing
+Title: Event replay produces wrong final state when events are out of sequence
+Difficulty: hard
+Tags: event-sourcing, ordering, off-by-one
+Estimated minutes: 30
+Prompt: The package in starter/ implements an event sourcing system. event.py provides Event(sequence, type, payload). store.py provides EventStore with append(event) and replay(from_seq) which returns all events with sequence >= from_seq in order. projector.py provides Projector with apply(events) which folds a list of events into a state dict. The state is wrong when events are not appended in sequence order and replay is called with a non-zero from_seq — the projector processes events in insertion order rather than sequence order, and replay uses '> from_seq' instead of '>= from_seq' causing the boundary event to be skipped. The grader inserts events out of order and checks that replaying from various sequence numbers produces correct state. Do not edit the tests.

@@ -231,6 +231,11 @@ def main(argv: list[str]) -> None:
         mock = "--mock" in rest
         _demo.cmd_demo(task_id, mock=mock)
 
+    elif command == "doctor":
+        from gradepack import doctor as _doctor
+        dry_run_mode = "--dry-run" in argv[1:]
+        _doctor.cmd_doctor(dry_run=dry_run_mode)
+
     else:
         print(f"Unknown command: {command!r}")
         _usage()

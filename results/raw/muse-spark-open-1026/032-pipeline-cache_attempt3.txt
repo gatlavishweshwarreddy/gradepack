@@ -1,0 +1,35 @@
+pipeline.py
+```python
+from cache import ResultCache
+
+
+class Pipeline:
+    def __init__(self, transforms):
+        self._transforms = transforms
+        self._cache = ResultCache()
+
+    def _to_hashable(self, value):
+        # Recursively convert unhashable containers to hashable equivalents
+        # so the cache key captures the full contents of the list.
+        if isinstance(value, list):
+            return tuple(self._to_hashable(v) for v in value)
+        elif isinstance(value, tuple):
+            return tuple(self._to_hashable(v) for v in value)
+        elif isinstance(value, dict):
+            return tuple(sorted((self._to_hashable(k), self._to_hashable(v)) for k, v in value.items()))
+        elif isinstance(value, set):
+            return frozenset(self._to_hashable(v) for v in value)
+        else:
+            return value
+
+    def run(self, data):
+        result = data
+        for t in self._transforms:
+            key = (t.name, self._to_hashable(result))
+            if self._cache.has(key):
+                result = self._cache.get(key)
+            else:
+                result = t.apply(result)
+                self._cache.set(key, result)
+        return result
+```

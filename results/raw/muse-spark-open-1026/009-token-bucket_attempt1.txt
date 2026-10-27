@@ -10,6 +10,8 @@ class TokenBucket:
     def consume(self, n, now):
         if self._last is not None:
             elapsed = now - self._last
+            if elapsed < 0:
+                elapsed = 0
             self._tokens = min(self.capacity, self._tokens + elapsed * self.rate)
         self._last = now
         if self._tokens >= n:

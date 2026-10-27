@@ -361,5 +361,145 @@
     "estimated_minutes": 25,
     "version": "1.0",
     "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/026-retry-client.json"
+  },
+  {
+    "id": "027-search-index",
+    "title": "Search index returns correct results but is too slow on large inputs",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "search",
+      "performance",
+      "data-structures"
+    ],
+    "estimated_minutes": 30,
+    "version": "1.0",
+    "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/027-search-index.json"
+  },
+  {
+    "id": "028-order-pipeline",
+    "title": "Order total is wrong for discounted orders above the bulk threshold",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "pipeline",
+      "arithmetic",
+      "two-bugs"
+    ],
+    "estimated_minutes": 30,
+    "version": "1.0",
+    "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/028-order-pipeline.json"
+  },
+  {
+    "id": "029-report-generator",
+    "title": "Sales report grand total is roughly double the expected value",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "aggregation",
+      "reporting",
+      "multi-layer"
+    ],
+    "estimated_minutes": 35,
+    "version": "1.0",
+    "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/029-report-generator.json"
+  },
+  {
+    "id": "030-expr-parser",
+    "title": "Expression parser gives wrong result for mixed addition and multiplication",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "parsing",
+      "precedence",
+      "backward-compat"
+    ],
+    "estimated_minutes": 35,
+    "version": "1.0",
+    "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/030-expr-parser.json"
+  },
+  {
+    "id": "031-graph-paths",
+    "title": "Shortest path finder returns suboptimal distances for some graphs",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "graph",
+      "dijkstra",
+      "shortest-path"
+    ],
+    "estimated_minutes": 30,
+    "version": "1.0",
+    "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/031-graph-paths.json"
+  },
+  {
+    "id": "032-pipeline-cache",
+    "title": "Data pipeline cache returns stale results when input list is modified",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "caching",
+      "mutable-key",
+      "pipeline"
+    ],
+    "estimated_minutes": 30,
+    "version": "1.0",
+    "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/032-pipeline-cache.json"
+  },
+  {
+    "id": "033-matrix-ops",
+    "title": "Matrix multiplication silently truncates fractional values",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "matrix",
+      "dtype",
+      "precision"
+    ],
+    "estimated_minutes": 25,
+    "version": "1.0",
+    "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/033-matrix-ops.json"
+  },
+  {
+    "id": "034-work-queue",
+    "title": "Work queue loses items when multiple workers consume concurrently",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "threading",
+      "queue",
+      "race-condition"
+    ],
+    "estimated_minutes": 30,
+    "version": "1.0",
+    "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/034-work-queue.json"
+  },
+  {
+    "id": "035-schema-validator",
+    "title": "Schema validator modifies the schema dict when expanding nested definitions",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "schema",
+      "mutation",
+      "deep-copy"
+    ],
+    "estimated_minutes": 30,
+    "version": "1.0",
+    "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/035-schema-validator.json"
+  },
+  {
+    "id": "036-event-sourcing",
+    "title": "Event replay produces wrong final state when events are out of sequence",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "event-sourcing",
+      "ordering",
+      "off-by-one"
+    ],
+    "estimated_minutes": 30,
+    "version": "1.0",
+    "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/036-event-sourcing.json"
   }
 ]

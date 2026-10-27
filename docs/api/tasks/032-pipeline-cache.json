@@ -1,0 +1,23 @@
+{
+  "id": "032-pipeline-cache",
+  "title": "Data pipeline cache returns stale results when input list is modified",
+  "difficulty": "hard",
+  "language": "python",
+  "tags": [
+    "caching",
+    "mutable-key",
+    "pipeline"
+  ],
+  "estimated_minutes": 30,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/032-pipeline-cache.json",
+  "prompt": "The package in starter/ implements a data processing pipeline with caching. transform.py provides Transform with apply(data) which processes a list and caches the result. cache.py provides ResultCache with get(key) and set(key, value). pipeline.py provides Pipeline(transforms) with run(data) which applies each transform in sequence, caching results per transform per input. The pipeline returns a cached result even when the input list has been modified since the cache entry was stored, because the cache key does not capture the full contents of the list. The grader calls run() twice with a list that is mutated between calls and asserts that both results match the independently computed reference output for each input. Do not edit the tests.",
+  "starter_files": {
+    "cache.py": "class ResultCache:\n    def __init__(self):\n        self._store = {}\n\n    def get(self, key):\n        return self._store.get(key)\n\n    def set(self, key, value):\n        self._store[key] = value\n\n    def has(self, key):\n        return key in self._store\n",
+    "pipeline.py": "from cache import ResultCache\n\n\nclass Pipeline:\n    def __init__(self, transforms):\n        self._transforms = transforms\n        self._cache = ResultCache()\n\n    def run(self, data):\n        result = data\n        for t in self._transforms:\n            # BUG: cache key is `(t.name, id(data))` \u2014 id() is reused\n            # after the list is mutated, so a mutated list with the same\n            # id() as a previous list returns stale cached results.\n            key = (t.name, id(result))\n            if self._cache.has(key):\n                result = self._cache.get(key)\n            else:\n                result = t.apply(result)\n                self._cache.set(key, result)\n        return result\n",
+    "transform.py": "class Transform:\n    def __init__(self, fn, name):\n        self.fn = fn\n        self.name = name\n\n    def apply(self, data):\n        return self.fn(data)\n"
+  },
+  "grader_files": {
+    "test_pipeline_cache.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom pipeline import Pipeline\nfrom transform import Transform\nimport pytest\n\n\ndef _double(data):\n    return [x * 2 for x in data]\n\n\ndef _add_one(data):\n    return [x + 1 for x in data]\n\n\ndef test_pipeline_basic():\n    p = Pipeline([Transform(_double, \"double\")])\n    assert p.run([1, 2, 3]) == [2, 4, 6]\n\n\ndef test_pipeline_chain():\n    p = Pipeline([Transform(_double, \"double\"), Transform(_add_one, \"add_one\")])\n    assert p.run([1, 2, 3]) == [3, 5, 7]\n\n\ndef test_cache_invalidated_on_mutation():\n    p = Pipeline([Transform(_double, \"double\")])\n    data = [1, 2, 3]\n    r1 = p.run(data)\n    assert r1 == [2, 4, 6]\n    data[0] = 10\n    r2 = p.run(data)\n    assert r2 == [20, 4, 6], f\"Cache should be invalidated after mutation, got {r2}\"\n\n\ndef test_same_content_same_result():\n    p = Pipeline([Transform(_double, \"double\")])\n    assert p.run([5, 6]) == p.run([5, 6])\n\n\ndef test_different_inputs_different_results():\n    p = Pipeline([Transform(_double, \"double\")])\n    r1 = p.run([1, 2])\n    r2 = p.run([3, 4])\n    assert r1 == [2, 4]\n    assert r2 == [6, 8]\n"
+  }
+}

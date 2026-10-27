@@ -1,0 +1,23 @@
+{
+  "id": "030-expr-parser",
+  "title": "Expression parser gives wrong result for mixed addition and multiplication",
+  "difficulty": "hard",
+  "language": "python",
+  "tags": [
+    "parsing",
+    "precedence",
+    "backward-compat"
+  ],
+  "estimated_minutes": 35,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/030-expr-parser.json",
+  "prompt": "The package in starter/ implements an arithmetic expression parser. tokenizer.py provides tokenize(expr) which splits a string like '3 + 4 * 2' into a list of tokens. parser.py provides parse(tokens) which builds an AST, and eval_ast(node) which evaluates it. The public API in expr.py provides evaluate(expr_str) (one argument) which must continue to work as before (backward compatibility). A new two-argument form evaluate(expr_str, variables) was added to support variable substitution. The expression evaluator gives the wrong result for expressions that mix addition and multiplication \u2014 it evaluates left to right without respecting operator precedence, so '3 + 4 * 2' returns 14 instead of 11. All existing single-argument calls must continue to return the same values they did before. The grader tests both the new two-argument form and old single-argument calls including regression tests. Do not edit the tests.",
+  "starter_files": {
+    "expr.py": "from parser import parse_and_eval\n\n\ndef evaluate(expr_str, variables=None):\n    \"\"\"Evaluate an arithmetic expression string. variables is an optional dict.\"\"\"\n    return parse_and_eval(expr_str, variables or {})\n",
+    "parser.py": "from tokenizer import tokenize\n\n\ndef _parse_expr(tokens, pos, variables):\n    \"\"\"BUG: left-to-right evaluation, no operator precedence.\"\"\"\n    left, pos = _parse_atom(tokens, pos, variables)\n    while pos < len(tokens) and tokens[pos] in ('+', '-', '*', '/'):\n        op = tokens[pos]\n        pos += 1\n        right, pos = _parse_atom(tokens, pos, variables)\n        if op == '+': left = left + right\n        elif op == '-': left = left - right\n        elif op == '*': left = left * right\n        elif op == '/': left = left / right\n    return left, pos\n\n\ndef _parse_atom(tokens, pos, variables):\n    tok = tokens[pos]\n    if tok == '(':\n        val, pos = _parse_expr(tokens, pos + 1, variables)\n        pos += 1  # skip ')'\n        return val, pos\n    elif tok in variables:\n        return float(variables[tok]), pos + 1\n    else:\n        return float(tok), pos + 1\n\n\ndef parse_and_eval(expr_str, variables=None):\n    if variables is None:\n        variables = {}\n    tokens = tokenize(expr_str)\n    result, _ = _parse_expr(tokens, 0, variables)\n    return result\n",
+    "tokenizer.py": "def tokenize(expr):\n    \"\"\"Split expression into list of tokens (numbers, operators, parens).\"\"\"\n    import re\n    tokens = []\n    for m in re.finditer(r'\\d+\\.?\\d*|[+\\-*/()]|\\b[a-zA-Z_]\\w*\\b', expr):\n        tokens.append(m.group())\n    return tokens\n"
+  },
+  "grader_files": {
+    "test_expr_parser.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom expr import evaluate\nimport pytest\n\n\ndef test_addition():\n    assert evaluate(\"1 + 2\") == 3.0\n\n\ndef test_multiplication():\n    assert evaluate(\"3 * 4\") == 12.0\n\n\ndef test_precedence_mul_before_add():\n    assert evaluate(\"3 + 4 * 2\") == 11.0, \"multiplication must bind tighter than addition\"\n\n\ndef test_precedence_add_then_mul():\n    assert evaluate(\"2 * 3 + 4\") == 10.0\n\n\ndef test_mixed_precedence():\n    assert evaluate(\"1 + 2 * 3 + 4\") == 11.0\n\n\ndef test_parentheses_override_precedence():\n    assert evaluate(\"(3 + 4) * 2\") == 14.0\n\n\ndef test_variable_substitution():\n    assert evaluate(\"x * 2 + 1\", {\"x\": 5}) == 11.0\n\n\ndef test_variable_precedence():\n    assert evaluate(\"a + b * c\", {\"a\": 1, \"b\": 2, \"c\": 3}) == 7.0\n\n\ndef test_backward_compat_no_variables():\n    assert evaluate(\"10 - 3\") == 7.0\n    assert evaluate(\"8 / 4\") == 2.0\n\n\ndef test_regression_single_arg():\n    assert evaluate(\"5 + 5\") == 10.0\n    assert evaluate(\"2 * 2 * 2\") == 8.0\n"
+  }
+}

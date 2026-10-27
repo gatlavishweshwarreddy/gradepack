@@ -1,0 +1,12 @@
+{
+  "id": "033-matrix-ops",
+  "title": "Matrix multiplication silently truncates fractional values",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The package in starter/ implements basic matrix operations without NumPy. matrix.py provides Matrix(rows) where rows is a list of lists. It supports Matrix.__matmul__ (the @ operator) for matrix multiplication and Matrix.scale(factor). dtype.py provides coerce_element(v) which converts each element to an appropriate numeric type. The bug: when two integer matrices are multiplied and the result contains fractional intermediate values, coerce_element silently truncates to int, so Matrix([[1,2],[3,4]]) @ Matrix([[1,1],[1,2]]) returns wrong integer values instead of correct float results. The grader checks matrix multiplication results against a reference computation and verifies that fractional results are preserved. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": ["matrix", "dtype", "precision"],
+  "estimated_minutes": 25,
+  "license": "MIT"
+}

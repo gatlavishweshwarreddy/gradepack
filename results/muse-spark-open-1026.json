@@ -1,227 +1,10 @@
 [
   {
     "task_id": "001-pagination-off-by-one",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:24:01Z",
-    "passed": 7,
-    "failed": 0,
-    "total": 7,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 11.27,
-    "raw_output_path": "results/raw/muse-spark-open-1026/001-pagination-off-by-one_attempt1.txt",
-    "token_usage": {
-      "prompt_tokens": 404,
-      "completion_tokens": 3357,
-      "total_tokens": 3761,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 0
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 2418,
-        "audio_tokens": 0,
-        "reasoning_tokens": 3250,
-        "rejected_prediction_tokens": 4162
-      }
-    }
-  },
-  {
-    "task_id": "001-pagination-off-by-one",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:11Z",
-    "passed": 7,
-    "failed": 0,
-    "total": 7,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 3.67,
-    "raw_output_path": "results/raw/muse-spark-open-1026/001-pagination-off-by-one_attempt1.txt",
-    "token_usage": {
-      "prompt_tokens": 404,
-      "completion_tokens": 703,
-      "total_tokens": 1107,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 384
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 526,
-        "audio_tokens": 0,
-        "reasoning_tokens": 596,
-        "rejected_prediction_tokens": 727
-      }
-    }
-  },
-  {
-    "task_id": "001-pagination-off-by-one",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:14Z",
-    "passed": 7,
-    "failed": 0,
-    "total": 7,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 6.82,
-    "raw_output_path": "results/raw/muse-spark-open-1026/001-pagination-off-by-one_attempt2.txt",
-    "token_usage": {
-      "prompt_tokens": 404,
-      "completion_tokens": 1560,
-      "total_tokens": 1964,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 384
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 1170,
-        "audio_tokens": 0,
-        "reasoning_tokens": 1458,
-        "rejected_prediction_tokens": 1560
-      }
-    }
-  },
-  {
-    "task_id": "002-csv-parse-strip",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:16Z",
-    "passed": 5,
-    "failed": 0,
-    "total": 5,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 4.37,
-    "raw_output_path": "results/raw/muse-spark-open-1026/002-csv-parse-strip_attempt1.txt",
-    "token_usage": {
-      "prompt_tokens": 451,
-      "completion_tokens": 1026,
-      "total_tokens": 1477,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 128
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 777,
-        "audio_tokens": 0,
-        "reasoning_tokens": 897,
-        "rejected_prediction_tokens": 966
-      }
-    }
-  },
-  {
-    "task_id": "002-csv-parse-strip",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:21Z",
-    "passed": 5,
-    "failed": 0,
-    "total": 5,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 6.42,
-    "raw_output_path": "results/raw/muse-spark-open-1026/002-csv-parse-strip_attempt2.txt",
-    "token_usage": {
-      "prompt_tokens": 451,
-      "completion_tokens": 1521,
-      "total_tokens": 1972,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 384
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 1157,
-        "audio_tokens": 0,
-        "reasoning_tokens": 1410,
-        "rejected_prediction_tokens": 1405
-      }
-    }
-  },
-  {
-    "task_id": "002-csv-parse-strip",
     "attempt": 3,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:21Z",
-    "passed": 5,
-    "failed": 0,
-    "total": 5,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 5.29,
-    "raw_output_path": "results/raw/muse-spark-open-1026/002-csv-parse-strip_attempt3.txt",
-    "token_usage": {
-      "prompt_tokens": 451,
-      "completion_tokens": 1222,
-      "total_tokens": 1673,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 384
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 911,
-        "audio_tokens": 0,
-        "reasoning_tokens": 1093,
-        "rejected_prediction_tokens": 1266
-      }
-    }
-  },
-  {
-    "task_id": "003-date-diff",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:25Z",
-    "passed": 5,
-    "failed": 0,
-    "total": 5,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 4.13,
-    "raw_output_path": "results/raw/muse-spark-open-1026/003-date-diff_attempt1.txt",
-    "token_usage": {
-      "prompt_tokens": 474,
-      "completion_tokens": 863,
-      "total_tokens": 1337,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 128
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 639,
-        "audio_tokens": 0,
-        "reasoning_tokens": 784,
-        "rejected_prediction_tokens": 929
-      }
-    }
-  },
-  {
-    "task_id": "001-pagination-off-by-one",
-    "attempt": 3,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:25Z",
+    "date": "2026-10-27T12:48:49Z",
     "passed": 7,
     "failed": 0,
     "total": 7,
@@ -229,30 +12,63 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 17.83,
+    "elapsed_s": 6.61,
     "raw_output_path": "results/raw/muse-spark-open-1026/001-pagination-off-by-one_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 404,
-      "completion_tokens": 4117,
-      "total_tokens": 4521,
+      "completion_tokens": 1524,
+      "total_tokens": 1928,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 2989,
+        "accepted_prediction_tokens": 1143,
         "audio_tokens": 0,
-        "reasoning_tokens": 4010,
-        "rejected_prediction_tokens": 4907
+        "reasoning_tokens": 1417,
+        "rejected_prediction_tokens": 1538
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
-    "task_id": "003-date-diff",
+    "task_id": "001-pagination-off-by-one",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:27Z",
+    "date": "2026-10-27T12:48:49Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 7.14,
+    "raw_output_path": "results/raw/muse-spark-open-1026/001-pagination-off-by-one_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 1635,
+      "total_tokens": 2039,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1208,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1529,
+        "rejected_prediction_tokens": 1788
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "002-csv-parse-strip",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:48:54Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -260,30 +76,63 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 5.22,
-    "raw_output_path": "results/raw/muse-spark-open-1026/003-date-diff_attempt2.txt",
+    "elapsed_s": 4.7,
+    "raw_output_path": "results/raw/muse-spark-open-1026/002-csv-parse-strip_attempt2.txt",
     "token_usage": {
-      "prompt_tokens": 474,
-      "completion_tokens": 1250,
-      "total_tokens": 1724,
+      "prompt_tokens": 451,
+      "completion_tokens": 1113,
+      "total_tokens": 1564,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 909,
+        "accepted_prediction_tokens": 840,
         "audio_tokens": 0,
-        "reasoning_tokens": 1171,
-        "rejected_prediction_tokens": 1478
+        "reasoning_tokens": 1002,
+        "rejected_prediction_tokens": 1071
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "001-pagination-off-by-one",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:48:55Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 12.83,
+    "raw_output_path": "results/raw/muse-spark-open-1026/001-pagination-off-by-one_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 2834,
+      "total_tokens": 3238,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2017,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2739,
+        "rejected_prediction_tokens": 3702
+      }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "003-date-diff",
-    "attempt": 3,
+    "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:28Z",
+    "date": "2026-10-27T12:48:57Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -292,29 +141,30 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 2.17,
-    "raw_output_path": "results/raw/muse-spark-open-1026/003-date-diff_attempt3.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/003-date-diff_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 474,
-      "completion_tokens": 492,
-      "total_tokens": 966,
+      "completion_tokens": 480,
+      "total_tokens": 954,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 0
+        "cached_tokens": 384
       },
       "completion_tokens_details": {
         "accepted_prediction_tokens": 362,
         "audio_tokens": 0,
-        "reasoning_tokens": 413,
-        "rejected_prediction_tokens": 548
+        "reasoning_tokens": 401,
+        "rejected_prediction_tokens": 464
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
-    "task_id": "004-word-frequency",
-    "attempt": 1,
+    "task_id": "002-csv-parse-strip",
+    "attempt": 3,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:36Z",
+    "date": "2026-10-27T12:48:58Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -322,92 +172,159 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 10.59,
+    "elapsed_s": 3.93,
+    "raw_output_path": "results/raw/muse-spark-open-1026/002-csv-parse-strip_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 451,
+      "completion_tokens": 1006,
+      "total_tokens": 1457,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 768,
+        "audio_tokens": 0,
+        "reasoning_tokens": 895,
+        "rejected_prediction_tokens": 898
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "002-csv-parse-strip",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:48:58Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 9.46,
+    "raw_output_path": "results/raw/muse-spark-open-1026/002-csv-parse-strip_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 451,
+      "completion_tokens": 2333,
+      "total_tokens": 2784,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1722,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2213,
+        "rejected_prediction_tokens": 2562
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "003-date-diff",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:49:02Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 3.97,
+    "raw_output_path": "results/raw/muse-spark-open-1026/003-date-diff_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 474,
+      "completion_tokens": 935,
+      "total_tokens": 1409,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 709,
+        "audio_tokens": 0,
+        "reasoning_tokens": 856,
+        "rejected_prediction_tokens": 880
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "003-date-diff",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:49:04Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 5.04,
+    "raw_output_path": "results/raw/muse-spark-open-1026/003-date-diff_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 474,
+      "completion_tokens": 1363,
+      "total_tokens": 1837,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1010,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1284,
+        "rejected_prediction_tokens": 1475
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "004-word-frequency",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:49:11Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 12.01,
     "raw_output_path": "results/raw/muse-spark-open-1026/004-word-frequency_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 413,
-      "completion_tokens": 3077,
-      "total_tokens": 3490,
+      "completion_tokens": 2789,
+      "total_tokens": 3202,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 0
+        "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 2193,
+        "accepted_prediction_tokens": 1948,
         "audio_tokens": 0,
-        "reasoning_tokens": 2988,
-        "rejected_prediction_tokens": 3995
+        "reasoning_tokens": 2700,
+        "rejected_prediction_tokens": 3939
       }
-    }
-  },
-  {
-    "task_id": "005-lru-cache",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:38Z",
-    "passed": 5,
-    "failed": 0,
-    "total": 5,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 1.46,
-    "raw_output_path": "results/raw/muse-spark-open-1026/005-lru-cache_attempt1.txt",
-    "token_usage": {
-      "prompt_tokens": 510,
-      "completion_tokens": 313,
-      "total_tokens": 823,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 128
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 245,
-        "audio_tokens": 0,
-        "reasoning_tokens": 168,
-        "rejected_prediction_tokens": 231
-      }
-    }
-  },
-  {
-    "task_id": "004-word-frequency",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:38Z",
-    "passed": 5,
-    "failed": 0,
-    "total": 5,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 11.56,
-    "raw_output_path": "results/raw/muse-spark-open-1026/004-word-frequency_attempt2.txt",
-    "token_usage": {
-      "prompt_tokens": 413,
-      "completion_tokens": 3308,
-      "total_tokens": 3721,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 0
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 2334,
-        "audio_tokens": 0,
-        "reasoning_tokens": 3219,
-        "rejected_prediction_tokens": 4484
-      }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "004-word-frequency",
     "attempt": 3,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:40Z",
+    "date": "2026-10-27T12:49:12Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -415,61 +332,31 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 11.84,
+    "elapsed_s": 8.04,
     "raw_output_path": "results/raw/muse-spark-open-1026/004-word-frequency_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 413,
-      "completion_tokens": 3490,
-      "total_tokens": 3903,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 0
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 2477,
-        "audio_tokens": 0,
-        "reasoning_tokens": 3374,
-        "rejected_prediction_tokens": 4614
-      }
-    }
-  },
-  {
-    "task_id": "005-lru-cache",
-    "attempt": 3,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:41Z",
-    "passed": 5,
-    "failed": 0,
-    "total": 5,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 2.83,
-    "raw_output_path": "results/raw/muse-spark-open-1026/005-lru-cache_attempt3.txt",
-    "token_usage": {
-      "prompt_tokens": 510,
-      "completion_tokens": 647,
-      "total_tokens": 1157,
+      "completion_tokens": 2210,
+      "total_tokens": 2623,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 489,
+        "accepted_prediction_tokens": 1569,
         "audio_tokens": 0,
-        "reasoning_tokens": 502,
-        "rejected_prediction_tokens": 617
+        "reasoning_tokens": 2094,
+        "rejected_prediction_tokens": 2918
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
-    "task_id": "006-stack-with-min",
+    "task_id": "005-lru-cache",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:42Z",
+    "date": "2026-10-27T12:49:14Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -477,30 +364,63 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 2.12,
-    "raw_output_path": "results/raw/muse-spark-open-1026/006-stack-with-min_attempt1.txt",
+    "elapsed_s": 3.26,
+    "raw_output_path": "results/raw/muse-spark-open-1026/005-lru-cache_attempt1.txt",
     "token_usage": {
-      "prompt_tokens": 453,
-      "completion_tokens": 437,
-      "total_tokens": 890,
+      "prompt_tokens": 510,
+      "completion_tokens": 811,
+      "total_tokens": 1321,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 128
+        "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 329,
+        "accepted_prediction_tokens": 617,
         "audio_tokens": 0,
-        "reasoning_tokens": 301,
-        "rejected_prediction_tokens": 434
+        "reasoning_tokens": 666,
+        "rejected_prediction_tokens": 741
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "004-word-frequency",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:49:14Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 12.75,
+    "raw_output_path": "results/raw/muse-spark-open-1026/004-word-frequency_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 413,
+      "completion_tokens": 3180,
+      "total_tokens": 3593,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2240,
+        "audio_tokens": 0,
+        "reasoning_tokens": 3091,
+        "rejected_prediction_tokens": 4340
+      }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "005-lru-cache",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:42Z",
+    "date": "2026-10-27T12:49:15Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -508,30 +428,31 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 4.1,
+    "elapsed_s": 2.52,
     "raw_output_path": "results/raw/muse-spark-open-1026/005-lru-cache_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 510,
-      "completion_tokens": 944,
-      "total_tokens": 1454,
+      "completion_tokens": 656,
+      "total_tokens": 1166,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 685,
+        "accepted_prediction_tokens": 518,
         "audio_tokens": 0,
-        "reasoning_tokens": 799,
-        "rejected_prediction_tokens": 1128
+        "reasoning_tokens": 511,
+        "rejected_prediction_tokens": 448
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
-    "task_id": "006-stack-with-min",
-    "attempt": 2,
+    "task_id": "005-lru-cache",
+    "attempt": 3,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:44Z",
+    "date": "2026-10-27T12:49:17Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -539,61 +460,95 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 2.53,
+    "elapsed_s": 2.78,
+    "raw_output_path": "results/raw/muse-spark-open-1026/005-lru-cache_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 510,
+      "completion_tokens": 774,
+      "total_tokens": 1284,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 597,
+        "audio_tokens": 0,
+        "reasoning_tokens": 629,
+        "rejected_prediction_tokens": 642
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "006-stack-with-min",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:49:19Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 4.06,
+    "raw_output_path": "results/raw/muse-spark-open-1026/006-stack-with-min_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 453,
+      "completion_tokens": 864,
+      "total_tokens": 1317,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 651,
+        "audio_tokens": 0,
+        "reasoning_tokens": 728,
+        "rejected_prediction_tokens": 847
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "006-stack-with-min",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:49:19Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 4.07,
     "raw_output_path": "results/raw/muse-spark-open-1026/006-stack-with-min_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 453,
-      "completion_tokens": 545,
-      "total_tokens": 998,
+      "completion_tokens": 862,
+      "total_tokens": 1315,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 413,
+        "accepted_prediction_tokens": 639,
         "audio_tokens": 0,
-        "reasoning_tokens": 409,
-        "rejected_prediction_tokens": 518
+        "reasoning_tokens": 726,
+        "rejected_prediction_tokens": 929
       }
-    }
-  },
-  {
-    "task_id": "007-slug-generator",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:45Z",
-    "passed": 6,
-    "failed": 0,
-    "total": 6,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 3.09,
-    "raw_output_path": "results/raw/muse-spark-open-1026/007-slug-generator_attempt1.txt",
-    "token_usage": {
-      "prompt_tokens": 467,
-      "completion_tokens": 812,
-      "total_tokens": 1279,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 128
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 616,
-        "audio_tokens": 0,
-        "reasoning_tokens": 692,
-        "rejected_prediction_tokens": 756
-      }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "006-stack-with-min",
     "attempt": 3,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:46Z",
+    "date": "2026-10-27T12:49:20Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -601,61 +556,31 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 3.42,
+    "elapsed_s": 2.95,
     "raw_output_path": "results/raw/muse-spark-open-1026/006-stack-with-min_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 453,
-      "completion_tokens": 849,
-      "total_tokens": 1302,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 384
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 644,
-        "audio_tokens": 0,
-        "reasoning_tokens": 713,
-        "rejected_prediction_tokens": 798
-      }
-    }
-  },
-  {
-    "task_id": "008-run-length-encoding",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:47Z",
-    "passed": 8,
-    "failed": 0,
-    "total": 8,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 1.49,
-    "raw_output_path": "results/raw/muse-spark-open-1026/008-run-length-encoding_attempt1.txt",
-    "token_usage": {
-      "prompt_tokens": 465,
-      "completion_tokens": 328,
-      "total_tokens": 793,
+      "completion_tokens": 781,
+      "total_tokens": 1234,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 128
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 256,
+        "accepted_prediction_tokens": 592,
         "audio_tokens": 0,
-        "reasoning_tokens": 173,
-        "rejected_prediction_tokens": 241
+        "reasoning_tokens": 645,
+        "rejected_prediction_tokens": 738
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "007-slug-generator",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:49Z",
+    "date": "2026-10-27T12:49:22Z",
     "passed": 6,
     "failed": 0,
     "total": 6,
@@ -663,30 +588,31 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 4.38,
+    "elapsed_s": 3.15,
     "raw_output_path": "results/raw/muse-spark-open-1026/007-slug-generator_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 467,
-      "completion_tokens": 1203,
-      "total_tokens": 1670,
+      "completion_tokens": 638,
+      "total_tokens": 1105,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 927,
+        "accepted_prediction_tokens": 482,
         "audio_tokens": 0,
-        "reasoning_tokens": 1085,
-        "rejected_prediction_tokens": 1005
+        "reasoning_tokens": 508,
+        "rejected_prediction_tokens": 617
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "008-run-length-encoding",
-    "attempt": 2,
+    "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:49Z",
+    "date": "2026-10-27T12:49:24Z",
     "passed": 8,
     "failed": 0,
     "total": 8,
@@ -694,30 +620,31 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 1.6,
-    "raw_output_path": "results/raw/muse-spark-open-1026/008-run-length-encoding_attempt2.txt",
+    "elapsed_s": 1.62,
+    "raw_output_path": "results/raw/muse-spark-open-1026/008-run-length-encoding_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 465,
-      "completion_tokens": 419,
-      "total_tokens": 884,
+      "completion_tokens": 357,
+      "total_tokens": 822,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 338,
+        "accepted_prediction_tokens": 279,
         "audio_tokens": 0,
-        "reasoning_tokens": 269,
-        "rejected_prediction_tokens": 229
+        "reasoning_tokens": 213,
+        "rejected_prediction_tokens": 267
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "007-slug-generator",
     "attempt": 3,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:49Z",
+    "date": "2026-10-27T12:49:26Z",
     "passed": 6,
     "failed": 0,
     "total": 6,
@@ -725,30 +652,95 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 3.87,
+    "elapsed_s": 5.07,
     "raw_output_path": "results/raw/muse-spark-open-1026/007-slug-generator_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 467,
-      "completion_tokens": 976,
-      "total_tokens": 1443,
+      "completion_tokens": 1141,
+      "total_tokens": 1608,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 730,
+        "accepted_prediction_tokens": 845,
         "audio_tokens": 0,
-        "reasoning_tokens": 854,
-        "rejected_prediction_tokens": 992
+        "reasoning_tokens": 999,
+        "rejected_prediction_tokens": 1227
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "008-run-length-encoding",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:49:26Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 1.88,
+    "raw_output_path": "results/raw/muse-spark-open-1026/008-run-length-encoding_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 465,
+      "completion_tokens": 470,
+      "total_tokens": 935,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 373,
+        "audio_tokens": 0,
+        "reasoning_tokens": 320,
+        "rejected_prediction_tokens": 313
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "007-slug-generator",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:49:26Z",
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 7.33,
+    "raw_output_path": "results/raw/muse-spark-open-1026/007-slug-generator_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 467,
+      "completion_tokens": 1775,
+      "total_tokens": 2242,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1294,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1653,
+        "rejected_prediction_tokens": 2073
+      }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "008-run-length-encoding",
     "attempt": 3,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:26:52Z",
+    "date": "2026-10-27T12:49:28Z",
     "passed": 8,
     "failed": 0,
     "total": 8,
@@ -756,92 +748,31 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 2.7,
+    "elapsed_s": 1.64,
     "raw_output_path": "results/raw/muse-spark-open-1026/008-run-length-encoding_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 465,
-      "completion_tokens": 801,
-      "total_tokens": 1266,
+      "completion_tokens": 354,
+      "total_tokens": 819,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 128
+        "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 619,
+        "accepted_prediction_tokens": 279,
         "audio_tokens": 0,
-        "reasoning_tokens": 646,
-        "rejected_prediction_tokens": 648
+        "reasoning_tokens": 204,
+        "rejected_prediction_tokens": 246
       }
-    }
-  },
-  {
-    "task_id": "009-token-bucket",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:02Z",
-    "passed": 5,
-    "failed": 0,
-    "total": 5,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 12.29,
-    "raw_output_path": "results/raw/muse-spark-open-1026/009-token-bucket_attempt1.txt",
-    "token_usage": {
-      "prompt_tokens": 538,
-      "completion_tokens": 3069,
-      "total_tokens": 3607,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 128
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 2284,
-        "audio_tokens": 0,
-        "reasoning_tokens": 2936,
-        "rejected_prediction_tokens": 3211
-      }
-    }
-  },
-  {
-    "task_id": "010-json-flattener",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:05Z",
-    "passed": 7,
-    "failed": 0,
-    "total": 7,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 2.66,
-    "raw_output_path": "results/raw/muse-spark-open-1026/010-json-flattener_attempt1.txt",
-    "token_usage": {
-      "prompt_tokens": 481,
-      "completion_tokens": 733,
-      "total_tokens": 1214,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 0
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 556,
-        "audio_tokens": 0,
-        "reasoning_tokens": 624,
-        "rejected_prediction_tokens": 683
-      }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "009-token-bucket",
     "attempt": 3,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:05Z",
+    "date": "2026-10-27T12:49:39Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -849,30 +780,95 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 13.19,
+    "elapsed_s": 11.53,
     "raw_output_path": "results/raw/muse-spark-open-1026/009-token-bucket_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 538,
-      "completion_tokens": 3018,
-      "total_tokens": 3556,
+      "completion_tokens": 2660,
+      "total_tokens": 3198,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 512
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 2153,
+        "accepted_prediction_tokens": 1922,
         "audio_tokens": 0,
-        "reasoning_tokens": 2884,
-        "rejected_prediction_tokens": 3895
+        "reasoning_tokens": 2520,
+        "rejected_prediction_tokens": 3244
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "009-token-bucket",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:49:41Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 14.37,
+    "raw_output_path": "results/raw/muse-spark-open-1026/009-token-bucket_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 538,
+      "completion_tokens": 3322,
+      "total_tokens": 3860,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2421,
+        "audio_tokens": 0,
+        "reasoning_tokens": 3175,
+        "rejected_prediction_tokens": 3893
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "010-json-flattener",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:49:42Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.65,
+    "raw_output_path": "results/raw/muse-spark-open-1026/010-json-flattener_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 481,
+      "completion_tokens": 616,
+      "total_tokens": 1097,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 463,
+        "audio_tokens": 0,
+        "reasoning_tokens": 504,
+        "rejected_prediction_tokens": 615
+      }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "010-json-flattener",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:07Z",
+    "date": "2026-10-27T12:49:43Z",
     "passed": 7,
     "failed": 0,
     "total": 7,
@@ -880,30 +876,31 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 1.81,
+    "elapsed_s": 2.42,
     "raw_output_path": "results/raw/muse-spark-open-1026/010-json-flattener_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 481,
-      "completion_tokens": 419,
-      "total_tokens": 900,
+      "completion_tokens": 552,
+      "total_tokens": 1033,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 324,
+        "accepted_prediction_tokens": 428,
         "audio_tokens": 0,
-        "reasoning_tokens": 307,
-        "rejected_prediction_tokens": 341
+        "reasoning_tokens": 442,
+        "rejected_prediction_tokens": 440
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "010-json-flattener",
     "attempt": 3,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:08Z",
+    "date": "2026-10-27T12:49:44Z",
     "passed": 7,
     "failed": 0,
     "total": 7,
@@ -911,30 +908,31 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 2.59,
+    "elapsed_s": 2.04,
     "raw_output_path": "results/raw/muse-spark-open-1026/010-json-flattener_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 481,
-      "completion_tokens": 714,
-      "total_tokens": 1195,
+      "completion_tokens": 347,
+      "total_tokens": 828,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 0
+        "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 546,
+        "accepted_prediction_tokens": 264,
         "audio_tokens": 0,
-        "reasoning_tokens": 603,
-        "rejected_prediction_tokens": 630
+        "reasoning_tokens": 238,
+        "rejected_prediction_tokens": 324
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "009-token-bucket",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:10Z",
+    "date": "2026-10-27T12:49:46Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -942,30 +940,31 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 20.04,
+    "elapsed_s": 19.76,
     "raw_output_path": "results/raw/muse-spark-open-1026/009-token-bucket_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 538,
-      "completion_tokens": 5250,
-      "total_tokens": 5788,
+      "completion_tokens": 4904,
+      "total_tokens": 5442,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 512
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 3805,
+        "accepted_prediction_tokens": 3482,
         "audio_tokens": 0,
-        "reasoning_tokens": 5109,
-        "rejected_prediction_tokens": 6310
+        "reasoning_tokens": 4766,
+        "rejected_prediction_tokens": 6472
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "011-iso-week",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:10Z",
+    "date": "2026-10-27T12:49:48Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -973,30 +972,31 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 3.62,
+    "elapsed_s": 4.15,
     "raw_output_path": "results/raw/muse-spark-open-1026/011-iso-week_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 484,
-      "completion_tokens": 924,
-      "total_tokens": 1408,
+      "completion_tokens": 994,
+      "total_tokens": 1478,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 128
+        "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 662,
+        "accepted_prediction_tokens": 761,
         "audio_tokens": 0,
-        "reasoning_tokens": 846,
-        "rejected_prediction_tokens": 1179
+        "reasoning_tokens": 924,
+        "rejected_prediction_tokens": 870
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "011-iso-week",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:11Z",
+    "date": "2026-10-27T12:49:49Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -1004,30 +1004,31 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 2.85,
+    "elapsed_s": 4.57,
     "raw_output_path": "results/raw/muse-spark-open-1026/011-iso-week_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 484,
-      "completion_tokens": 513,
-      "total_tokens": 997,
+      "completion_tokens": 1207,
+      "total_tokens": 1691,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 0
+        "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 384,
+        "accepted_prediction_tokens": 905,
         "audio_tokens": 0,
-        "reasoning_tokens": 443,
-        "rejected_prediction_tokens": 519
+        "reasoning_tokens": 1129,
+        "rejected_prediction_tokens": 1209
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "011-iso-week",
     "attempt": 3,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:12Z",
+    "date": "2026-10-27T12:49:51Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -1035,30 +1036,31 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 2.05,
+    "elapsed_s": 4.44,
     "raw_output_path": "results/raw/muse-spark-open-1026/011-iso-week_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 484,
-      "completion_tokens": 458,
-      "total_tokens": 942,
+      "completion_tokens": 1075,
+      "total_tokens": 1559,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 338,
+        "accepted_prediction_tokens": 776,
         "audio_tokens": 0,
-        "reasoning_tokens": 380,
-        "rejected_prediction_tokens": 502
+        "reasoning_tokens": 997,
+        "rejected_prediction_tokens": 1324
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "012-retry-decorator",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:16Z",
+    "date": "2026-10-27T12:49:54Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -1066,61 +1068,31 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 5.46,
+    "elapsed_s": 6.23,
     "raw_output_path": "results/raw/muse-spark-open-1026/012-retry-decorator_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 506,
-      "completion_tokens": 1246,
-      "total_tokens": 1752,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 128
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 921,
-        "audio_tokens": 0,
-        "reasoning_tokens": 1129,
-        "rejected_prediction_tokens": 1354
-      }
-    }
-  },
-  {
-    "task_id": "012-retry-decorator",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:17Z",
-    "passed": 5,
-    "failed": 0,
-    "total": 5,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 5.41,
-    "raw_output_path": "results/raw/muse-spark-open-1026/012-retry-decorator_attempt2.txt",
-    "token_usage": {
-      "prompt_tokens": 506,
-      "completion_tokens": 1268,
-      "total_tokens": 1774,
+      "completion_tokens": 1431,
+      "total_tokens": 1937,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 943,
+        "accepted_prediction_tokens": 1042,
         "audio_tokens": 0,
-        "reasoning_tokens": 1151,
-        "rejected_prediction_tokens": 1332
+        "reasoning_tokens": 1314,
+        "rejected_prediction_tokens": 1688
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "012-retry-decorator",
     "attempt": 3,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:17Z",
+    "date": "2026-10-27T12:49:54Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -1128,61 +1100,63 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 5.38,
+    "elapsed_s": 3.16,
     "raw_output_path": "results/raw/muse-spark-open-1026/012-retry-decorator_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 506,
-      "completion_tokens": 1362,
-      "total_tokens": 1868,
+      "completion_tokens": 620,
+      "total_tokens": 1126,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 1020,
+        "accepted_prediction_tokens": 457,
         "audio_tokens": 0,
-        "reasoning_tokens": 1245,
-        "rejected_prediction_tokens": 1381
+        "reasoning_tokens": 503,
+        "rejected_prediction_tokens": 684
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
-    "task_id": "013-timezone-scheduler",
-    "attempt": 1,
+    "task_id": "012-retry-decorator",
+    "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:24Z",
-    "passed": 8,
+    "date": "2026-10-27T12:49:57Z",
+    "passed": 5,
     "failed": 0,
-    "total": 8,
+    "total": 5,
     "score": 1.0,
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 7.91,
-    "raw_output_path": "results/raw/muse-spark-open-1026/013-timezone-scheduler_attempt1.txt",
+    "elapsed_s": 7.4,
+    "raw_output_path": "results/raw/muse-spark-open-1026/012-retry-decorator_attempt2.txt",
     "token_usage": {
-      "prompt_tokens": 821,
-      "completion_tokens": 2579,
-      "total_tokens": 3400,
+      "prompt_tokens": 506,
+      "completion_tokens": 1889,
+      "total_tokens": 2395,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 0
+        "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 1929,
+        "accepted_prediction_tokens": 1382,
         "audio_tokens": 0,
-        "reasoning_tokens": 2359,
-        "rejected_prediction_tokens": 2628
+        "reasoning_tokens": 1772,
+        "rejected_prediction_tokens": 2195
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "013-timezone-scheduler",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:25Z",
+    "date": "2026-10-27T12:50:16Z",
     "passed": 8,
     "failed": 0,
     "total": 8,
@@ -1190,61 +1164,31 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 8.45,
+    "elapsed_s": 21.15,
     "raw_output_path": "results/raw/muse-spark-open-1026/013-timezone-scheduler_attempt2.txt",
     "token_usage": {
-      "prompt_tokens": 821,
-      "completion_tokens": 2745,
-      "total_tokens": 3566,
+      "prompt_tokens": 764,
+      "completion_tokens": 5094,
+      "total_tokens": 5858,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 0
+        "cached_tokens": 640
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 2056,
+        "accepted_prediction_tokens": 3731,
         "audio_tokens": 0,
-        "reasoning_tokens": 2525,
-        "rejected_prediction_tokens": 2767
+        "reasoning_tokens": 4792,
+        "rejected_prediction_tokens": 5803
       }
-    }
-  },
-  {
-    "task_id": "013-timezone-scheduler",
-    "attempt": 3,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:26Z",
-    "passed": 8,
-    "failed": 0,
-    "total": 8,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 7.87,
-    "raw_output_path": "results/raw/muse-spark-open-1026/013-timezone-scheduler_attempt3.txt",
-    "token_usage": {
-      "prompt_tokens": 821,
-      "completion_tokens": 2684,
-      "total_tokens": 3505,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 0
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 2042,
-        "audio_tokens": 0,
-        "reasoning_tokens": 2464,
-        "rejected_prediction_tokens": 2466
-      }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "014-mutable-default",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:27Z",
+    "date": "2026-10-27T12:50:18Z",
     "passed": 9,
     "failed": 0,
     "total": 9,
@@ -1252,30 +1196,127 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 2.29,
+    "elapsed_s": 2.25,
     "raw_output_path": "results/raw/muse-spark-open-1026/014-mutable-default_attempt1.txt",
     "token_usage": {
-      "prompt_tokens": 457,
-      "completion_tokens": 348,
-      "total_tokens": 805,
+      "prompt_tokens": 423,
+      "completion_tokens": 509,
+      "total_tokens": 932,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 128
+        "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 264,
+        "accepted_prediction_tokens": 375,
         "audio_tokens": 0,
-        "reasoning_tokens": 256,
-        "rejected_prediction_tokens": 324
+        "reasoning_tokens": 417,
+        "rejected_prediction_tokens": 563
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "013-timezone-scheduler",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:50:19Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 22.17,
+    "raw_output_path": "results/raw/muse-spark-open-1026/013-timezone-scheduler_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 764,
+      "completion_tokens": 5733,
+      "total_tokens": 6497,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 4248,
+        "audio_tokens": 0,
+        "reasoning_tokens": 5422,
+        "rejected_prediction_tokens": 6189
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "013-timezone-scheduler",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:50:20Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 25.34,
+    "raw_output_path": "results/raw/muse-spark-open-1026/013-timezone-scheduler_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 764,
+      "completion_tokens": 6374,
+      "total_tokens": 7138,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 4661,
+        "audio_tokens": 0,
+        "reasoning_tokens": 6031,
+        "rejected_prediction_tokens": 7330
+      }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
     "task_id": "014-mutable-default",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:28Z",
+    "date": "2026-10-27T12:50:20Z",
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.06,
+    "raw_output_path": "results/raw/muse-spark-open-1026/014-mutable-default_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 423,
+      "completion_tokens": 388,
+      "total_tokens": 811,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 287,
+        "audio_tokens": 0,
+        "reasoning_tokens": 296,
+        "rejected_prediction_tokens": 420
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "014-mutable-default",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:50:22Z",
     "passed": 9,
     "failed": 0,
     "total": 9,
@@ -1284,29 +1325,512 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 2.27,
-    "raw_output_path": "results/raw/muse-spark-open-1026/014-mutable-default_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/014-mutable-default_attempt3.txt",
     "token_usage": {
-      "prompt_tokens": 457,
-      "completion_tokens": 380,
-      "total_tokens": 837,
+      "prompt_tokens": 423,
+      "completion_tokens": 480,
+      "total_tokens": 903,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 277,
+        "accepted_prediction_tokens": 349,
         "audio_tokens": 0,
-        "reasoning_tokens": 288,
-        "rejected_prediction_tokens": 444
+        "reasoning_tokens": 388,
+        "rejected_prediction_tokens": 568
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
-    "task_id": "014-mutable-default",
+    "task_id": "015-sliding-window-max",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:50:26Z",
+    "passed": 12,
+    "failed": 0,
+    "total": 12,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 5.79,
+    "raw_output_path": "results/raw/muse-spark-open-1026/015-sliding-window-max_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 551,
+      "completion_tokens": 1295,
+      "total_tokens": 1846,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 954,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1131,
+        "rejected_prediction_tokens": 1433
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "015-sliding-window-max",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:50:28Z",
+    "passed": 12,
+    "failed": 0,
+    "total": 12,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 8.0,
+    "raw_output_path": "results/raw/muse-spark-open-1026/015-sliding-window-max_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 551,
+      "completion_tokens": 1909,
+      "total_tokens": 2460,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1438,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1748,
+        "rejected_prediction_tokens": 1866
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "015-sliding-window-max",
     "attempt": 3,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:28Z",
+    "date": "2026-10-27T12:50:30Z",
+    "passed": 12,
+    "failed": 0,
+    "total": 12,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 7.93,
+    "raw_output_path": "results/raw/muse-spark-open-1026/015-sliding-window-max_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 551,
+      "completion_tokens": 2017,
+      "total_tokens": 2568,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1475,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1852,
+        "rejected_prediction_tokens": 2333
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "016-decimal-money",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:50:41Z",
+    "passed": 13,
+    "failed": 0,
+    "total": 13,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 12.73,
+    "raw_output_path": "results/raw/muse-spark-open-1026/016-decimal-money_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 472,
+      "completion_tokens": 2955,
+      "total_tokens": 3427,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2148,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2728,
+        "rejected_prediction_tokens": 3494
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "016-decimal-money",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:50:43Z",
+    "passed": 13,
+    "failed": 0,
+    "total": 13,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 16.78,
+    "raw_output_path": "results/raw/muse-spark-open-1026/016-decimal-money_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 472,
+      "completion_tokens": 4049,
+      "total_tokens": 4521,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2922,
+        "audio_tokens": 0,
+        "reasoning_tokens": 3831,
+        "rejected_prediction_tokens": 4960
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "016-decimal-money",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:50:45Z",
+    "passed": 13,
+    "failed": 0,
+    "total": 13,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 14.69,
+    "raw_output_path": "results/raw/muse-spark-open-1026/016-decimal-money_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 472,
+      "completion_tokens": 3671,
+      "total_tokens": 4143,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2684,
+        "audio_tokens": 0,
+        "reasoning_tokens": 3459,
+        "rejected_prediction_tokens": 4260
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "017-unicode-dedup",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:51:20Z",
+    "passed": 11,
+    "failed": 0,
+    "total": 11,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 35.03,
+    "raw_output_path": "results/raw/muse-spark-open-1026/017-unicode-dedup_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 438,
+      "completion_tokens": 7386,
+      "total_tokens": 7824,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 5077,
+        "audio_tokens": 0,
+        "reasoning_tokens": 7287,
+        "rejected_prediction_tokens": 11086
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "017-unicode-dedup",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:51:33Z",
+    "passed": 11,
+    "failed": 0,
+    "total": 11,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 51.86,
+    "raw_output_path": "results/raw/muse-spark-open-1026/017-unicode-dedup_attempt1.txt",
+    "retried": true,
+    "token_usage": {
+      "prompt_tokens": 438,
+      "completion_tokens": 3001,
+      "total_tokens": 3439,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2084,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2891,
+        "rejected_prediction_tokens": 4356
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "017-unicode-dedup",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:51:36Z",
+    "passed": 11,
+    "failed": 0,
+    "total": 11,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 51.98,
+    "raw_output_path": "results/raw/muse-spark-open-1026/017-unicode-dedup_attempt2.txt",
+    "retried": true,
+    "token_usage": {
+      "prompt_tokens": 438,
+      "completion_tokens": 3398,
+      "total_tokens": 3836,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2356,
+        "audio_tokens": 0,
+        "reasoning_tokens": 3271,
+        "rejected_prediction_tokens": 4966
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "018-thread-safe-cache",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:51:57Z",
+    "passed": 0,
+    "failed": 0,
+    "total": 0,
+    "score": 0.0,
+    "failing_tests": [],
+    "failure_reason": "timeout",
+    "finish_reason": "stop",
+    "elapsed_s": 6.58,
+    "raw_output_path": "results/raw/muse-spark-open-1026/018-thread-safe-cache_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 520,
+      "completion_tokens": 1869,
+      "total_tokens": 2389,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1335,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1738,
+        "rejected_prediction_tokens": 2403
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "019-invoice-total",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:51:59Z",
+    "passed": 11,
+    "failed": 0,
+    "total": 11,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.41,
+    "raw_output_path": "results/raw/muse-spark-open-1026/019-invoice-total_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 683,
+      "completion_tokens": 550,
+      "total_tokens": 1233,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 406,
+        "audio_tokens": 0,
+        "reasoning_tokens": 379,
+        "rejected_prediction_tokens": 609
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "019-invoice-total",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:52:03Z",
+    "passed": 11,
+    "failed": 0,
+    "total": 11,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.98,
+    "raw_output_path": "results/raw/muse-spark-open-1026/019-invoice-total_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 683,
+      "completion_tokens": 786,
+      "total_tokens": 1469,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 585,
+        "audio_tokens": 0,
+        "reasoning_tokens": 615,
+        "rejected_prediction_tokens": 829
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "019-invoice-total",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:52:07Z",
+    "passed": 11,
+    "failed": 0,
+    "total": 11,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 3.71,
+    "raw_output_path": "results/raw/muse-spark-open-1026/019-invoice-total_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 683,
+      "completion_tokens": 824,
+      "total_tokens": 1507,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 561,
+        "audio_tokens": 0,
+        "reasoning_tokens": 653,
+        "rejected_prediction_tokens": 1280
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "018-thread-safe-cache",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:52:11Z",
+    "passed": 0,
+    "failed": 0,
+    "total": 0,
+    "score": 0.0,
+    "failing_tests": [],
+    "failure_reason": "timeout",
+    "finish_reason": "stop",
+    "elapsed_s": 8.11,
+    "raw_output_path": "results/raw/muse-spark-open-1026/018-thread-safe-cache_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 520,
+      "completion_tokens": 1872,
+      "total_tokens": 2392,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1299,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1714,
+        "rejected_prediction_tokens": 2705
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "018-thread-safe-cache",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:52:13Z",
+    "passed": 0,
+    "failed": 0,
+    "total": 0,
+    "score": 0.0,
+    "failing_tests": [],
+    "failure_reason": "timeout",
+    "finish_reason": "stop",
+    "elapsed_s": 7.27,
+    "raw_output_path": "results/raw/muse-spark-open-1026/018-thread-safe-cache_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 520,
+      "completion_tokens": 1664,
+      "total_tokens": 2184,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1137,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1574,
+        "rejected_prediction_tokens": 2545
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "020-log-parser",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:52:16Z",
     "passed": 9,
     "failed": 0,
     "total": 9,
@@ -1314,315 +1838,1001 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 2.18,
-    "raw_output_path": "results/raw/muse-spark-open-1026/014-mutable-default_attempt3.txt",
+    "elapsed_s": 9.61,
+    "raw_output_path": "results/raw/muse-spark-open-1026/020-log-parser_attempt1.txt",
     "token_usage": {
-      "prompt_tokens": 457,
-      "completion_tokens": 491,
-      "total_tokens": 948,
+      "prompt_tokens": 795,
+      "completion_tokens": 2353,
+      "total_tokens": 3148,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 384
+        "cached_tokens": 768
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 377,
+        "accepted_prediction_tokens": 1670,
         "audio_tokens": 0,
-        "reasoning_tokens": 399,
-        "rejected_prediction_tokens": 421
+        "reasoning_tokens": 2147,
+        "rejected_prediction_tokens": 3139
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
-    "task_id": "015-sliding-window-max",
+    "task_id": "021-config-merger",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:30Z",
-    "passed": 12,
+    "date": "2026-10-27T12:52:23Z",
+    "passed": 8,
     "failed": 0,
-    "total": 12,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 5.99,
+    "raw_output_path": "results/raw/muse-spark-open-1026/021-config-merger_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 588,
+      "completion_tokens": 1671,
+      "total_tokens": 2259,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1189,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1529,
+        "rejected_prediction_tokens": 2178
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "020-log-parser",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:52:23Z",
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 11.57,
+    "raw_output_path": "results/raw/muse-spark-open-1026/020-log-parser_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 795,
+      "completion_tokens": 2937,
+      "total_tokens": 3732,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 768
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2159,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2740,
+        "rejected_prediction_tokens": 3294
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "021-config-merger",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:52:27Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 4.31,
+    "raw_output_path": "results/raw/muse-spark-open-1026/021-config-merger_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 588,
+      "completion_tokens": 786,
+      "total_tokens": 1374,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 546,
+        "audio_tokens": 0,
+        "reasoning_tokens": 656,
+        "rejected_prediction_tokens": 1127
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "021-config-merger",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:52:28Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 4.95,
+    "raw_output_path": "results/raw/muse-spark-open-1026/021-config-merger_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 588,
+      "completion_tokens": 1271,
+      "total_tokens": 1859,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 933,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1141,
+        "rejected_prediction_tokens": 1433
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "020-log-parser",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:52:30Z",
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 16.25,
+    "raw_output_path": "results/raw/muse-spark-open-1026/020-log-parser_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 795,
+      "completion_tokens": 4151,
+      "total_tokens": 4946,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 768
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2921,
+        "audio_tokens": 0,
+        "reasoning_tokens": 3989,
+        "rejected_prediction_tokens": 5689
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "022-permissions",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:52:30Z",
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.9,
+    "raw_output_path": "results/raw/muse-spark-open-1026/022-permissions_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 584,
+      "completion_tokens": 590,
+      "total_tokens": 1174,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 422,
+        "audio_tokens": 0,
+        "reasoning_tokens": 525,
+        "rejected_prediction_tokens": 754
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "022-permissions",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:52:31Z",
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.74,
+    "raw_output_path": "results/raw/muse-spark-open-1026/022-permissions_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 584,
+      "completion_tokens": 488,
+      "total_tokens": 1072,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 358,
+        "audio_tokens": 0,
+        "reasoning_tokens": 355,
+        "rejected_prediction_tokens": 559
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "022-permissions",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:52:34Z",
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 4.62,
+    "raw_output_path": "results/raw/muse-spark-open-1026/022-permissions_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 584,
+      "completion_tokens": 1207,
+      "total_tokens": 1791,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 870,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1142,
+        "rejected_prediction_tokens": 1482
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "023-inventory",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:52:44Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 12.51,
+    "raw_output_path": "results/raw/muse-spark-open-1026/023-inventory_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 616,
+      "completion_tokens": 2836,
+      "total_tokens": 3452,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2024,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2525,
+        "rejected_prediction_tokens": 3660
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "023-inventory",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:52:45Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 10.04,
+    "raw_output_path": "results/raw/muse-spark-open-1026/023-inventory_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 616,
+      "completion_tokens": 2368,
+      "total_tokens": 2984,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1732,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2076,
+        "rejected_prediction_tokens": 2720
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "023-inventory",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:52:46Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 15.34,
+    "raw_output_path": "results/raw/muse-spark-open-1026/023-inventory_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 616,
+      "completion_tokens": 3673,
+      "total_tokens": 4289,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2630,
+        "audio_tokens": 0,
+        "reasoning_tokens": 3380,
+        "rejected_prediction_tokens": 4671
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "024-csv-importer",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:52:54Z",
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 10.16,
+    "raw_output_path": "results/raw/muse-spark-open-1026/024-csv-importer_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 749,
+      "completion_tokens": 2231,
+      "total_tokens": 2980,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1599,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2115,
+        "rejected_prediction_tokens": 2818
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "024-csv-importer",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:52:57Z",
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 10.66,
+    "raw_output_path": "results/raw/muse-spark-open-1026/024-csv-importer_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 749,
+      "completion_tokens": 2643,
+      "total_tokens": 3392,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1970,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2546,
+        "rejected_prediction_tokens": 2741
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "024-csv-importer",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:52:57Z",
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 12.07,
+    "raw_output_path": "results/raw/muse-spark-open-1026/024-csv-importer_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 749,
+      "completion_tokens": 2800,
+      "total_tokens": 3549,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2009,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2647,
+        "rejected_prediction_tokens": 3521
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "025-rate-limiter",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:53:02Z",
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 7.65,
+    "raw_output_path": "results/raw/muse-spark-open-1026/025-rate-limiter_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 676,
+      "completion_tokens": 1862,
+      "total_tokens": 2538,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1368,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1586,
+        "rejected_prediction_tokens": 2097
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "026-retry-client",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:53:06Z",
+    "passed": 10,
+    "failed": 0,
+    "total": 10,
     "score": 1.0,
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 3.45,
-    "raw_output_path": "results/raw/muse-spark-open-1026/015-sliding-window-max_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/026-retry-client_attempt1.txt",
     "token_usage": {
-      "prompt_tokens": 585,
-      "completion_tokens": 973,
-      "total_tokens": 1558,
+      "prompt_tokens": 914,
+      "completion_tokens": 1090,
+      "total_tokens": 2004,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 896
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 852,
+        "audio_tokens": 0,
+        "reasoning_tokens": 648,
+        "rejected_prediction_tokens": 821
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "025-rate-limiter",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:53:07Z",
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 9.76,
+    "raw_output_path": "results/raw/muse-spark-open-1026/025-rate-limiter_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 676,
+      "completion_tokens": 2353,
+      "total_tokens": 3029,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1716,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2077,
+        "rejected_prediction_tokens": 2743
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "026-retry-client",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:53:11Z",
+    "passed": 10,
+    "failed": 0,
+    "total": 10,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 3.88,
+    "raw_output_path": "results/raw/muse-spark-open-1026/026-retry-client_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 914,
+      "completion_tokens": 1017,
+      "total_tokens": 1931,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 896
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 782,
+        "audio_tokens": 0,
+        "reasoning_tokens": 708,
+        "rejected_prediction_tokens": 870
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "026-retry-client",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:53:12Z",
+    "passed": 10,
+    "failed": 0,
+    "total": 10,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 5.61,
+    "raw_output_path": "results/raw/muse-spark-open-1026/026-retry-client_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 914,
+      "completion_tokens": 1656,
+      "total_tokens": 2570,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 896
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1285,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1354,
+        "rejected_prediction_tokens": 1312
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "025-rate-limiter",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:53:12Z",
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 14.9,
+    "raw_output_path": "results/raw/muse-spark-open-1026/025-rate-limiter_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 676,
+      "completion_tokens": 3629,
+      "total_tokens": 4305,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2522,
+        "audio_tokens": 0,
+        "reasoning_tokens": 3356,
+        "rejected_prediction_tokens": 5234
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "027-search-index",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:54:26Z",
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 73.79,
+    "raw_output_path": "results/raw/muse-spark-open-1026/027-search-index_attempt3.txt",
+    "retried": true,
+    "token_usage": {
+      "prompt_tokens": 538,
+      "completion_tokens": 7002,
+      "total_tokens": 7540,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 4847,
+        "audio_tokens": 0,
+        "reasoning_tokens": 6562,
+        "rejected_prediction_tokens": 10231
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "028-order-pipeline",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:54:28Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.14,
+    "raw_output_path": "results/raw/muse-spark-open-1026/028-order-pipeline_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 714,
+      "completion_tokens": 491,
+      "total_tokens": 1205,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 128
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 726,
+        "accepted_prediction_tokens": 371,
         "audio_tokens": 0,
-        "reasoning_tokens": 805,
-        "rejected_prediction_tokens": 996
+        "reasoning_tokens": 347,
+        "rejected_prediction_tokens": 469
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
-    "task_id": "015-sliding-window-max",
+    "task_id": "028-order-pipeline",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:31Z",
-    "passed": 12,
+    "date": "2026-10-27T12:54:31Z",
+    "passed": 8,
     "failed": 0,
-    "total": 12,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.5,
+    "raw_output_path": "results/raw/muse-spark-open-1026/028-order-pipeline_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 714,
+      "completion_tokens": 559,
+      "total_tokens": 1273,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 430,
+        "audio_tokens": 0,
+        "reasoning_tokens": 415,
+        "rejected_prediction_tokens": 473
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "028-order-pipeline",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:54:34Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 3.02,
+    "raw_output_path": "results/raw/muse-spark-open-1026/028-order-pipeline_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 714,
+      "completion_tokens": 750,
+      "total_tokens": 1464,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 560,
+        "audio_tokens": 0,
+        "reasoning_tokens": 606,
+        "rejected_prediction_tokens": 770
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "029-report-generator",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:54:38Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 3.66,
+    "raw_output_path": "results/raw/muse-spark-open-1026/029-report-generator_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 926,
+      "completion_tokens": 1037,
+      "total_tokens": 1963,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 778,
+        "audio_tokens": 0,
+        "reasoning_tokens": 856,
+        "rejected_prediction_tokens": 1035
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "029-report-generator",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:54:42Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 3.55,
+    "raw_output_path": "results/raw/muse-spark-open-1026/029-report-generator_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 926,
+      "completion_tokens": 804,
+      "total_tokens": 1730,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 896
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 582,
+        "audio_tokens": 0,
+        "reasoning_tokens": 622,
+        "rejected_prediction_tokens": 979
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "029-report-generator",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:54:45Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
     "score": 1.0,
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 2.84,
-    "raw_output_path": "results/raw/muse-spark-open-1026/015-sliding-window-max_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/029-report-generator_attempt3.txt",
     "token_usage": {
-      "prompt_tokens": 585,
-      "completion_tokens": 777,
-      "total_tokens": 1362,
+      "prompt_tokens": 926,
+      "completion_tokens": 576,
+      "total_tokens": 1502,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 128
+        "cached_tokens": 896
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 582,
+        "accepted_prediction_tokens": 408,
         "audio_tokens": 0,
-        "reasoning_tokens": 610,
-        "rejected_prediction_tokens": 776
+        "reasoning_tokens": 399,
+        "rejected_prediction_tokens": 768
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
-    "task_id": "015-sliding-window-max",
-    "attempt": 3,
+    "task_id": "027-search-index",
+    "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:33Z",
-    "passed": 12,
+    "date": "2026-10-27T12:54:51Z",
+    "passed": 6,
     "failed": 0,
-    "total": 12,
+    "total": 6,
     "score": 1.0,
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 4.91,
-    "raw_output_path": "results/raw/muse-spark-open-1026/015-sliding-window-max_attempt3.txt",
+    "elapsed_s": 100.36,
+    "raw_output_path": "results/raw/muse-spark-open-1026/027-search-index_attempt1.txt",
+    "retried": true,
     "token_usage": {
-      "prompt_tokens": 585,
-      "completion_tokens": 1677,
-      "total_tokens": 2262,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 128
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 1295,
-        "audio_tokens": 0,
-        "reasoning_tokens": 1515,
-        "rejected_prediction_tokens": 1372
-      }
-    }
-  },
-  {
-    "task_id": "016-decimal-money",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:45Z",
-    "passed": 12,
-    "failed": 1,
-    "total": 13,
-    "score": 0.9231,
-    "failing_tests": [
-      "test_parametrized_exact[amounts2-1.01]"
-    ],
-    "failure_reason": "test_failure_parametrized",
-    "finish_reason": "stop",
-    "elapsed_s": 13.64,
-    "raw_output_path": "results/raw/muse-spark-open-1026/016-decimal-money_attempt2.txt",
-    "token_usage": {
-      "prompt_tokens": 524,
-      "completion_tokens": 3402,
-      "total_tokens": 3926,
+      "prompt_tokens": 538,
+      "completion_tokens": 13106,
+      "total_tokens": 13644,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 512
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 2519,
+        "accepted_prediction_tokens": 8809,
         "audio_tokens": 0,
-        "reasoning_tokens": 3228,
-        "rejected_prediction_tokens": 3662
+        "reasoning_tokens": 12345,
+        "rejected_prediction_tokens": 21263
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
-    "task_id": "016-decimal-money",
-    "attempt": 3,
+    "task_id": "027-search-index",
+    "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:46Z",
-    "passed": 12,
-    "failed": 1,
-    "total": 13,
-    "score": 0.9231,
+    "date": "2026-10-27T12:55:01Z",
+    "passed": 0,
+    "failed": 6,
+    "total": 6,
+    "score": 0.0,
     "failing_tests": [
-      "test_parametrized_exact[amounts2-1.01]"
+      "test_search_comparison_count_is_sublinear_or_linear",
+      "test_search_comparison_count_for_common_term"
     ],
-    "failure_reason": "test_failure_parametrized",
-    "finish_reason": "stop",
-    "elapsed_s": 13.2,
-    "raw_output_path": "results/raw/muse-spark-open-1026/016-decimal-money_attempt3.txt",
+    "failure_reason": "no_answer",
+    "finish_reason": "length",
+    "elapsed_s": 108.78,
+    "raw_output_path": null,
+    "retried": true,
     "token_usage": {
-      "prompt_tokens": 524,
-      "completion_tokens": 3087,
-      "total_tokens": 3611,
+      "prompt_tokens": 538,
+      "completion_tokens": 16384,
+      "total_tokens": 16922,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 512
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 2229,
+        "accepted_prediction_tokens": 11129,
         "audio_tokens": 0,
-        "reasoning_tokens": 2906,
-        "rejected_prediction_tokens": 3777
+        "reasoning_tokens": 16386,
+        "rejected_prediction_tokens": 25649
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
-    "task_id": "017-unicode-dedup",
+    "task_id": "030-expr-parser",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:46Z",
-    "passed": 11,
-    "failed": 0,
-    "total": 11,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 1.57,
-    "raw_output_path": "results/raw/muse-spark-open-1026/017-unicode-dedup_attempt1.txt",
-    "token_usage": {
-      "prompt_tokens": 480,
-      "completion_tokens": 350,
-      "total_tokens": 830,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 128
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 273,
-        "audio_tokens": 0,
-        "reasoning_tokens": 255,
-        "rejected_prediction_tokens": 266
-      }
-    }
-  },
-  {
-    "task_id": "016-decimal-money",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:48Z",
-    "passed": 12,
-    "failed": 1,
-    "total": 13,
-    "score": 0.9231,
+    "date": "2026-10-27T12:55:50Z",
+    "passed": 8,
+    "failed": 2,
+    "total": 10,
+    "score": 0.8,
     "failing_tests": [
-      "test_parametrized_exact[amounts2-1.01]"
+      "test_precedence_mul_before_add",
+      "test_mixed_precedence"
     ],
-    "failure_reason": "test_failure_parametrized",
+    "failure_reason": "wrong_answer",
     "finish_reason": "stop",
-    "elapsed_s": 17.11,
-    "raw_output_path": "results/raw/muse-spark-open-1026/016-decimal-money_attempt1.txt",
+    "elapsed_s": 64.34,
+    "raw_output_path": "results/raw/muse-spark-open-1026/030-expr-parser_attempt1.txt",
+    "retried": true,
     "token_usage": {
-      "prompt_tokens": 524,
-      "completion_tokens": 4113,
-      "total_tokens": 4637,
+      "prompt_tokens": 839,
+      "completion_tokens": 9414,
+      "total_tokens": 10253,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 128
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 2956,
+        "accepted_prediction_tokens": 6773,
         "audio_tokens": 0,
-        "reasoning_tokens": 3932,
-        "rejected_prediction_tokens": 5143
+        "reasoning_tokens": 8585,
+        "rejected_prediction_tokens": 11714
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
-    "task_id": "017-unicode-dedup",
-    "attempt": 3,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:49Z",
-    "passed": 11,
-    "failed": 0,
-    "total": 11,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 2.1,
-    "raw_output_path": "results/raw/muse-spark-open-1026/017-unicode-dedup_attempt3.txt",
-    "token_usage": {
-      "prompt_tokens": 480,
-      "completion_tokens": 389,
-      "total_tokens": 869,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 384
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 306,
-        "audio_tokens": 0,
-        "reasoning_tokens": 294,
-        "rejected_prediction_tokens": 275
-      }
-    }
-  },
-  {
-    "task_id": "017-unicode-dedup",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:51Z",
-    "passed": 11,
-    "failed": 0,
-    "total": 11,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 4.2,
-    "raw_output_path": "results/raw/muse-spark-open-1026/017-unicode-dedup_attempt2.txt",
-    "token_usage": {
-      "prompt_tokens": 480,
-      "completion_tokens": 1040,
-      "total_tokens": 1520,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 384
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 779,
-        "audio_tokens": 0,
-        "reasoning_tokens": 945,
-        "rejected_prediction_tokens": 1048
-      }
-    }
-  },
-  {
-    "task_id": "018-thread-safe-cache",
+    "task_id": "031-graph-paths",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:56Z",
+    "date": "2026-10-27T12:55:55Z",
     "passed": 8,
     "failed": 0,
     "total": 8,
@@ -1630,61 +2840,103 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 8.4,
-    "raw_output_path": "results/raw/muse-spark-open-1026/018-thread-safe-cache_attempt1.txt",
+    "elapsed_s": 4.85,
+    "raw_output_path": "results/raw/muse-spark-open-1026/031-graph-paths_attempt1.txt",
     "token_usage": {
-      "prompt_tokens": 592,
-      "completion_tokens": 2042,
-      "total_tokens": 2634,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 0
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 1477,
-        "audio_tokens": 0,
-        "reasoning_tokens": 1925,
-        "rejected_prediction_tokens": 2485
-      }
-    }
-  },
-  {
-    "task_id": "018-thread-safe-cache",
-    "attempt": 3,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:27:57Z",
-    "passed": 8,
-    "failed": 0,
-    "total": 8,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 5.65,
-    "raw_output_path": "results/raw/muse-spark-open-1026/018-thread-safe-cache_attempt3.txt",
-    "token_usage": {
-      "prompt_tokens": 592,
-      "completion_tokens": 1645,
-      "total_tokens": 2237,
+      "prompt_tokens": 629,
+      "completion_tokens": 1386,
+      "total_tokens": 2015,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 128
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 1197,
+        "accepted_prediction_tokens": 1014,
         "audio_tokens": 0,
-        "reasoning_tokens": 1539,
-        "rejected_prediction_tokens": 1932
+        "reasoning_tokens": 1122,
+        "rejected_prediction_tokens": 1590
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
   },
   {
-    "task_id": "018-thread-safe-cache",
+    "task_id": "030-expr-parser",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:55:59Z",
+    "passed": 8,
+    "failed": 2,
+    "total": 10,
+    "score": 0.8,
+    "failing_tests": [
+      "test_precedence_mul_before_add",
+      "test_mixed_precedence"
+    ],
+    "failure_reason": "wrong_answer",
+    "finish_reason": "stop",
+    "elapsed_s": 58.26,
+    "raw_output_path": "results/raw/muse-spark-open-1026/030-expr-parser_attempt3.txt",
+    "retried": true,
+    "token_usage": {
+      "prompt_tokens": 839,
+      "completion_tokens": 6619,
+      "total_tokens": 7458,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 768
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 4944,
+        "audio_tokens": 0,
+        "reasoning_tokens": 5782,
+        "rejected_prediction_tokens": 6781
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "030-expr-parser",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T10:28:08Z",
+    "date": "2026-10-27T12:56:01Z",
+    "passed": 8,
+    "failed": 2,
+    "total": 10,
+    "score": 0.8,
+    "failing_tests": [
+      "test_precedence_mul_before_add",
+      "test_mixed_precedence"
+    ],
+    "failure_reason": "wrong_answer",
+    "finish_reason": "stop",
+    "elapsed_s": 69.27,
+    "raw_output_path": "results/raw/muse-spark-open-1026/030-expr-parser_attempt2.txt",
+    "retried": true,
+    "token_usage": {
+      "prompt_tokens": 839,
+      "completion_tokens": 9001,
+      "total_tokens": 9840,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 768
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 6447,
+        "audio_tokens": 0,
+        "reasoning_tokens": 8034,
+        "rejected_prediction_tokens": 11431
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "031-graph-paths",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:56:03Z",
     "passed": 8,
     "failed": 0,
     "total": 8,
@@ -1692,22 +2944,535 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 18.97,
-    "raw_output_path": "results/raw/muse-spark-open-1026/018-thread-safe-cache_attempt2.txt",
+    "elapsed_s": 2.98,
+    "raw_output_path": "results/raw/muse-spark-open-1026/031-graph-paths_attempt3.txt",
     "token_usage": {
-      "prompt_tokens": 592,
-      "completion_tokens": 5410,
-      "total_tokens": 6002,
+      "prompt_tokens": 629,
+      "completion_tokens": 648,
+      "total_tokens": 1277,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 512
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 3854,
+        "accepted_prediction_tokens": 482,
         "audio_tokens": 0,
-        "reasoning_tokens": 5304,
-        "rejected_prediction_tokens": 7031
+        "reasoning_tokens": 392,
+        "rejected_prediction_tokens": 680
       }
-    }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "031-graph-paths",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:56:07Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 11.53,
+    "raw_output_path": "results/raw/muse-spark-open-1026/031-graph-paths_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 629,
+      "completion_tokens": 3393,
+      "total_tokens": 4022,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2482,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2882,
+        "rejected_prediction_tokens": 3902
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "032-pipeline-cache",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:56:12Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 10.45,
+    "raw_output_path": "results/raw/muse-spark-open-1026/032-pipeline-cache_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 657,
+      "completion_tokens": 2594,
+      "total_tokens": 3251,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1886,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2300,
+        "rejected_prediction_tokens": 3084
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "032-pipeline-cache",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:56:17Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 13.68,
+    "raw_output_path": "results/raw/muse-spark-open-1026/032-pipeline-cache_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 657,
+      "completion_tokens": 3213,
+      "total_tokens": 3870,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2277,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2923,
+        "rejected_prediction_tokens": 4275
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "033-matrix-ops",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:56:25Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 13.22,
+    "raw_output_path": "results/raw/muse-spark-open-1026/033-matrix-ops_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 682,
+      "completion_tokens": 3685,
+      "total_tokens": 4367,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2701,
+        "audio_tokens": 0,
+        "reasoning_tokens": 3289,
+        "rejected_prediction_tokens": 4194
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "032-pipeline-cache",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:56:26Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 18.74,
+    "raw_output_path": "results/raw/muse-spark-open-1026/032-pipeline-cache_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 657,
+      "completion_tokens": 5115,
+      "total_tokens": 5772,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 3661,
+        "audio_tokens": 0,
+        "reasoning_tokens": 4842,
+        "rejected_prediction_tokens": 6531
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "033-matrix-ops",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:56:35Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 18.07,
+    "raw_output_path": "results/raw/muse-spark-open-1026/033-matrix-ops_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 682,
+      "completion_tokens": 4984,
+      "total_tokens": 5666,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 3674,
+        "audio_tokens": 0,
+        "reasoning_tokens": 4574,
+        "rejected_prediction_tokens": 5496
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "033-matrix-ops",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:56:39Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 13.92,
+    "raw_output_path": "results/raw/muse-spark-open-1026/033-matrix-ops_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 682,
+      "completion_tokens": 3642,
+      "total_tokens": 4324,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2666,
+        "audio_tokens": 0,
+        "reasoning_tokens": 3249,
+        "rejected_prediction_tokens": 4173
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "034-work-queue",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:56:44Z",
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 18.2,
+    "raw_output_path": "results/raw/muse-spark-open-1026/034-work-queue_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 602,
+      "completion_tokens": 4673,
+      "total_tokens": 5275,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 3285,
+        "audio_tokens": 0,
+        "reasoning_tokens": 4431,
+        "rejected_prediction_tokens": 6431
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "034-work-queue",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:56:49Z",
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 13.82,
+    "raw_output_path": "results/raw/muse-spark-open-1026/034-work-queue_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 602,
+      "completion_tokens": 2997,
+      "total_tokens": 3599,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2069,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2726,
+        "rejected_prediction_tokens": 4420
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "035-schema-validator",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:56:49Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 5.17,
+    "raw_output_path": "results/raw/muse-spark-open-1026/035-schema-validator_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 822,
+      "completion_tokens": 1420,
+      "total_tokens": 2242,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1019,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1015,
+        "rejected_prediction_tokens": 1788
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "034-work-queue",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:56:51Z",
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 12.0,
+    "raw_output_path": "results/raw/muse-spark-open-1026/034-work-queue_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 602,
+      "completion_tokens": 2770,
+      "total_tokens": 3372,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1907,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2503,
+        "rejected_prediction_tokens": 4134
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "035-schema-validator",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:56:56Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 6.94,
+    "raw_output_path": "results/raw/muse-spark-open-1026/035-schema-validator_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 822,
+      "completion_tokens": 1854,
+      "total_tokens": 2676,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 768
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1391,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1431,
+        "rejected_prediction_tokens": 1850
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "036-event-sourcing",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:56:57Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 5.26,
+    "raw_output_path": "results/raw/muse-spark-open-1026/036-event-sourcing_attempt1.txt",
+    "token_usage": {
+      "prompt_tokens": 690,
+      "completion_tokens": 1676,
+      "total_tokens": 2366,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1275,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1450,
+        "rejected_prediction_tokens": 1525
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "035-schema-validator",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:57:00Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 10.14,
+    "raw_output_path": "results/raw/muse-spark-open-1026/035-schema-validator_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 822,
+      "completion_tokens": 2464,
+      "total_tokens": 3286,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 768
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1705,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2203,
+        "rejected_prediction_tokens": 3608
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "036-event-sourcing",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:57:02Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 5.35,
+    "raw_output_path": "results/raw/muse-spark-open-1026/036-event-sourcing_attempt2.txt",
+    "token_usage": {
+      "prompt_tokens": 690,
+      "completion_tokens": 1248,
+      "total_tokens": 1938,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 908,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1012,
+        "rejected_prediction_tokens": 1472
+      }
+    },
+    "run_id": "20261027T124842Z"
+  },
+  {
+    "task_id": "036-event-sourcing",
+    "attempt": 3,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T12:57:02Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 4.41,
+    "raw_output_path": "results/raw/muse-spark-open-1026/036-event-sourcing_attempt3.txt",
+    "token_usage": {
+      "prompt_tokens": 690,
+      "completion_tokens": 1006,
+      "total_tokens": 1696,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 749,
+        "audio_tokens": 0,
+        "reasoning_tokens": 781,
+        "rejected_prediction_tokens": 1050
+      }
+    },
+    "run_id": "20261027T124842Z"
   }
 ]

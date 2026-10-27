@@ -1,0 +1,14 @@
+coerce.py
+```python
+def coerce(value, type_name):
+    """
+    Convert string value to type_name ('int', 'float', 'str').
+    Raises ValueError for non-numeric values when type is int or float.
+    """
+    if type_name == "int":
+        return int(float(value))
+    elif type_name == "float":
+        return float(value)
+    else:
+        return str(value)
+```

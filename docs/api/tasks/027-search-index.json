@@ -1,0 +1,21 @@
+{
+  "id": "027-search-index",
+  "title": "Search index returns correct results but is too slow on large inputs",
+  "difficulty": "hard",
+  "language": "python",
+  "tags": [
+    "search",
+    "performance",
+    "data-structures"
+  ],
+  "estimated_minutes": 30,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/027-search-index.json",
+  "prompt": "The package in starter/ implements a text search index. index.py provides SearchIndex with add(doc_id, text) which adds a document and build() which finalises the index. search(query) returns a list of doc_ids whose text contains the query term. The results are correct for small inputs, but the number of string comparisons performed during search grows quadratically with the number of documents. The grader instruments the index to count comparisons and asserts that searching N documents requires at most O(N) comparisons \u2014 specifically at most 2*N \u2014 not O(N^2). The grader also checks correctness for several query and document combinations. Do not edit the tests.",
+  "starter_files": {
+    "index.py": "class SearchIndex:\n    def __init__(self):\n        self._docs = {}\n        self._built = False\n        self.comparison_count = 0\n\n    def add(self, doc_id, text):\n        self._docs[doc_id] = text.lower()\n        self._built = False\n\n    def build(self):\n        # BUG: no inverted index built \u2014 search does a linear scan\n        self._built = True\n\n    def search(self, query):\n        \"\"\"Return doc_ids whose text contains query. BUG: O(N) scan per query.\"\"\"\n        q = query.lower()\n        results = []\n        for doc_id, text in self._docs.items():\n            self.comparison_count += 1\n            if q in text:\n                results.append(doc_id)\n        return results\n"
+  },
+  "grader_files": {
+    "test_search_index.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom index import SearchIndex\nimport pytest\n\n\ndef _build_index(n):\n    idx = SearchIndex()\n    for i in range(n):\n        idx.add(f\"doc{i}\", f\"word{i} common token{i % 10}\")\n    idx.build()\n    return idx\n\n\ndef test_search_finds_exact_match():\n    idx = _build_index(5)\n    results = idx.search(\"word2\")\n    assert \"doc2\" in results\n\n\ndef test_search_finds_common_term():\n    idx = _build_index(20)\n    results = idx.search(\"common\")\n    assert len(results) == 20\n\n\ndef test_search_returns_empty_for_missing():\n    idx = _build_index(5)\n    assert idx.search(\"nothere\") == []\n\n\ndef test_search_is_case_insensitive():\n    idx = SearchIndex()\n    idx.add(\"d1\", \"Hello World\")\n    idx.build()\n    assert \"d1\" in idx.search(\"hello\")\n    assert \"d1\" in idx.search(\"WORLD\")\n\n\ndef test_search_comparison_count_is_sublinear_or_linear():\n    n = 200\n    idx = _build_index(n)\n    idx.comparison_count = 0\n    idx.search(\"word50\")\n    count = idx.comparison_count\n    assert count <= 5, (\n        f\"search() made {count} comparisons for {n} docs \u2014 expected at most 5 \"\n        f\"(use an inverted index for O(1) lookup, not a linear scan).\"\n    )\n\n\ndef test_search_comparison_count_for_common_term():\n    n = 200\n    idx = _build_index(n)\n    idx.comparison_count = 0\n    idx.search(\"common\")\n    count = idx.comparison_count\n    assert count <= 5, (\n        f\"search() made {count} comparisons for {n} docs \u2014 expected at most 5.\"\n    )\n"
+  }
+}

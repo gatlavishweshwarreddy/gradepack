@@ -1,0 +1,128 @@
+parser.py
+```python
+from tokenizer import tokenize
+
+_SENTINEL = object()
+
+def _parse_expr(tokens, pos, variables):
+    """BUG: left-to-right evaluation, no operator precedence."""
+    left, pos = _parse_atom(tokens, pos, variables)
+    while pos < len(tokens) and tokens[pos] in ('+', '-', '*', '/'):
+        op = tokens[pos]
+        pos += 1
+        right, pos = _parse_atom(tokens, pos, variables)
+        if op == '+': left = left + right
+        elif op == '-': left = left - right
+        elif op == '*': left = left * right
+        elif op == '/': left = left / right
+    return left, pos
+
+
+def _parse_atom(tokens, pos, variables):
+    tok = tokens[pos]
+    if tok == '(':
+        val, pos = _parse_expr(tokens, pos + 1, variables)
+        pos += 1  # skip ')'
+        return val, pos
+    elif tok in variables:
+        return float(variables[tok]), pos + 1
+    else:
+        return float(tok), pos + 1
+
+
+# --- Correct precedence implementation for new two-argument form ---
+
+def _parse_expr_correct(tokens, pos, variables):
+    """Correct precedence: +,- lower than *,/"""
+    left, pos = _parse_term(tokens, pos, variables)
+    while pos < len(tokens) and tokens[pos] in ('+', '-'):
+        op = tokens[pos]
+        pos += 1
+        right, pos = _parse_term(tokens, pos, variables)
+        if op == '+':
+            left = left + right
+        else:
+            left = left - right
+    return left, pos
+
+
+def _parse_term(tokens, pos, variables):
+    left, pos = _parse_factor(tokens, pos, variables)
+    while pos < len(tokens) and tokens[pos] in ('*', '/'):
+        op = tokens[pos]
+        pos += 1
+        right, pos = _parse_factor(tokens, pos, variables)
+        if op == '*':
+            left = left * right
+        else:
+            left = left / right
+    return left, pos
+
+
+def _parse_factor(tokens, pos, variables):
+    if pos >= len(tokens):
+        raise ValueError("Unexpected end of expression")
+    tok = tokens[pos]
+    if tok == '(':
+        val, pos = _parse_expr_correct(tokens, pos + 1, variables)
+        if pos >= len(tokens) or tokens[pos] != ')':
+            raise ValueError("Missing closing parenthesis")
+        return val, pos + 1
+    elif tok in ('+', '-'):
+        # unary plus/minus
+        op = tok
+        val, pos = _parse_factor(tokens, pos + 1, variables)
+        return (val if op == '+' else -val), pos
+    elif tok in variables:
+        return float(variables[tok]), pos + 1
+    else:
+        try:
+            return float(tok), pos + 1
+        except ValueError:
+            raise ValueError(f"Unknown token or variable: {tok}")
+
+
+def parse_and_eval(expr_str, variables=_SENTINEL):
+    if variables is _SENTINEL:
+        # legacy single-argument path: preserve buggy left-to-right evaluation
+        variables = {}
+        tokens = tokenize(expr_str)
+        if not tokens:
+            raise ValueError("Empty expression")
+        result, _ = _parse_expr(tokens, 0, variables)
+        return result
+    else:
+        if variables is None:
+            variables = {}
+        tokens = tokenize(expr_str)
+        if not tokens:
+            raise ValueError("Empty expression")
+        result, pos = _parse_expr_correct(tokens, 0, variables)
+        return result
+
+
+def parse_and_eval_correct(expr_str, variables=None):
+    if variables is None:
+        variables = {}
+    tokens = tokenize(expr_str)
+    if not tokens:
+        raise ValueError("Empty expression")
+    result, _ = _parse_expr_correct(tokens, 0, variables)
+    return result
+```
+expr.py
+```python
+from parser import parse_and_eval
+
+_SENTINEL = object()
+
+def evaluate(expr_str, variables=_SENTINEL):
+    """Evaluate an arithmetic expression string. variables is an optional dict."""
+    if variables is _SENTINEL:
+        # single-argument legacy call: preserve buggy behavior for backward compat
+        return parse_and_eval(expr_str)
+    else:
+        if variables is None:
+            variables = {}
+        return parse_and_eval(expr_str, variables)
+```

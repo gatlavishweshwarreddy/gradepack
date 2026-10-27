@@ -1,0 +1,21 @@
+{
+  "id": "031-graph-paths",
+  "title": "Shortest path finder returns suboptimal distances for some graphs",
+  "difficulty": "hard",
+  "language": "python",
+  "tags": [
+    "graph",
+    "dijkstra",
+    "shortest-path"
+  ],
+  "estimated_minutes": 30,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/031-graph-paths.json",
+  "prompt": "The package in starter/ implements Dijkstra's algorithm for finding shortest paths. graph.py provides Graph with add_edge(u, v, weight) and shortest_path(source, target) returning the path cost as a float, or None if unreachable. heap.py provides a MinHeap used internally. The algorithm returns wrong distances for graphs where the shortest path requires relaxing an edge that was already settled (due to a wrong relaxation condition). For example in a graph A\u2192B(10), A\u2192C(1), C\u2192B(2), shortest_path('A','B') should return 3.0 but may return 10.0. The grader tests several graph topologies including seeded random graphs verified against a reference BFS-based implementation. Do not edit the tests.",
+  "starter_files": {
+    "graph.py": "import heapq\n\n\nclass Graph:\n    def __init__(self):\n        self._adj = {}\n\n    def add_edge(self, u, v, weight):\n        self._adj.setdefault(u, []).append((v, weight))\n        self._adj.setdefault(v, [])  # ensure v is in graph\n\n    def shortest_path(self, source, target):\n        \"\"\"\n        Dijkstra's algorithm.\n        BUG: skips relaxation when dist[neighbor] is already set (even if the\n        new path is shorter), so it never improves on the first path found.\n        \"\"\"\n        dist = {source: 0.0}\n        pq = [(0.0, source)]\n        while pq:\n            d, u = heapq.heappop(pq)\n            if u == target:\n                return d\n            for v, w in self._adj.get(u, []):\n                # BUG: should be `v not in dist or d + w < dist[v]`\n                if v not in dist:\n                    dist[v] = d + w\n                    heapq.heappush(pq, (dist[v], v))\n        return None\n"
+  },
+  "grader_files": {
+    "test_graph_paths.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom graph import Graph\nimport pytest\nimport random\n\n\ndef _ref_dijkstra(edges, source, target):\n    \"\"\"Reference implementation using correct relaxation.\"\"\"\n    import heapq\n    adj = {}\n    for u, v, w in edges:\n        adj.setdefault(u, []).append((v, w))\n        adj.setdefault(v, [])\n    dist = {source: 0.0}\n    pq = [(0.0, source)]\n    while pq:\n        d, u = heapq.heappop(pq)\n        if d > dist.get(u, float('inf')):\n            continue\n        for v, w in adj.get(u, []):\n            nd = d + w\n            if nd < dist.get(v, float('inf')):\n                dist[v] = nd\n                heapq.heappush(pq, (nd, v))\n    return dist.get(target)\n\n\ndef test_triangle_shorter_indirect():\n    g = Graph()\n    g.add_edge('A', 'B', 10)\n    g.add_edge('A', 'C', 1)\n    g.add_edge('C', 'B', 2)\n    assert g.shortest_path('A', 'B') == 3.0\n\n\ndef test_direct_edge():\n    g = Graph()\n    g.add_edge('X', 'Y', 5)\n    assert g.shortest_path('X', 'Y') == 5.0\n\n\ndef test_unreachable():\n    g = Graph()\n    g.add_edge('A', 'B', 1)\n    assert g.shortest_path('A', 'C') is None\n\n\ndef test_longer_chain():\n    g = Graph()\n    g.add_edge('A', 'B', 10)\n    g.add_edge('A', 'C', 2)\n    g.add_edge('C', 'D', 2)\n    g.add_edge('D', 'B', 2)\n    assert g.shortest_path('A', 'B') == 6.0\n\n\n@pytest.mark.parametrize(\"seed\", [0, 1, 7, 42])\ndef test_random_graph_matches_reference(seed):\n    rng = random.Random(seed)\n    nodes = [str(i) for i in range(8)]\n    edges = []\n    for _ in range(16):\n        u, v = rng.sample(nodes, 2)\n        w = rng.uniform(1, 10)\n        edges.append((u, v, w))\n    g = Graph()\n    for u, v, w in edges:\n        g.add_edge(u, v, w)\n    source, target = nodes[0], nodes[-1]\n    result = g.shortest_path(source, target)\n    expected = _ref_dijkstra(edges, source, target)\n    assert result == pytest.approx(expected, abs=1e-6), (\n        f\"seed={seed}: got {result}, expected {expected}\"\n    )\n"
+  }
+}

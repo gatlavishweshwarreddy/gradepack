@@ -1,0 +1,32 @@
+store.py
+```python
+class EventStore:
+    def __init__(self):
+        self._events = []
+
+    def append(self, event):
+        self._events.append(event)
+
+    def replay(self, from_seq=0):
+        """
+        Return events with sequence >= from_seq in sequence order.
+        """
+        return [e for e in sorted(self._events, key=lambda e: e.sequence) if e.sequence >= from_seq]
+```
+
+projector.py
+```python
+class Projector:
+    def apply(self, events):
+        """Fold events into state dict in sequence order."""
+        state = {}
+        for e in sorted(events, key=lambda e: e.sequence):
+            if e.type == "set":
+                state[e.payload["key"]] = e.payload["value"]
+            elif e.type == "delete":
+                state.pop(e.payload["key"], None)
+            elif e.type == "increment":
+                k = e.payload["key"]
+                state[k] = state.get(k, 0) + e.payload["by"]
+        return state
+```

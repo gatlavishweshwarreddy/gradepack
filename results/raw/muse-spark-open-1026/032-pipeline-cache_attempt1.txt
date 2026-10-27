@@ -1,0 +1,40 @@
+pipeline.py
+```python
+from cache import ResultCache
+
+
+def _make_hashable(obj):
+    """Recursively convert obj into a hashable representation that captures full contents."""
+    if isinstance(obj, list):
+        return tuple(_make_hashable(x) for x in obj)
+    if isinstance(obj, tuple):
+        return tuple(_make_hashable(x) for x in obj)
+    if isinstance(obj, dict):
+        # sort by key representation to be deterministic
+        return tuple(sorted((_make_hashable(k), _make_hashable(v)) for k, v in obj.items()))
+    if isinstance(obj, set):
+        return frozenset(_make_hashable(x) for x in obj)
+    # for other types, try to hash directly; fallback to repr if unhashable
+    try:
+        hash(obj)
+        return obj
+    except TypeError:
+        return repr(obj)
+
+
+class Pipeline:
+    def __init__(self, transforms):
+        self._transforms = transforms
+        self._cache = ResultCache()
+
+    def run(self, data):
+        result = data
+        for t in self._transforms:
+            key = (t.name, _make_hashable(result))
+            if self._cache.has(key):
+                result = self._cache.get(key)
+            else:
+                result = t.apply(result)
+                self._cache.set(key, result)
+        return result
+```

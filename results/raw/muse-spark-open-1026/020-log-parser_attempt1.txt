@@ -1,0 +1,29 @@
+stats.py
+```python
+import datetime
+
+
+def duration_seconds(entries):
+    """
+    Return elapsed seconds between first and last entry.
+    Returns 0 if fewer than 2 entries.
+    Correctly handles logs that span midnight (and multiple midnights)
+    by detecting when the time goes backwards.
+    """
+    if len(entries) < 2:
+        return 0
+    base = datetime.date(2000, 1, 1)
+    first = datetime.datetime.combine(base, entries[0].time)
+
+    # Count midnight crossings by scanning entries in order
+    days = 0
+    prev_time = entries[0].time
+    for e in entries[1:]:
+        if e.time < prev_time:
+            days += 1
+        prev_time = e.time
+
+    last = datetime.datetime.combine(base + datetime.timedelta(days=days), entries[-1].time)
+    delta = last - first
+    return delta.total_seconds()
+```

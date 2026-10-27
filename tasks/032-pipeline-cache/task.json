@@ -1,0 +1,12 @@
+{
+  "id": "032-pipeline-cache",
+  "title": "Data pipeline cache returns stale results when input list is modified",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The package in starter/ implements a data processing pipeline with caching. transform.py provides Transform with apply(data) which processes a list and caches the result. cache.py provides ResultCache with get(key) and set(key, value). pipeline.py provides Pipeline(transforms) with run(data) which applies each transform in sequence, caching results per transform per input. The pipeline returns a cached result even when the input list has been modified since the cache entry was stored, because the cache key does not capture the full contents of the list. The grader calls run() twice with a list that is mutated between calls and asserts that both results match the independently computed reference output for each input. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": ["caching", "mutable-key", "pipeline"],
+  "estimated_minutes": 30,
+  "license": "MIT"
+}

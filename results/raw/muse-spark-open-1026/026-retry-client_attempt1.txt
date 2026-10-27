@@ -1,0 +1,64 @@
+client.py
+```python
+from transport import Response
+from backoff import wait_seconds
+
+
+# Status codes that should trigger a retry
+_RETRYABLE = {500, 502, 503, 504}
+
+
+class HttpClient:
+    def __init__(self, transport, max_retries=3, backoff_base=1.0):
+        self._transport = transport
+        self._max_retries = max_retries
+        self._base = backoff_base
+        self._waits = []  # record of wait_seconds calls for testing
+
+    def get(self, url):
+        """
+        Call transport.request(url) and retry on transient errors.
+        """
+        retryable = _RETRYABLE
+        for attempt in range(1, self._max_retries + 2):
+            resp = self._transport.request(url)
+            if resp.status_code not in retryable:
+                return resp
+            if attempt <= self._max_retries:
+                delay = wait_seconds(attempt, self._base)
+                self._waits.append(delay)
+        return resp
+```
+
+backoff.py
+```python
+def wait_seconds(attempt, base=1.0):
+    """
+    Return the backoff delay for a given attempt number (1-indexed).
+    attempt=1 → base, attempt=2 → base*2, attempt=3 → base*4, etc.
+    """
+    return base * (2 ** (attempt - 1))
+```
+
+transport.py
+```python
+class Response:
+    def __init__(self, status_code, body=""):
+        self.status_code = status_code
+        self.body = body
+
+
+class FakeTransport:
+    """Controllable test double for HTTP transport."""
+
+    def __init__(self, responses):
+        """responses: list of Response objects returned in order."""
+        self._queue = list(responses)
+        self.call_count = 0
+
+    def request(self, url):
+        self.call_count += 1
+        if not self._queue:
+            raise RuntimeError("FakeTransport: no more responses configured")
+        return self._queue.pop(0)
+```

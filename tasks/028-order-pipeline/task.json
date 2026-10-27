@@ -1,0 +1,12 @@
+{
+  "id": "028-order-pipeline",
+  "title": "Order total is wrong for discounted orders above the bulk threshold",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The package in starter/ implements an order processing pipeline. order.py provides Order with add_item(name, price, qty) and Order.total(). pricer.py provides apply_bulk_discount(subtotal) which applies a 10% discount when subtotal >= 100.0, and 5% when subtotal >= 50.0. tax.py provides calculate_tax(amount) which returns amount * 0.08. pipeline.py provides process(order) which returns the final charged amount: subtotal → apply_bulk_discount → calculate_tax. The final amount is wrong for orders above $100: the discount tier selection is off by one boundary, AND the tax is applied to the undiscounted subtotal rather than the discounted total. Both bugs must be fixed for the grader to pass. The grader checks process() against a reference computation for orders at several price points. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": ["pipeline", "arithmetic", "two-bugs"],
+  "estimated_minutes": 30,
+  "license": "MIT"
+}

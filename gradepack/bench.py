@@ -38,10 +38,13 @@ def _categorise(
     finish_reason: str = "",
     had_candidate: bool = True,
 ) -> str:
+    # Subprocess timeout from run_pytest is always "timeout"
+    if result.get("timed_out"):
+        return "timeout"
     if error_msg:
         if "timeout" in error_msg.lower() or "timed out" in error_msg.lower():
             return "timeout"
-        if any(k in error_msg.lower() for k in ("http", "api", "429", "5")):
+        if any(k in error_msg.lower() for k in ("http", "api", "429")):
             return "api_error"
         return "runner_error"
     if not had_candidate:
@@ -154,6 +157,7 @@ def _bench_task(
     finish_reason: str = ""
     token_usage: dict | None = None
 
+    retried: bool = False
     if mock:
         candidate_files = _mock_fixed_files(task_id) if mock_pass else _mock_broken_files(task_id)
         raw_response = "[mock]"
@@ -171,6 +175,20 @@ def _bench_task(
             raw_response  = _api.extract_content(resp_data)
             finish_reason = _api.extract_finish_reason(resp_data)
             token_usage   = _api.extract_usage(resp_data)
+            # D: retry once with doubled max_tokens if truncated
+            if finish_reason in ("length", "max_tokens") and not raw_response:
+                doubled = min(max_tokens * 2, 32768)
+                resp_data2 = _api.chat(
+                    _api._SYSTEM_CODING,
+                    user_msg,
+                    temperature=temperature,
+                    max_tokens=doubled,
+                    timeout=180,
+                )
+                raw_response  = _api.extract_content(resp_data2)
+                finish_reason = _api.extract_finish_reason(resp_data2)
+                token_usage   = _api.extract_usage(resp_data2)
+                retried = True
             if raw_response:
                 candidate_files = _api.parse_coding_response(raw_response, allowed)
         except Exception as exc:
@@ -234,6 +252,8 @@ def _bench_task(
         "elapsed_s":       elapsed,
         "raw_output_path": raw_path,
     }
+    if retried:
+        record["retried"] = True
     if token_usage:
         record["token_usage"] = token_usage
     if error_msg:
@@ -473,6 +493,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--provider-label", default="",  help="Human-readable provider label stored in records")
     p.add_argument("--publish",        action="store_true", help="Copy results to docs/results/ after run")
     p.add_argument("--include-mock",   action="store_true", help="Allow publishing mock result files")
+    p.add_argument("--append",         action="store_true", help="Append to existing results instead of replacing")
+    p.add_argument("--dry-run",        action="store_true", help="Print first request body (key redacted) and exit")
     return p
 
 
@@ -495,6 +517,8 @@ def cmd_bench_argv(argv: list[str]) -> None:
         provider_label=args.provider_label,
         publish=args.publish,
         include_mock=args.include_mock,
+        append=args.append,
+        dry_run=args.dry_run,
     )
 
 
@@ -513,6 +537,8 @@ def cmd_bench(
     provider_label: str = "",
     publish: bool = False,
     include_mock: bool = False,
+    append: bool = False,
+    dry_run: bool = False,
 ) -> None:
     results_dir = core._repo_root() / "results"
     results_dir.mkdir(exist_ok=True)
@@ -524,11 +550,53 @@ def cmd_bench(
         provider = provider_label or os.environ.get("BASE_URL", "").rstrip("/")
         model_name = _api.get_model()
 
+    # B: run_id = UTC timestamp for this run
+    run_id = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+
+    # E: --dry-run: print first request body and exit
+    if dry_run:
+        task_ids_all = task_filter if task_filter else core.all_task_ids()
+        if task_ids_all:
+            tid = task_ids_all[0]
+            meta = core.load_task_json(tid)
+            starter_dir = core.task_dir(tid) / "starter"
+            starter_files = {
+                p.name: p.read_text()
+                for p in starter_dir.iterdir()
+                if p.is_file() and p.suffix == ".py"
+            }
+            user_msg = _api.build_coding_prompt(meta.get("prompt", ""), starter_files)
+            body = {
+                "model": model_name,
+                "messages": [
+                    {"role": "system", "content": _api._SYSTEM_CODING},
+                    {"role": "user",   "content": user_msg[:200] + "…[truncated]"},
+                ],
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+            }
+            print(json.dumps({"BASE_URL": os.environ.get("BASE_URL","(not set)"),
+                              "API_KEY": "(redacted)" if os.environ.get("API_KEY") else "(not set)",
+                              "request_body_preview": body}, indent=2))
+        return
+
     raw_output_dir = results_dir / "raw" / model
     results_file   = results_dir / f"{model}.json"
 
+    # B: archive previous results to history/ unless --append
+    if results_file.exists() and not append:
+        hist_dir = results_dir / "history"
+        hist_dir.mkdir(exist_ok=True)
+        try:
+            old_data = json.loads(results_file.read_text())
+            old_run_id = old_data[0].get("run_id", "unknown") if old_data else "unknown"
+        except Exception:
+            old_run_id = "unknown"
+        dest = hist_dir / f"{model}-{old_run_id}.json"
+        shutil.copy2(results_file, dest)
+
     existing: list[dict] = []
-    if results_file.exists():
+    if append and results_file.exists():
         try:
             existing = json.loads(results_file.read_text())
         except json.JSONDecodeError:
@@ -574,6 +642,7 @@ def cmd_bench(
                     "date": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
                     "score": 0.0, "passed": 0, "failed": 0, "total": 0,
                 }
+            record["run_id"] = run_id
             new_records.append(record)
             turn_info = ""
             if record.get("agentic"):

@@ -1,0 +1,12 @@
+{
+  "id": "031-graph-paths",
+  "title": "Shortest path finder returns suboptimal distances for some graphs",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The package in starter/ implements Dijkstra's algorithm for finding shortest paths. graph.py provides Graph with add_edge(u, v, weight) and shortest_path(source, target) returning the path cost as a float, or None if unreachable. heap.py provides a MinHeap used internally. The algorithm returns wrong distances for graphs where the shortest path requires relaxing an edge that was already settled (due to a wrong relaxation condition). For example in a graph A→B(10), A→C(1), C→B(2), shortest_path('A','B') should return 3.0 but may return 10.0. The grader tests several graph topologies including seeded random graphs verified against a reference BFS-based implementation. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": ["graph", "dijkstra", "shortest-path"],
+  "estimated_minutes": 30,
+  "license": "MIT"
+}

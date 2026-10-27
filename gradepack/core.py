@@ -153,22 +153,36 @@ def run_pytest(grader_dir: pathlib.Path, timeout: int = 30) -> dict:
         safe_env["PATH"] = python_dir + os.pathsep + existing_path
 
     # Use a fresh temp dir as cwd so pytest cannot pick up stray conftest.py files.
-    with tempfile.TemporaryDirectory() as tmp_cwd:
-        proc = subprocess.run(
-            [
-                "python", "-m", "pytest",
-                str(grader_dir),
-                "-v",
-                "--tb=no",
-                "--no-header",
-                "-p", "no:cacheprovider",
-            ],
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            cwd=tmp_cwd,
-            env=safe_env,
-        )
+    try:
+        with tempfile.TemporaryDirectory() as tmp_cwd:
+            proc = subprocess.run(
+                [
+                    "python", "-m", "pytest",
+                    str(grader_dir),
+                    "-v",
+                    "--tb=short",
+                    "--no-header",
+                    "-p", "no:cacheprovider",
+                ],
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                cwd=tmp_cwd,
+                env=safe_env,
+            )
+    except subprocess.TimeoutExpired as exc:
+        # Pytest process timed out — classify as timeout, not runner_error.
+        partial = ""
+        if exc.stdout:
+            partial = exc.stdout if isinstance(exc.stdout, str) else exc.stdout.decode(errors="replace")
+        if exc.stderr:
+            partial += exc.stderr if isinstance(exc.stderr, str) else exc.stderr.decode(errors="replace")
+        return {
+            "passed": 0, "failed": 0, "total": 0, "failures": [],
+            "error": f"pytest timed out after {timeout}s",
+            "timed_out": True,
+            "_raw_output": partial[:_OUTPUT_CAP],
+        }
 
     raw = proc.stdout + proc.stderr
     # Cap output size to avoid memory issues.

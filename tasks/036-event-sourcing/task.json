@@ -1,0 +1,12 @@
+{
+  "id": "036-event-sourcing",
+  "title": "Event replay produces wrong final state when events are out of sequence",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The package in starter/ implements an event sourcing system. event.py provides Event(sequence, type, payload). store.py provides EventStore with append(event) and replay(from_seq) which returns all events with sequence >= from_seq in order. projector.py provides Projector with apply(events) which folds a list of events into a state dict. The state is wrong when events are not appended in sequence order and replay is called with a non-zero from_seq — the projector processes events in insertion order rather than sequence order, and replay uses '> from_seq' instead of '>= from_seq' causing the boundary event to be skipped. The grader inserts events out of order and checks that replaying from various sequence numbers produces correct state. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": ["event-sourcing", "ordering", "off-by-one"],
+  "estimated_minutes": 30,
+  "license": "MIT"
+}

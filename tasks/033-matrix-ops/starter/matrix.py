@@ -1,0 +1,31 @@
+from dtype import coerce_element
+
+
+class Matrix:
+    def __init__(self, rows):
+        self.rows = [[coerce_element(v) for v in row] for row in rows]
+        self.nrows = len(rows)
+        self.ncols = len(rows[0]) if rows else 0
+
+    def __matmul__(self, other):
+        if self.ncols != other.nrows:
+            raise ValueError("incompatible shapes")
+        result = []
+        for i in range(self.nrows):
+            row = []
+            for j in range(other.ncols):
+                s = sum(self.rows[i][k] * other.rows[k][j]
+                        for k in range(self.ncols))
+                row.append(coerce_element(s))
+            result.append(row)
+        return Matrix(result)
+
+    def scale(self, factor):
+        return Matrix([[coerce_element(v * factor) for v in row]
+                       for row in self.rows])
+
+    def __eq__(self, other):
+        return self.rows == other.rows
+
+    def __repr__(self):
+        return f"Matrix({self.rows!r})"

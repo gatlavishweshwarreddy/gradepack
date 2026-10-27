@@ -1,0 +1,26 @@
+permissions.py
+```python
+def has_permission(user_roles, permission):
+    """
+    Return True if any role in user_roles grants the given permission.
+    """
+    for role in user_roles:
+        if permission in role.permissions:
+            return True
+    return False
+```
+
+roles.py
+```python
+from dataclasses import dataclass, field
+
+
+@dataclass
+class Role:
+    name: str
+    permissions: frozenset = field(default_factory=frozenset)
+
+    def __post_init__(self):
+        if not isinstance(self.permissions, frozenset):
+            self.permissions = frozenset(self.permissions)
+```

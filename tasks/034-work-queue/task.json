@@ -1,0 +1,12 @@
+{
+  "id": "034-work-queue",
+  "title": "Work queue loses items when multiple workers consume concurrently",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The package in starter/ implements a thread-safe work queue. queue.py provides WorkQueue with put(item) and get() which returns the next item or None if empty, and a done() method. worker.py provides Worker(queue, results) which calls queue.get() in a loop and appends processed items to results. The grader tests that when N items are enqueued and K workers drain the queue concurrently, all N items appear in results (no items are lost or duplicated) using threading.Barrier to ensure all workers start simultaneously. With the current implementation some items are lost under concurrent access. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": ["threading", "queue", "race-condition"],
+  "estimated_minutes": 30,
+  "license": "MIT"
+}

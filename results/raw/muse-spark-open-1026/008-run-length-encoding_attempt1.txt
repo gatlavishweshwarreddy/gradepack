@@ -5,16 +5,12 @@ def encode(s):
     if not s:
         return []
     result = []
-    prev_char = s[0]
-    count = 1
-    for ch in s[1:]:
-        if ch == prev_char:
-            count += 1
+    for ch in s:
+        if result and result[-1][0] == ch:
+            prev_char, prev_count = result[-1]
+            result[-1] = (prev_char, prev_count + 1)
         else:
-            result.append((prev_char, count))
-            prev_char = ch
-            count = 1
-    result.append((prev_char, count))
+            result.append((ch, 1))
     return result
 
 

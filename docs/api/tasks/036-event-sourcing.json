@@ -1,0 +1,23 @@
+{
+  "id": "036-event-sourcing",
+  "title": "Event replay produces wrong final state when events are out of sequence",
+  "difficulty": "hard",
+  "language": "python",
+  "tags": [
+    "event-sourcing",
+    "ordering",
+    "off-by-one"
+  ],
+  "estimated_minutes": 30,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/036-event-sourcing.json",
+  "prompt": "The package in starter/ implements an event sourcing system. event.py provides Event(sequence, type, payload). store.py provides EventStore with append(event) and replay(from_seq) which returns all events with sequence >= from_seq in order. projector.py provides Projector with apply(events) which folds a list of events into a state dict. The state is wrong when events are not appended in sequence order and replay is called with a non-zero from_seq \u2014 the projector processes events in insertion order rather than sequence order, and replay uses '> from_seq' instead of '>= from_seq' causing the boundary event to be skipped. The grader inserts events out of order and checks that replaying from various sequence numbers produces correct state. Do not edit the tests.",
+  "starter_files": {
+    "event.py": "class Event:\n    def __init__(self, sequence, type_, payload):\n        self.sequence = sequence\n        self.type = type_\n        self.payload = payload\n\n    def __repr__(self):\n        return f\"Event(seq={self.sequence}, type={self.type!r}, payload={self.payload!r})\"\n",
+    "projector.py": "class Projector:\n    def apply(self, events):\n        \"\"\"Fold events into state dict.\"\"\"\n        state = {}\n        for e in events:\n            if e.type == \"set\":\n                state[e.payload[\"key\"]] = e.payload[\"value\"]\n            elif e.type == \"delete\":\n                state.pop(e.payload[\"key\"], None)\n            elif e.type == \"increment\":\n                k = e.payload[\"key\"]\n                state[k] = state.get(k, 0) + e.payload[\"by\"]\n        return state\n",
+    "store.py": "class EventStore:\n    def __init__(self):\n        self._events = []\n\n    def append(self, event):\n        self._events.append(event)\n\n    def replay(self, from_seq=0):\n        \"\"\"\n        Return events with sequence >= from_seq in sequence order.\n        BUG 1: uses > from_seq instead of >= from_seq (skips the boundary event).\n        BUG 2: does not sort by sequence before returning.\n        \"\"\"\n        return [e for e in self._events if e.sequence > from_seq]\n"
+  },
+  "grader_files": {
+    "test_event_sourcing.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom event import Event\nfrom store import EventStore\nfrom projector import Projector\nimport pytest\n\n\ndef _make_store():\n    store = EventStore()\n    # Insert out of order\n    store.append(Event(3, \"set\",       {\"key\": \"c\", \"value\": 30}))\n    store.append(Event(1, \"set\",       {\"key\": \"a\", \"value\": 10}))\n    store.append(Event(4, \"increment\", {\"key\": \"a\", \"by\": 5}))\n    store.append(Event(2, \"set\",       {\"key\": \"b\", \"value\": 20}))\n    store.append(Event(5, \"delete\",    {\"key\": \"b\"}))\n    return store\n\n\ndef test_replay_from_zero_all_events():\n    store = _make_store()\n    proj = Projector()\n    state = proj.apply(store.replay(0))\n    assert state == {\"a\": 15, \"c\": 30}, f\"Got: {state}\"\n\n\ndef test_replay_from_seq_includes_boundary():\n    store = _make_store()\n    proj = Projector()\n    state = proj.apply(store.replay(3))\n    assert state == {\"c\": 30, \"a\": 5}, f\"Got: {state}\"\n\n\ndef test_replay_sorted_order():\n    store = _make_store()\n    events = store.replay(0)\n    seqs = [e.sequence for e in events]\n    assert seqs == sorted(seqs), f\"Events not in sequence order: {seqs}\"\n\n\ndef test_replay_from_seq_1():\n    store = _make_store()\n    proj = Projector()\n    state = proj.apply(store.replay(1))\n    assert state.get(\"a\") is not None\n\n\ndef test_empty_replay():\n    store = EventStore()\n    assert store.replay(0) == []\n"
+  }
+}

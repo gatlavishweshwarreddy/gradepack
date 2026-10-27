@@ -261,11 +261,45 @@ MCP stdio server with three tools: `list_tasks`, `get_task(task_id)`, `run_candi
 
 ---
 
+### `doctor [--dry-run]`
+
+```bash
+gradepack doctor           # check env vars, make a tiny test request
+gradepack doctor --dry-run # check env vars only, no network request
+```
+
+Prints `set` or `missing` for each env var (never the key value). Reports `status`, `finish_reason`, whether `content` or `reasoning_content` was returned, and warns if only `reasoning_content` is present (gradepack uses `content` only).
+
+---
+
+### `bench --dry-run`
+
+```bash
+gradepack bench --model gpt-4o --dry-run --task 001-pagination-off-by-one
+```
+
+Prints the first request body for one task with the API key redacted. Makes no API calls.
+
+---
+
 ### `gen-registry [--site]`
 
 ```bash
 gradepack gen-registry          # tasks/index.json + llms.txt
 gradepack gen-registry --site   # also writes docs/api/ for GitHub Pages
+```
+
+---
+
+## Results management
+
+By default, each `bench` run **replaces** the previous `results/<model>.json` file (moving it to `results/history/<model>-<run_id>.json`, git-ignored). Use `--append` to accumulate records instead.
+
+Every record includes a `run_id` (UTC timestamp) and `raw_output_path` (relative to the repo root).
+
+```bash
+gradepack bench --model gpt-4o --mock            # replaces previous results
+gradepack bench --model gpt-4o --mock --append   # accumulates
 ```
 
 ---
