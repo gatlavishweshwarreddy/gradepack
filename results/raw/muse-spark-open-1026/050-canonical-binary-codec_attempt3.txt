@@ -1,7 +1,6 @@
 codec.py
 ```python
 import struct
-import math
 
 TAG_NULL = 0x00
 TAG_TRUE = 0x01
@@ -38,15 +37,13 @@ def _decode_varint(buf, pos):
             break
         shift += 7
         if shift >= 64:
-            # allow arbitrary Python ints but still guard against malformed streams
-            # 64 bits is enough for 64-bit ints; larger ints need more bytes
-            # use a much larger limit to support big ints while preventing DoS
-            if shift >= 100000:
-                raise ValueError("varint too long")
+            raise ValueError("varint too long")
     return result, pos
 
 
 def _encode_zigzag(n):
+    # canonical zigzag for arbitrary Python int
+    # 0 -> 0, -1 -> 1, 1 -> 2, -2 -> 3, ...
     if n >= 0:
         return n << 1
     else:
@@ -57,24 +54,42 @@ def _decode_zigzag(n):
     return (n >> 1) ^ -(n & 1)
 
 
-def _sort_key(x):
-    # canonical type order based on TAG order: None < bool < int < float < str < bytes
-    if x is None:
-        return (0, 0)
-    if isinstance(x, bool):
-        return (1, int(x))
-    if isinstance(x, int):
-        return (2, x)
-    if isinstance(x, float):
-        if math.isnan(x):
-            return (3, (1, 0))
-        return (3, (0, x))
-    if isinstance(x, str):
-        return (4, x)
-    if isinstance(x, bytes):
-        return (5, x)
-    # fallback for unexpected hashable types (should not occur for dict keys / set elements)
-    return (6, repr(x))
+def _type_rank(o):
+    if o is None:
+        return 0
+    if isinstance(o, bool):
+        return 1
+    if isinstance(o, int):
+        return 2
+    if isinstance(o, float):
+        return 3
+    if isinstance(o, str):
+        return 4
+    if isinstance(o, bytes):
+        return 5
+    if isinstance(o, list):
+        return 6
+    if isinstance(o, dict):
+        return 7
+    if isinstance(o, set):
+        return 8
+    return 9
+
+
+def _sort_key(o):
+    r = _type_rank(o)
+    if o is None:
+        return (r, 0)
+    if isinstance(o, bool):
+        return (r, int(o))
+    # for int, float, str, bytes use natural ordering
+    # list/dict/set are not expected as dict keys / set elements (unhashable)
+    # but handle them for completeness
+    try:
+        return (r, o)
+    except TypeError:
+        # fallback to repr for unorderable types
+        return (r, repr(o))
 
 
 class Codec:
@@ -139,6 +154,7 @@ class Codec:
             buf.extend(_encode_varint(len(obj)))
             buf.extend(obj)
         elif isinstance(obj, list):
+            # memoize before encoding contents to support cycles/shared refs
             memo[obj_id] = next_id[0]
             next_id[0] += 1
             buf.append(TAG_LIST)
@@ -146,4 +162,91 @@ class Codec:
             for item in obj:
                 self._encode(item, buf, memo, next_id)
         elif isinstance(obj, dict):
-            memo[obj_id] = next_id[0
+            memo[obj_id] = next_id[0]
+            next_id[0] += 1
+            buf.append(TAG_DICT)
+            buf.extend(_encode_varint(len(obj)))
+            # canonical sorted order
+            for k, v in sorted(obj.items(), key=lambda kv: _sort_key(kv[0])):
+                self._encode(k, buf, memo, next_id)
+                self._encode(v, buf, memo, next_id)
+        elif isinstance(obj, set):
+            memo[obj_id] = next_id[0]
+            next_id[0] += 1
+            buf.append(TAG_SET)
+            buf.extend(_encode_varint(len(obj)))
+            for item in sorted(obj, key=_sort_key):
+                self._encode(item, buf, memo, next_id)
+        else:
+            raise TypeError(f"unsupported type: {type(obj)}")
+
+    def _decode(self, buf, pos, memo):
+        if pos >= len(buf):
+            raise ValueError("truncated data")
+        tag = buf[pos]
+        pos += 1
+        if tag == TAG_NULL:
+            return None, pos
+        elif tag == TAG_TRUE:
+            return True, pos
+        elif tag == TAG_FALSE:
+            return False, pos
+        elif tag == TAG_INT:
+            zz, pos = _decode_varint(buf, pos)
+            return _decode_zigzag(zz), pos
+        elif tag == TAG_FLOAT:
+            if pos + 8 > len(buf):
+                raise ValueError("truncated float")
+            val = struct.unpack('<d', buf[pos:pos+8])[0]
+            pos += 8
+            return val, pos
+        elif tag == TAG_STR:
+            length, pos = _decode_varint(buf, pos)
+            if pos + length > len(buf):
+                raise ValueError("truncated str")
+            try:
+                s = buf[pos:pos+length].decode('utf-8')
+            except UnicodeDecodeError as e:
+                raise ValueError("invalid utf-8") from e
+            pos += length
+            return s, pos
+        elif tag == TAG_BYTES:
+            length, pos = _decode_varint(buf, pos)
+            if pos + length > len(buf):
+                raise ValueError("truncated bytes")
+            b = bytes(buf[pos:pos+length])
+            pos += length
+            return b, pos
+        elif tag == TAG_LIST:
+            length, pos = _decode_varint(buf, pos)
+            lst = []
+            memo.append(lst)
+            for _ in range(length):
+                val, pos = self._decode(buf, pos, memo)
+                lst.append(val)
+            return lst, pos
+        elif tag == TAG_DICT:
+            length, pos = _decode_varint(buf, pos)
+            d = {}
+            memo.append(d)
+            for _ in range(length):
+                k, pos = self._decode(buf, pos, memo)
+                v, pos = self._decode(buf, pos, memo)
+                d[k] = v
+            return d, pos
+        elif tag == TAG_SET:
+            length, pos = _decode_varint(buf, pos)
+            s = set()
+            memo.append(s)
+            for _ in range(length):
+                val, pos = self._decode(buf, pos, memo)
+                s.add(val)
+            return s, pos
+        elif tag == TAG_REF:
+            ref_id, pos = _decode_varint(buf, pos)
+            if ref_id >= len(memo):
+                raise ValueError("invalid ref")
+            return memo[ref_id], pos
+        else:
+            raise ValueError(f"unknown tag: {tag}")
+```

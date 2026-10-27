@@ -1,0 +1,242 @@
+codec.py
+```python
+import struct
+
+TAG_NULL = 0x00
+TAG_TRUE = 0x01
+TAG_FALSE = 0x02
+TAG_INT = 0x03
+TAG_FLOAT = 0x04
+TAG_STR = 0x05
+TAG_BYTES = 0x06
+TAG_LIST = 0x07
+TAG_DICT = 0x08
+TAG_SET = 0x09
+TAG_REF = 0x0A
+
+
+def _encode_varint(n):
+    out = bytearray()
+    while n >= 0x80:
+        out.append((n & 0x7F) | 0x80)
+        n >>= 7
+    out.append(n & 0x7F)
+    return bytes(out)
+
+
+def _decode_varint(buf, pos):
+    result = 0
+    shift = 0
+    while True:
+        if pos >= len(buf):
+            raise ValueError("truncated varint")
+        b = buf[pos]
+        pos += 1
+        result |= (b & 0x7F) << shift
+        if (b & 0x80) == 0:
+            break
+        shift += 7
+        if shift >= 64:
+            raise ValueError("varint too long")
+    return result, pos
+
+
+def _encode_zigzag(n):
+    # ZigZag for arbitrary Python ints: (n<<1) ^ (n>>63) with sign extension
+    # For Python big ints n>>63 is not just sign, so use conditional
+    if n >= 0:
+        return n << 1
+    else:
+        return (-n << 1) - 1
+
+
+def _decode_zigzag(n):
+    return (n >> 1) ^ -(n & 1)
+
+
+def _type_rank(obj):
+    if obj is None:
+        return 0
+    elif isinstance(obj, bool):
+        return 1
+    elif isinstance(obj, int):
+        return 2
+    elif isinstance(obj, float):
+        return 3
+    elif isinstance(obj, str):
+        return 4
+    elif isinstance(obj, bytes):
+        return 5
+    elif isinstance(obj, list):
+        return 6
+    elif isinstance(obj, dict):
+        return 7
+    elif isinstance(obj, set):
+        return 8
+    else:
+        return 9
+
+
+def _sort_key(obj):
+    # canonical sort: first by type rank, then by natural value
+    # for same rank natural comparison is valid; for different ranks rank decides
+    # fallback to repr for incomparable types
+    try:
+        return (_type_rank(obj), obj)
+    except TypeError:
+        return (_type_rank(obj), repr(obj))
+
+
+class Codec:
+    """
+    Binary codec for Python values.
+
+    Public API:
+      dumps(obj) -> bytes
+      loads(data) -> obj
+
+    Supported types: None, bool, int, float, str, bytes, list, dict, set.
+    Shared references and cyclic structures are preserved via back-references.
+    Dict keys and set elements are serialized in canonical sorted order.
+    Internal helpers _encode, _decode, _encode_varint, _decode_varint,
+    _encode_zigzag, _decode_zigzag may be instrumented for performance checks.
+    Floats are little-endian IEEE-754. Strings are UTF-8 with byte-length prefix.
+    The decoder validates input and rejects trailing/unknown/truncated data.
+    """
+
+    def dumps(self, obj):
+        buf = bytearray()
+        memo = {}
+        next_id = [0]
+        self._encode(obj, buf, memo, next_id)
+        return bytes(buf)
+
+    def loads(self, data):
+        if not isinstance(data, (bytes, bytearray)):
+            raise TypeError("data must be bytes")
+        if len(data) == 0:
+            raise ValueError("empty data")
+        memo = []
+        obj, pos = self._decode(data, 0, memo)
+        if pos != len(data):
+            raise ValueError("trailing bytes")
+        return obj
+
+    def _encode(self, obj, buf, memo, next_id):
+        obj_id = id(obj)
+        if obj_id in memo:
+            buf.append(TAG_REF)
+            buf.extend(_encode_varint(memo[obj_id]))
+            return
+        if obj is None:
+            buf.append(TAG_NULL)
+        elif isinstance(obj, bool):
+            buf.append(TAG_TRUE if obj else TAG_FALSE)
+        elif isinstance(obj, int):
+            buf.append(TAG_INT)
+            zz = _encode_zigzag(obj)
+            buf.extend(_encode_varint(zz))
+        elif isinstance(obj, float):
+            buf.append(TAG_FLOAT)
+            buf.extend(struct.pack('<d', obj))
+        elif isinstance(obj, str):
+            b = obj.encode('utf-8')
+            buf.append(TAG_STR)
+            buf.extend(_encode_varint(len(b)))
+            buf.extend(b)
+        elif isinstance(obj, bytes):
+            buf.append(TAG_BYTES)
+            buf.extend(_encode_varint(len(obj)))
+            buf.extend(obj)
+        elif isinstance(obj, list):
+            memo[obj_id] = next_id[0]
+            next_id[0] += 1
+            buf.append(TAG_LIST)
+            buf.extend(_encode_varint(len(obj)))
+            for item in obj:
+                self._encode(item, buf, memo, next_id)
+        elif isinstance(obj, dict):
+            memo[obj_id] = next_id[0]
+            next_id[0] += 1
+            buf.append(TAG_DICT)
+            buf.extend(_encode_varint(len(obj)))
+            for k, v in sorted(obj.items(), key=lambda kv: _sort_key(kv[0])):
+                self._encode(k, buf, memo, next_id)
+                self._encode(v, buf, memo, next_id)
+        elif isinstance(obj, set):
+            memo[obj_id] = next_id[0]
+            next_id[0] += 1
+            buf.append(TAG_SET)
+            buf.extend(_encode_varint(len(obj)))
+            for item in sorted(obj, key=_sort_key):
+                self._encode(item, buf, memo, next_id)
+        else:
+            raise TypeError(f"unsupported type: {type(obj)}")
+
+    def _decode(self, buf, pos, memo):
+        if pos >= len(buf):
+            raise ValueError("truncated data")
+        tag = buf[pos]
+        pos += 1
+        if tag == TAG_NULL:
+            return None, pos
+        elif tag == TAG_TRUE:
+            return True, pos
+        elif tag == TAG_FALSE:
+            return False, pos
+        elif tag == TAG_INT:
+            zz, pos = _decode_varint(buf, pos)
+            return _decode_zigzag(zz), pos
+        elif tag == TAG_FLOAT:
+            if pos + 8 > len(buf):
+                raise ValueError("truncated float")
+            val = struct.unpack('<d', buf[pos:pos+8])[0]
+            pos += 8
+            return val, pos
+        elif tag == TAG_STR:
+            length, pos = _decode_varint(buf, pos)
+            if pos + length > len(buf):
+                raise ValueError("truncated str")
+            s = buf[pos:pos+length].decode('utf-8')
+            pos += length
+            return s, pos
+        elif tag == TAG_BYTES:
+            length, pos = _decode_varint(buf, pos)
+            if pos + length > len(buf):
+                raise ValueError("truncated bytes")
+            b = bytes(buf[pos:pos+length])
+            pos += length
+            return b, pos
+        elif tag == TAG_LIST:
+            length, pos = _decode_varint(buf, pos)
+            lst = []
+            memo.append(lst)
+            for _ in range(length):
+                val, pos = self._decode(buf, pos, memo)
+                lst.append(val)
+            return lst, pos
+        elif tag == TAG_DICT:
+            length, pos = _decode_varint(buf, pos)
+            d = {}
+            memo.append(d)
+            for _ in range(length):
+                k, pos = self._decode(buf, pos, memo)
+                v, pos = self._decode(buf, pos, memo)
+                d[k] = v
+            return d, pos
+        elif tag == TAG_SET:
+            length, pos = _decode_varint(buf, pos)
+            s = set()
+            memo.append(s)
+            for _ in range(length):
+                val, pos = self._decode(buf, pos, memo)
+                s.add(val)
+            return s, pos
+        elif tag == TAG_REF:
+            ref_id, pos = _decode_varint(buf, pos)
+            if ref_id >= len(memo):
+                raise ValueError("invalid ref")
+            return memo[ref_id], pos
+        else:
+            raise ValueError(f"unknown tag: {tag}")
+```

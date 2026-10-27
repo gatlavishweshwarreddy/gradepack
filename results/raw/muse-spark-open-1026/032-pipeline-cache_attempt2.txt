@@ -1,20 +1,26 @@
 pipeline.py
 ```python
 from cache import ResultCache
-import copy
 
 
-def _make_hashable(obj):
-    if isinstance(obj, list):
-        return tuple(_make_hashable(x) for x in obj)
-    elif isinstance(obj, tuple):
-        return tuple(_make_hashable(x) for x in obj)
-    elif isinstance(obj, dict):
-        return tuple(sorted((_make_hashable(k), _make_hashable(v)) for k, v in obj.items()))
-    elif isinstance(obj, set):
-        return frozenset(_make_hashable(x) for x in obj)
-    else:
-        return obj
+def _to_hashable(value):
+    # Recursively convert mutable containers to immutable, hashable equivalents
+    if isinstance(value, list):
+        return tuple(_to_hashable(v) for v in value)
+    if isinstance(value, tuple):
+        return tuple(_to_hashable(v) for v in value)
+    if isinstance(value, dict):
+        # sort by hashable key representation to be deterministic
+        return tuple(sorted((_to_hashable(k), _to_hashable(v)) for k, v in value.items()))
+    if isinstance(value, set):
+        return frozenset(_to_hashable(v) for v in value)
+    # hashable leaf types (str, int, float, bool, None, etc.)
+    try:
+        hash(value)
+        return value
+    except TypeError:
+        # fallback for unhashable custom objects: use repr which captures value
+        return repr(value)
 
 
 class Pipeline:
@@ -25,11 +31,12 @@ class Pipeline:
     def run(self, data):
         result = data
         for t in self._transforms:
-            key = (t.name, _make_hashable(result))
+            # cache key captures full contents of the input, not identity
+            key = (t.name, _to_hashable(result))
             if self._cache.has(key):
-                result = copy.deepcopy(self._cache.get(key))
+                result = self._cache.get(key)
             else:
                 result = t.apply(result)
-                self._cache.set(key, copy.deepcopy(result))
+                self._cache.set(key, result)
         return result
 ```

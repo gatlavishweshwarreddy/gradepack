@@ -85,57 +85,54 @@ class BufferedIterator:
             return []
         result = []
         for _ in range(n):
-            if self._buffer:
-                result.append(self._buffer.popleft())
-            elif self._exhausted:
+            try:
+                result.append(next(self))
+            except StopIteration:
                 break
-            else:
-                try:
-                    result.append(next(self._source_iter))
-                except StopIteration:
-                    self._exhausted = True
-                    break
         return result
 
     def window(self, size, step=1):
         if size <= 0 or step <= 0:
             raise ValueError("size and step must be positive")
-        buf = deque(maxlen=size)
-        idx = 0
-        for item in self:
-            buf.append(item)
+        buf = []
+        for _ in range(size):
+            try:
+                buf.append(next(self))
+            except StopIteration:
+                return
+        yield tuple(buf)
+        while True:
+            for _ in range(step):
+                try:
+                    buf.append(next(self))
+                except StopIteration:
+                    return
+            buf = buf[step:]
             if len(buf) < size:
-                idx += 1
-                continue
-            start = idx - size + 1
-            if start % step == 0:
-                yield tuple(buf)
-            idx += 1
+                return
+            yield tuple(buf)
 
     def close(self):
         if hasattr(self._source_iter, 'close'):
             try:
                 self._source_iter.close()
             except Exception:
-                self._buffer.clear()
-                self._exhausted = True
-                raise
+                pass
         self._buffer.clear()
         self._exhausted = True
 
     def throw(self, exc_type, exc_val=None, tb=None):
+        self._buffer.clear()
         if hasattr(self._source_iter, 'throw'):
-            self._buffer.clear()
             try:
                 result = self._source_iter.throw(exc_type, exc_val, tb)
+                self._exhausted = False
+                return result
             except StopIteration:
                 self._exhausted = True
                 raise
             except BaseException:
                 raise
-            else:
-                self._exhausted = False
-                return result
         if isinstance(exc_type, BaseException):
             if tb is not None:
                 raise exc_type.with_traceback(tb)

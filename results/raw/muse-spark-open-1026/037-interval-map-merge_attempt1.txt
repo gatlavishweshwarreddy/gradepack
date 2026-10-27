@@ -22,8 +22,10 @@ class IntervalMap:
         new_intervals.sort(key=lambda x: x[0])
         merged = []
         for a, b, v in new_intervals:
-            if merged and merged[-1][1] == a and merged[-1][2] == v:
-                merged[-1][1] = b
+            if merged and merged[-1][1] >= a and merged[-1][2] == v:
+                # adjacent (==) or overlapping (>) with same value -> merge
+                if b > merged[-1][1]:
+                    merged[-1][1] = b
             else:
                 merged.append([a, b, v])
         self._intervals = merged
@@ -55,6 +57,7 @@ class IntervalMap:
         return None
 
     def intervals(self):
+        # return a new list of tuples (copy) so mutation doesn't affect internal state
         return [(a, b, v) for a, b, v in self._intervals]
 
     def total_covered(self):

@@ -1,0 +1,158 @@
+buffered_iterator.py
+```python
+import collections
+from collections import deque
+
+_sentinel = object()
+
+class BufferedIterator:
+    def __init__(self, iterable):
+        self._iterator = iter(iterable)
+        self._buffer = deque()
+        self._closed = False
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self._closed:
+            raise StopIteration
+        if self._buffer:
+            return self._buffer.popleft()
+        return next(self._iterator)
+
+    def peek(self, n=0, default=_sentinel):
+        if n < 0:
+            raise ValueError("n must be non-negative")
+        if self._closed:
+            if default is not _sentinel:
+                return default
+            raise StopIteration
+        while len(self._buffer) <= n:
+            try:
+                self._buffer.append(next(self._iterator))
+            except StopIteration:
+                if default is not _sentinel:
+                    return default
+                raise
+        return self._buffer[n]
+
+    def push_back(self, *values):
+        if self._closed:
+            raise StopIteration("Cannot push_back on closed iterator")
+        # push so that first value is returned first
+        for v in reversed(values):
+            self._buffer.appendleft(v)
+
+    def take(self, n):
+        if n <= 0:
+            return []
+        result = []
+        for _ in range(n):
+            try:
+                result.append(next(self))
+            except StopIteration:
+                break
+        return result
+
+    def window(self, size, step=1):
+        if size <= 0:
+            raise ValueError("size must be positive")
+        if step <= 0:
+            raise ValueError("step must be positive")
+        if self._closed:
+            return
+            yield
+        buf = deque()
+        for _ in range(size):
+            try:
+                buf.append(next(self))
+            except StopIteration:
+                return
+        yield tuple(buf)
+        while True:
+            if step < size:
+                for _ in range(step):
+                    buf.popleft()
+                for _ in range(step):
+                    try:
+                        buf.append(next(self))
+                    except StopIteration:
+                        return
+                yield tuple(buf)
+            else:
+                for _ in range(step - size):
+                    try:
+                        next(self)
+                    except StopIteration:
+                        return
+                buf.clear()
+                for _ in range(size):
+                    try:
+                        buf.append(next(self))
+                    except StopIteration:
+                        return
+                yield tuple(buf)
+
+    def close(self):
+        if self._closed:
+            return
+        self._closed = True
+        close_method = getattr(self._iterator, "close", None)
+        if callable(close_method):
+            try:
+                close_method()
+            except Exception:
+                raise
+
+    def throw(self, *args, **kwargs):
+        if self._closed:
+            if args:
+                exc = args[0]
+                if isinstance(exc, BaseException):
+                    raise exc
+                elif isinstance(exc, type) and issubclass(exc, BaseException):
+                    val = args[1] if len(args) > 1 else None
+                    tb = args[2] if len(args) > 2 else None
+                    if val is None:
+                        exc_obj = exc()
+                    else:
+                        exc_obj = val if isinstance(val, BaseException) else exc(val)
+                    if tb is not None:
+                        raise exc_obj.with_traceback(tb)
+                    raise exc_obj
+            raise StopIteration
+        throw_method = getattr(self._iterator, "throw", None)
+        if throw_method is not None:
+            return throw_method(*args, **kwargs)
+        else:
+            if not args:
+                raise TypeError("throw() requires at least one argument")
+            typ = args[0]
+            if isinstance(typ, BaseException):
+                raise typ
+            elif isinstance(typ, type) and issubclass(typ, BaseException):
+                val = args[1] if len(args) > 1 else None
+                tb = args[2] if len(args) > 2 else None
+                if val is None:
+                    exc_obj = typ()
+                else:
+                    exc_obj = val if isinstance(val, BaseException) else typ(val)
+                if tb is not None:
+                    raise exc_obj.with_traceback(tb)
+                raise exc_obj
+            else:
+                raise typ
+
+    @property
+    def closed(self):
+        return self._closed
+
+    @property
+    def _is_closed(self):
+        return self._closed
+
+    @property
+    def is_closed(self):
+        return self._closed
+```

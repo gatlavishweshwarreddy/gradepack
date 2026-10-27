@@ -6,6 +6,7 @@ import copy
 class Schema:
     def __init__(self):
         self._definitions = {}
+        self._definition = {}
 
     def load(self, definition):
         """Store a schema definition dict."""
@@ -24,18 +25,16 @@ class Schema:
         return expanded
 
     def _resolve(self, node):
-        if isinstance(node, dict):
-            if "$ref" in node:
-                ref_name = node["$ref"]
-                if ref_name in self._definitions:
-                    ref_copy = copy.deepcopy(self._definitions[ref_name])
-                    del node["$ref"]
-                    node.update(ref_copy)
-            for v in list(node.values()):
-                self._resolve(v)
-        elif isinstance(node, list):
-            for item in node:
-                self._resolve(item)
+        if not isinstance(node, dict):
+            return
+        if "$ref" in node:
+            ref_name = node["$ref"]
+            if ref_name in self._definitions:
+                ref_copy = copy.deepcopy(self._definitions[ref_name])
+                del node["$ref"]
+                node.update(ref_copy)
+        for v in list(node.values()):
+            self._resolve(v)
 ```
 
 validator.py

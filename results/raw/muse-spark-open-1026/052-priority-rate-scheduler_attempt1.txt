@@ -131,50 +131,50 @@ class Scheduler:
         self._now = now
         self.bucket.refill(now)
 
-        # Complete RUNNING tasks whose duration has elapsed
-        finishing = []
-        for task in self.tasks.values():
-            if task.state == TaskState.RUNNING and task.start_time is not None and now >= task.start_time + task.duration:
-                finishing.append(task)
-        # deterministic priority order
-        finishing.sort(key=lambda t: (t.priority, t.seq))
         completed = []
-        for task in finishing:
-            try:
-                task.result = task.func()
-                task.state = TaskState.COMPLETED
-            except Exception as e:
-                task.error = e
-                task.state = TaskState.FAILED
-            self.running_count -= 1
-            completed.append(task.task_id)
 
-        # Promote PENDING tasks: check dependencies every tick
-        # Iterate in seq order (dict insertion order == seq order) to handle cascading failures in one pass
         for task in list(self.tasks.values()):
-            if task.state != TaskState.PENDING:
-                continue
-            # if any dep FAILED or CANCELLED -> FAILED propagation
-            failed_dep = False
-            for d in task.deps:
-                dep_state = self.tasks[d].state
-                if dep_state == TaskState.FAILED or dep_state == TaskState.CANCELLED:
-                    failed_dep = True
-                    break
-            if failed_dep:
-                task.state = TaskState.FAILED
-                continue
-            # if all deps COMPLETED -> READY
-            if task.deps and all(self.tasks[d].state == TaskState.COMPLETED for d in task.deps):
-                task.state = TaskState.READY
-                heapq.heappush(self.ready_heap, (task.priority, task.seq, task.task_id))
-            elif not task.deps:
-                # Should not happen because empty deps tasks are made READY on submit,
-                # but handle just in case
-                task.state = TaskState.READY
-                heapq.heappush(self.ready_heap, (task.priority, task.seq, task.task_id))
+            if task.state == TaskState.RUNNING and task.start_time is not None and now >= task.start_time + task.duration:
+                try:
+                    task.result = task.func()
+                    task.state = TaskState.COMPLETED
+                except Exception as e:
+                    task.error = e
+                    task.state = TaskState.FAILED
+                self.running_count -= 1
+                completed.append(task.task_id)
 
-        # Start as many READY tasks as allowed by concurrency and tokens
+        # Promote PENDING tasks: handle FAILED propagation and READY promotion
+        # Loop to handle transitive propagation in same tick (deps have lower seq, but loop ensures correctness)
+        changed = True
+        while changed:
+            changed = False
+            for task in self.tasks.values():
+                if task.state != TaskState.PENDING:
+                    continue
+                # Check for FAILED/CANCELLED propagation
+                has_failed = False
+                for d in task.deps:
+                    dep_state = self.tasks[d].state
+                    if dep_state == TaskState.FAILED or dep_state == TaskState.CANCELLED:
+                        has_failed = True
+                        break
+                if has_failed:
+                    task.state = TaskState.FAILED
+                    changed = True
+                    continue
+                # Check if all deps are COMPLETED
+                if task.deps and all(self.tasks[d].state == TaskState.COMPLETED for d in task.deps):
+                    task.state = TaskState.READY
+                    heapq.heappush(self.ready_heap, (task.priority, task.seq, task.task_id))
+                    changed = True
+                elif not task.deps:
+                    # Should not happen: no-dep tasks are made READY at submit time
+                    # But handle defensively
+                    task.state = TaskState.READY
+                    heapq.heappush(self.ready_heap, (task.priority, task.seq, task.task_id))
+                    changed = True
+
         while self.ready_heap and self.running_count < self.max_concurrency:
             if self.bucket.tokens < 1:
                 break
@@ -189,5 +189,7 @@ class Scheduler:
             task.start_time = now
             self.running_count += 1
 
+        # Return completed in deterministic priority order (sorted by priority, seq)
+        completed.sort(key=lambda tid: (self.tasks[tid].priority, self.tasks[tid].seq))
         return completed
 ```

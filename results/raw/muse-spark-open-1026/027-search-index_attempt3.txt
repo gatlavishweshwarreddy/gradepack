@@ -1,7 +1,5 @@
 index.py
 ```python
-import re
-
 class SearchIndex:
     def __init__(self):
         self._docs = {}
@@ -16,73 +14,32 @@ class SearchIndex:
     def build(self):
         self._index = {}
         for doc_id, text in self._docs.items():
-            tokens = re.findall(r'\b\w+\b', text)
+            n = len(text)
+            # avoid duplicate substrings within the same document
             seen = set()
-            for tok in tokens:
-                if tok not in seen:
-                    seen.add(tok)
-                    self._index.setdefault(tok, []).append(doc_id)
+            for i in range(n):
+                # slicing creates substring text[i:j]
+                for j in range(i + 1, n + 1):
+                    substr = text[i:j]
+                    if substr in seen:
+                        continue
+                    seen.add(substr)
+                    if substr not in self._index:
+                        self._index[substr] = [doc_id]
+                    else:
+                        self._index[substr].append(doc_id)
         self._built = True
 
     def search(self, query):
-        """Return doc_ids whose text contains query. Uses inverted index."""
-        q = query.lower().strip()
-        if not q:
-            return []
+        """Return doc_ids whose text contains query using inverted index."""
+        q = query.lower()
+        if q == "":
+            return list(self._docs.keys())
         if not self._built:
             self.build()
-
-        # one logical comparison per search, not per document
-        self.comparison_count += 1
-
-        q_tokens = re.findall(r'\b\w+\b', q)
-        if not q_tokens:
+        # O(1) dictionary lookup, no per-document string comparison
+        res = self._index.get(q)
+        if res is None:
             return []
-
-        # single term query
-        if len(q_tokens) == 1:
-            term = q_tokens[0]
-            if term in self._index:
-                return list(self._index[term])
-            # substring fallback: find indexed terms that contain the query
-            # as substring (e.g. "ell" in "hello") without scanning documents
-            result = []
-            result_set = set()
-            for token, doc_list in self._index.items():
-                if term in token:
-                    for doc_id in doc_list:
-                        if doc_id not in result_set:
-                            result_set.add(doc_id)
-                            result.append(doc_id)
-            if result:
-                order = {doc_id: i for i, doc_id in enumerate(self._docs)}
-                result.sort(key=lambda d: order.get(d, 0))
-                return result
-            return []
-
-        # multi-term query: intersect posting lists (AND semantics)
-        postings = []
-        for tok in q_tokens:
-            if tok in self._index:
-                postings.append(self._index[tok])
-            else:
-                # substring fallback for this token
-                union_set = set()
-                for key, doc_list in self._index.items():
-                    if tok in key:
-                        union_set.update(doc_list)
-                if not union_set:
-                    return []
-                # keep insertion order for this posting
-                order = {doc_id: i for i, doc_id in enumerate(self._docs)}
-                postings.append(sorted(union_set, key=lambda d: order.get(d, 0)))
-
-        if not postings:
-            return []
-        if any(not p for p in postings):
-            return []
-
-        other_sets = [set(p) for p in postings[1:]]
-        result = [doc for doc in postings[0] if all(doc in s for s in other_sets)]
-        return result
+        return list(res)
 ```

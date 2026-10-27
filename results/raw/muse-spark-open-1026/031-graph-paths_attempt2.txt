@@ -23,15 +23,19 @@ class Graph:
 
         while pq:
             d, u = heapq.heappop(pq)
+
             # Skip stale entries
-            if d != dist.get(u):
+            if d > dist.get(u, float('inf')):
                 continue
+
             if u == target:
-                return d
+                return float(d)
+
             for v, w in self._adj.get(u, []):
                 nd = d + w
                 if v not in dist or nd < dist[v]:
                     dist[v] = nd
                     heapq.heappush(pq, (nd, v))
+
         return None
 ```

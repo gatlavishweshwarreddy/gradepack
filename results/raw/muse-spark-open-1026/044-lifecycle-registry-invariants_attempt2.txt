@@ -9,4 +9,234 @@ Registry lifecycle:
   - open() moves to OPEN
   - close() moves to CLOSED (terminal, cannot be reopened)
   - any operation requiring OPEN must raise RegistryClosed if not OPEN
-  - public attributes: state (str
+  - public attributes: state (str), is_closed (bool)
+
+Resource lifecycle (per id):
+  PENDING -> ACTIVE -> SUSPENDED -> ACTIVE -> FAILED -> DISPOSED
+  Transitions:
+    register(id, data=None): creates PENDING, fails if duplicate id
+    initialize(id): PENDING -> ACTIVE
+    suspend(id): ACTIVE -> SUSPENDED, must raise InvalidTransition if already SUSPENDED
+    resume(id): SUSPENDED -> ACTIVE, must raise InvalidTransition if not SUSPENDED
+    fail(id): PENDING/ACTIVE/SUSPENDED -> FAILED
+    dispose(id): PENDING/ACTIVE/SUSPENDED/FAILED -> DISPOSED, requires ref_count==0 else ResourceInUse
+    DISPOSED is terminal for all operations
+
+Reference counting:
+  acquire(id): increments ref_count, allowed only on ACTIVE/SUSPENDED, raises InvalidTransition on DISPOSED/FAILED/PENDING
+  release(id): decrements, raises if count would go negative
+  get_refcount(id): returns current count
+  dispose requires ref_count==0
+
+Data access:
+  get(id): returns stored data, allowed only on ACTIVE/SUSPENDED, raises InvalidTransition otherwise, must be O(1)
+  put(id, data): sets data, allowed only on ACTIVE, must be O(1)
+  lookup_steps: public counter incremented per internal lookup step, must stay O(1) per get/put (1 step per op)
+
+Close semantics:
+  close() must transition every non-DISPOSED resource to DISPOSED.
+  If any resource has ref_count>0, close() must raise ResourceInUse and leave registry OPEN (not CLOSED).
+  After successful close, every resource must report DISPOSED via get_resource_state.
+
+Context managers:
+  Registry as context manager: __enter__ opens if needed, __exit__ closes (never suppresses exceptions)
+  session(id): context manager that does acquire on enter and release on exit, correctly handling exceptions
+
+Other public API:
+  get_resource_state(id) -> str
+  list_resources() -> list of ids
+"""
+
+class InvalidTransition(Exception):
+    pass
+
+class ResourceInUse(Exception):
+    pass
+
+class RegistryClosed(Exception):
+    pass
+
+
+class LifecycleRegistry:
+    def __init__(self):
+        self._state = "CREATED"
+        self._store = {}
+        self._states = {}
+        self._refcounts = {}
+        self.lookup_steps = 0
+
+    @property
+    def state(self):
+        return self._state
+
+    @property
+    def is_closed(self):
+        return self._state == "CLOSED"
+
+    def open(self):
+        if self._state == "CLOSED":
+            raise RegistryClosed("registry is closed")
+        if self._state == "OPEN":
+            return
+        self._state = "OPEN"
+
+    def close(self):
+        if self._state == "CLOSED":
+            return
+        if self._state != "OPEN":
+            raise RegistryClosed("registry not open")
+        for rid, count in self._refcounts.items():
+            if count > 0:
+                raise ResourceInUse(f"resource {rid} in use with refcount {count}")
+        for rid in list(self._states.keys()):
+            if self._states[rid] != "DISPOSED":
+                self._states[rid] = "DISPOSED"
+        self._state = "CLOSED"
+
+    def register(self, rid, data=None):
+        if self._state != "OPEN":
+            raise RegistryClosed("registry not open")
+        if rid in self._states:
+            raise InvalidTransition(f"duplicate id {rid}")
+        self._store[rid] = data
+        self._states[rid] = "PENDING"
+        self._refcounts[rid] = 0
+
+    def initialize(self, rid):
+        if self._state != "OPEN":
+            raise RegistryClosed("registry not open")
+        state = self._states.get(rid)
+        if state is None:
+            raise KeyError(rid)
+        if state != "PENDING":
+            raise InvalidTransition(f"initialize from {state}")
+        self._states[rid] = "ACTIVE"
+
+    def suspend(self, rid):
+        if self._state != "OPEN":
+            raise RegistryClosed("registry not open")
+        state = self._states.get(rid)
+        if state is None:
+            raise KeyError(rid)
+        if state == "ACTIVE":
+            self._states[rid] = "SUSPENDED"
+        else:
+            raise InvalidTransition(f"suspend from {state}")
+
+    def resume(self, rid):
+        if self._state != "OPEN":
+            raise RegistryClosed("registry not open")
+        state = self._states.get(rid)
+        if state is None:
+            raise KeyError(rid)
+        if state == "SUSPENDED":
+            self._states[rid] = "ACTIVE"
+        else:
+            raise InvalidTransition(f"resume from {state}")
+
+    def fail(self, rid):
+        if self._state != "OPEN":
+            raise RegistryClosed("registry not open")
+        state = self._states.get(rid)
+        if state is None:
+            raise KeyError(rid)
+        if state in ("PENDING", "ACTIVE", "SUSPENDED"):
+            self._states[rid] = "FAILED"
+        elif state == "FAILED":
+            raise InvalidTransition("already failed")
+        else:
+            raise InvalidTransition(f"fail from {state}")
+
+    def dispose(self, rid):
+        if self._state != "OPEN":
+            raise RegistryClosed("registry not open")
+        state = self._states.get(rid)
+        if state is None:
+            raise KeyError(rid)
+        if self._refcounts.get(rid, 0) > 0:
+            raise ResourceInUse(f"refcount {self._refcounts.get(rid,0)}")
+        if state == "DISPOSED":
+            raise InvalidTransition("already disposed")
+        if state in ("ACTIVE", "SUSPENDED", "FAILED", "PENDING"):
+            self._states[rid] = "DISPOSED"
+        else:
+            raise InvalidTransition(f"dispose from {state}")
+
+    def acquire(self, rid):
+        if self._state != "OPEN":
+            raise RegistryClosed("registry not open")
+        state = self._states.get(rid)
+        if state is None:
+            raise KeyError(rid)
+        if state in ("ACTIVE", "SUSPENDED"):
+            self._refcounts[rid] = self._refcounts.get(rid, 0) + 1
+        else:
+            raise InvalidTransition(f"acquire from {state}")
+
+    def release(self, rid):
+        if self._state != "OPEN":
+            raise RegistryClosed("registry not open")
+        if rid not in self._refcounts:
+            raise KeyError(rid)
+        if self._refcounts[rid] <= 0:
+            raise InvalidTransition("release without acquire")
+        self._refcounts[rid] -= 1
+
+    def get_refcount(self, rid):
+        if rid not in self._refcounts:
+            raise KeyError(rid)
+        return self._refcounts[rid]
+
+    def get(self, rid):
+        if self._state != "OPEN":
+            raise RegistryClosed("registry not open")
+        self.lookup_steps += 1
+        if rid not in self._store:
+            raise KeyError(rid)
+        state = self._states.get(rid)
+        if state not in ("ACTIVE", "SUSPENDED"):
+            raise InvalidTransition(f"get from {state}")
+        return self._store[rid]
+
+    def put(self, rid, data):
+        if self._state != "OPEN":
+            raise RegistryClosed("registry not open")
+        self.lookup_steps += 1
+        if rid not in self._store:
+            raise KeyError(rid)
+        state = self._states.get(rid)
+        if state != "ACTIVE":
+            raise InvalidTransition(f"put from {state}")
+        self._store[rid] = data
+
+    def get_resource_state(self, rid):
+        if rid not in self._states:
+            raise KeyError(rid)
+        return self._states[rid]
+
+    def list_resources(self):
+        return list(self._states.keys())
+
+    def session(self, rid):
+        registry = self
+        class _Session:
+            def __enter__(self):
+                registry.acquire(rid)
+                return registry.get(rid) if registry.get_resource_state(rid) in ("ACTIVE", "SUSPENDED") else None
+            def __exit__(self, exc_type, exc, tb):
+                registry.release(rid)
+                return False
+        return _Session()
+
+    def __enter__(self):
+        if self._state == "CREATED":
+            self.open()
+        elif self._state == "CLOSED":
+            raise RegistryClosed("cannot enter closed registry")
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        if self._state == "OPEN":
+            self.close()
+        return False
+```

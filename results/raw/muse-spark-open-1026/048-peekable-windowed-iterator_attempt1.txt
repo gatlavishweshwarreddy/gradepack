@@ -63,7 +63,7 @@ class BufferedIterator:
                 self._exhausted = True
                 if default is not _sentinel:
                     return default
-                raise
+                raise StopIteration
         return self._buffer[index]
 
     def has_next(self):
@@ -93,22 +93,24 @@ class BufferedIterator:
     def window(self, size, step=1):
         if size <= 0 or step <= 0:
             raise ValueError("size and step must be positive")
-        window_buf = []
+        # initial window
+        window = []
         for _ in range(size):
             try:
-                window_buf.append(next(self))
+                window.append(next(self))
             except StopIteration:
                 return
-        yield tuple(window_buf)
+        yield tuple(window)
         while True:
             if step < size:
-                window_buf = window_buf[step:]
+                new_items = []
                 for _ in range(step):
                     try:
-                        window_buf.append(next(self))
+                        new_items.append(next(self))
                     except StopIteration:
                         return
-                yield tuple(window_buf)
+                window = window[step:] + new_items
+                yield tuple(window)
             else:
                 skip = step - size
                 for _ in range(skip):
@@ -116,21 +118,20 @@ class BufferedIterator:
                         next(self)
                     except StopIteration:
                         return
-                window_buf = []
+                new_window = []
                 for _ in range(size):
                     try:
-                        window_buf.append(next(self))
+                        new_window.append(next(self))
                     except StopIteration:
                         return
-                yield tuple(window_buf)
+                window = new_window
+                yield tuple(window)
 
     def close(self):
         if hasattr(self._source_iter, 'close'):
             try:
                 self._source_iter.close()
-            except:
-                self._buffer.clear()
-                self._exhausted = True
+            except Exception:
                 raise
         self._buffer.clear()
         self._exhausted = True
@@ -139,17 +140,25 @@ class BufferedIterator:
         self._buffer.clear()
         if hasattr(self._source_iter, 'throw'):
             try:
-                return self._source_iter.throw(exc_type, exc_val, tb)
+                result = self._source_iter.throw(exc_type, exc_val, tb)
+                self._exhausted = False
+                return result
             except StopIteration:
                 self._exhausted = True
                 raise
             except BaseException:
-                self._exhausted = True
                 raise
-        self._exhausted = True
         if isinstance(exc_type, BaseException):
-            raise exc_type.with_traceback(tb)
-        if exc_val is not None:
-            raise exc_type(exc_val).with_traceback(tb)
-        raise exc_type().with_traceback(tb)
+            if tb is not None:
+                raise exc_type.with_traceback(tb)
+            raise exc_type
+        if exc_val is None:
+            exc = exc_type()
+        elif isinstance(exc_val, BaseException):
+            exc = exc_val
+        else:
+            exc = exc_type(exc_val)
+        if tb is not None:
+            raise exc.with_traceback(tb)
+        raise exc
 ```

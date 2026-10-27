@@ -9,7 +9,6 @@ def merge(base, override):
     Keys only in override are added. When both values are dicts,
     merge recursively; otherwise override wins.
     """
-    # Deep copy base so we never mutate the original or its nested dicts
     result = copy.deepcopy(base)
     for k, v in override.items():
         if k in result and isinstance(result[k], dict) and isinstance(v, dict):

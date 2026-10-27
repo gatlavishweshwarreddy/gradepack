@@ -13,7 +13,6 @@ class EventStore:
         """
         return sorted([e for e in self._events if e.sequence >= from_seq], key=lambda e: e.sequence)
 ```
-
 projector.py
 ```python
 class Projector:

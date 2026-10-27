@@ -1,14 +1,18 @@
 inventory.py
 ```python
-from reservation import ReservationLog
 import threading
+
+try:
+    from reservation import ReservationLog
+except ImportError:
+    from .reservation import ReservationLog
 
 
 class Inventory:
     def __init__(self):
         self._stock = {}
         self._log = ReservationLog()
-        self._lock = threading.RLock()
+        self._lock = threading.Lock()
 
     def add_stock(self, item, qty):
         with self._lock:
@@ -19,14 +23,36 @@ class Inventory:
             return self._stock.get(item, 0) - self._log.total_reserved(item)
 
     def reserve(self, item, qty):
-        if qty <= 0:
-            return False
         with self._lock:
-            if self.available(item) >= qty:
+            # atomically check and record; available must account for already-committed reservations
+            available = self._stock.get(item, 0) - self._log.total_reserved(item)
+            if available >= qty:
                 self._log.record(item, qty)
                 return True
             return False
 
     def reservations(self):
         return self._log
+```
+
+reservation.py
+```python
+import threading
+
+class ReservationLog:
+    def __init__(self):
+        self._log = []
+        self._lock = threading.Lock()
+
+    def record(self, item, qty):
+        with self._lock:
+            self._log.append((item, qty))
+
+    def total_reserved(self, item):
+        with self._lock:
+            return sum(q for i, q in self._log if i == item)
+
+    def all_reservations(self):
+        with self._lock:
+            return list(self._log)
 ```

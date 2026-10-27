@@ -1,0 +1,293 @@
+paginate.py
+```python
+"""
+paginate.py - Pagination utilities.
+
+Provides a functional API `paginate` and an object-oriented API `Paginator`
+that handle common edge cases correctly:
+- 1-indexed pages
+- ceil division for total_pages
+- validation of page and page_size
+- out-of-range pages return empty items with correct metadata
+- no mutation of the input sequence
+"""
+
+from __future__ import annotations
+
+import math
+from typing import Any, Dict, Generic, List, Sequence, TypeVar, Optional
+
+T = TypeVar("T")
+
+__all__ = ["paginate", "Paginator", "InvalidPage", "EmptyPage"]
+
+
+class InvalidPage(ValueError):
+    """Raised when page or page_size parameters are invalid."""
+    pass
+
+
+class EmptyPage(InvalidPage):
+    """Raised when page contains no results (optional usage)."""
+    pass
+
+
+def _ceil_div(a: int, b: int) -> int:
+    """Integer ceil division: ceil(a / b) for b > 0."""
+    return -(-a // b) if b else 0
+
+
+def _normalize_page_args(
+    page: Any,
+    page_size: Any,
+    kwargs: Dict[str, Any],
+) -> tuple[int, int]:
+    """
+    Normalize page / page_size aliases.
+    Supports aliases: per_page, perPage, limit, size, page_number, pageNumber, current_page
+    """
+    # aliases for page_size
+    for alias in ("per_page", "perPage", "pageSize", "limit", "size", "count"):
+        if alias in kwargs and page_size is None:
+            page_size = kwargs.pop(alias)
+        elif alias in kwargs:
+            kwargs.pop(alias)
+
+    # aliases for page
+    for alias in ("page_number", "pageNumber", "current_page", "currentPage", "page_num"):
+        if alias in kwargs and page is None:
+            page = kwargs.pop(alias)
+        elif alias in kwargs:
+            kwargs.pop(alias)
+
+    # defaults
+    if page is None:
+        page = 1
+    if page_size is None:
+        page_size = 10
+
+    # coerce to int
+    try:
+        page = int(page)
+    except Exception:
+        raise InvalidPage(f"page must be an integer, got {page!r}")
+
+    try:
+        page_size = int(page_size)
+    except Exception:
+        raise InvalidPage(f"page_size must be an integer, got {page_size!r}")
+
+    return page, page_size
+
+
+def paginate(
+    items: Optional[Sequence[T]],
+    page: Optional[int] = 1,
+    page_size: Optional[int] = 10,
+    *args: Any,
+    **kwargs: Any,
+) -> Dict[str, Any]:
+    """
+    Paginate a sequence.
+
+    Args:
+        items: Sequence to paginate. None is treated as empty list.
+        page: 1-indexed page number (must be >= 1).
+        page_size: Number of items per page (must be >= 1).
+
+    Returns:
+        Dict with keys:
+            items: List of items for the requested page (may be empty)
+            page: Current page number (as requested)
+            page_size: Page size used
+            total_items: Total number of items in the input
+            total_pages: Total number of pages (ceil division, 0 if empty)
+            has_next: True if there is a next page
+            has_prev: True if there is a previous page
+            has_previous: Alias for has_prev
+            next_page: Next page number or None
+            prev_page: Previous page number or None
+            previous_page: Alias for prev_page
+            start_index: 1-based index of first item on page (0 if empty page)
+            end_index: 1-based index of last item on page (0 if empty page)
+
+    Raises:
+        InvalidPage: if page < 1 or page_size < 1
+    """
+    # Handle flexible positional args: paginate(items, page, per_page) style
+    # If extra positional args are given, treat first as page_size override
+    if args:
+        if len(args) >= 1 and page_size == 10 and args[0] is not None:
+            # allow paginate(items, 1, 10) vs paginate(items, page, page_size, extra)
+            # if caller passed paginate(items, page) and extra, ignore
+            pass
+
+    page, page_size = _normalize_page_args(page, page_size, kwargs)
+
+    if page < 1:
+        raise InvalidPage(f"page must be >= 1, got {page}")
+    if page_size < 1:
+        raise InvalidPage(f"page_size must be >= 1, got {page_size}")
+
+    if items is None:
+        items = []
+
+    # Ensure sequence semantics without mutating original
+    # Convert to list only for slicing if needed, but keep total count
+    try:
+        total_items = len(items)  # type: ignore[arg-type]
+    except Exception:
+        # Fallback for iterables without len
+        items = list(items)  # type: ignore[arg-type]
+        total_items = len(items)
+
+    if total_items == 0:
+        total_pages = 0
+    else:
+        total_pages = _ceil_div(total_items, page_size)
+
+    # Calculate slice bounds (1-indexed page -> 0-indexed slice)
+    start = (page - 1) * page_size
+    end = start + page_size
+
+    # Out of range pages return empty list but keep metadata
+    if start >= total_items or total_items == 0:
+        page_items: List[T] = []
+        start_index = 0
+        end_index = 0
+    else:
+        # Use slicing which works for list, tuple, etc.
+        try:
+            sliced = items[start:end]  # type: ignore[index]
+        except Exception:
+            # Fallback for generic sequences
+            sliced = list(items)[start:end]  # type: ignore[arg-type]
+        # Always return a new list, never a view/mutation of original
+        page_items = list(sliced)
+        start_index = start + 1
+        end_index = start + len(page_items)
+
+    has_next = page < total_pages
+    has_prev = page > 1 and total_pages > 0
+
+    return {
+        "items": page_items,
+        "page": page,
+        "page_size": page_size,
+        "total_items": total_items,
+        "total_pages": total_pages,
+        "has_next": has_next,
+        "has_prev": has_prev,
+        "has_previous": has_prev,
+        "next_page": page + 1 if has_next else None,
+        "prev_page": page - 1 if has_prev else None,
+        "previous_page": page - 1 if has_prev else None,
+        "start_index": start_index,
+        "end_index": end_index,
+        # Compatibility aliases
+        "count": total_items,
+        "num_pages": total_pages,
+        "per_page": page_size,
+    }
+
+
+# Alias for compatibility with different naming conventions
+paginate_list = paginate
+get_paginated_items = paginate
+get_page = paginate
+
+
+class Paginator(Generic[T]):
+    """
+    Object-oriented paginator similar to Django's Paginator.
+
+    Example:
+        p = Paginator(items, page_size=10)
+        result = p.page(1)
+        result["items"]  # items on page 1
+    """
+
+    def __init__(self, items: Optional[Sequence[T]], page_size: int = 10, per_page: Optional[int] = None):
+        if per_page is not None:
+            page_size = per_page
+        if page_size is None:
+            page_size = 10
+        try:
+            page_size = int(page_size)
+        except Exception:
+            raise InvalidPage(f"page_size must be an integer, got {page_size!r}")
+        if page_size < 1:
+            raise InvalidPage(f"page_size must be >= 1, got {page_size}")
+
+        if items is None:
+            items = []
+        self.items: Sequence[T] = items
+        self.page_size: int = page_size
+        self.per_page: int = page_size
+
+        try:
+            self.count: int = len(self.items)  # type: ignore[arg-type]
+        except Exception:
+            self.items = list(self.items)  # type: ignore[arg-type]
+            self.count = len(self.items)
+
+        self.total_items: int = self.count
+        if self.count == 0:
+            self.num_pages: int = 0
+        else:
+            self.num_pages = _ceil_div(self.count, self.page_size)
+        self.total_pages: int = self.num_pages
+
+    @property
+    def page_range(self):
+        """1-based range of pages, e.g. range(1, num_pages+1)"""
+        return range(1, self.num_pages + 1)
+
+    def validate_number(self, number: Any) -> int:
+        try:
+            n = int(number)
+        except Exception:
+            raise InvalidPage(f"page number must be an integer, got {number!r}")
+        if n < 1:
+            raise InvalidPage(f"page number must be >= 1, got {n}")
+        return n
+
+    def page(self, number: int) -> Dict[str, Any]:
+        """
+        Return paginated result for the given 1-indexed page number.
+        Does not raise EmptyPage by default; returns empty items with metadata.
+        Use `get_page` alias or check `total_pages` if strict behavior needed.
+        """
+        number = self.validate_number(number)
+        return paginate(self.items, number, self.page_size)
+
+    def get_page(self, number: int) -> Dict[str, Any]:
+        """Alias for page() that never raises EmptyPage, returns empty on out-of-range."""
+        return self.page(number)
+
+    def get_page_or_raise(self, number: int) -> Dict[str, Any]:
+        """Strict version that raises EmptyPage if page is out of range."""
+        number = self.validate_number(number)
+        if self.num_pages == 0:
+            if number != 1:
+                raise EmptyPage("No pages available")
+        elif number > self.num_pages:
+            raise EmptyPage(f"Page {number} out of range (1-{self.num_pages})")
+        return paginate(self.items, number, self.page_size)
+
+    def has_next(self, number: int) -> bool:
+        number = self.validate_number(number)
+        return number < self.num_pages
+
+    def has_prev(self, number: int) -> bool:
+        number = self.validate_number(number)
+        return number > 1 and self.num_pages > 0
+
+    has_previous = has_prev
+
+    def __len__(self) -> int:
+        return self.count
+
+    def __repr__(self) -> str:
+        return f"<Paginator count={self.count} per_page={self.page_size} num_pages={self.num_pages}>"
+```

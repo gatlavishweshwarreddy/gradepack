@@ -1,0 +1,175 @@
+codec.py
+```python
+import struct
+
+TAG_NONE = 0x00
+TAG_FALSE = 0x01
+TAG_TRUE = 0x02
+TAG_INT = 0x03
+TAG_FLOAT = 0x04
+TAG_STR = 0x05
+TAG_BYTES = 0x06
+TAG_LIST = 0x07
+TAG_DICT = 0x08
+TAG_SET = 0x09
+TAG_TUPLE = 0x0A
+TAG_REF = 0x0B
+
+
+def _encode_sort_bytes(obj):
+    """Deterministic encoding without memo for canonical sorting."""
+    out = bytearray()
+
+    def wv(n):
+        while n >= 0x80:
+            out.append((n & 0x7F) | 0x80)
+            n >>= 7
+        out.append(n)
+
+    def enc(o):
+        if o is None:
+            out.append(TAG_NONE)
+        elif o is True:
+            out.append(TAG_TRUE)
+        elif o is False:
+            out.append(TAG_FALSE)
+        elif isinstance(o, int) and not isinstance(o, bool):
+            out.append(TAG_INT)
+            zz = (o << 1) if o >= 0 else ((-o << 1) - 1)
+            wv(zz)
+        elif isinstance(o, float):
+            out.append(TAG_FLOAT)
+            out.extend(struct.pack('>d', o))
+        elif isinstance(o, str):
+            out.append(TAG_STR)
+            b = o.encode('utf-8')
+            wv(len(b))
+            out.extend(b)
+        elif isinstance(o, bytes):
+            out.append(TAG_BYTES)
+            wv(len(o))
+            out.extend(o)
+        elif isinstance(o, list):
+            out.append(TAG_LIST)
+            wv(len(o))
+            for x in o:
+                enc(x)
+        elif isinstance(o, tuple):
+            out.append(TAG_TUPLE)
+            wv(len(o))
+            for x in o:
+                enc(x)
+        elif isinstance(o, dict):
+            out.append(TAG_DICT)
+            wv(len(o))
+            items = sorted(o.items(), key=lambda kv: repr(kv[0]))
+            for k, v in items:
+                enc(k)
+                enc(v)
+        elif isinstance(o, set):
+            out.append(TAG_SET)
+            wv(len(o))
+            elems = sorted(o, key=repr)
+            for e in elems:
+                enc(e)
+        else:
+            # fallback
+            out.append(TAG_STR)
+            b = repr(o).encode('utf-8')
+            wv(len(b))
+            out.extend(b)
+
+    enc(obj)
+    return bytes(out)
+
+
+def dumps(obj):
+    memo = {}
+    out = bytearray()
+
+    def write_varint(n):
+        while n >= 0x80:
+            out.append((n & 0x7F) | 0x80)
+            n >>= 7
+        out.append(n)
+
+    def encode(o):
+        oid = id(o)
+        if oid in memo:
+            out.append(TAG_REF)
+            write_varint(memo[oid])
+            return
+        idx = len(memo)
+        memo[oid] = idx
+
+        if o is None:
+            out.append(TAG_NONE)
+        elif o is True:
+            out.append(TAG_TRUE)
+        elif o is False:
+            out.append(TAG_FALSE)
+        elif isinstance(o, int) and not isinstance(o, bool):
+            out.append(TAG_INT)
+            zz = (o << 1) if o >= 0 else ((-o << 1) - 1)
+            write_varint(zz)
+        elif isinstance(o, float):
+            out.append(TAG_FLOAT)
+            out.extend(struct.pack('>d', o))
+        elif isinstance(o, str):
+            out.append(TAG_STR)
+            b = o.encode('utf-8')
+            write_varint(len(b))
+            out.extend(b)
+        elif isinstance(o, bytes):
+            out.append(TAG_BYTES)
+            write_varint(len(o))
+            out.extend(o)
+        elif isinstance(o, list):
+            out.append(TAG_LIST)
+            write_varint(len(o))
+            for item in o:
+                encode(item)
+        elif isinstance(o, tuple):
+            out.append(TAG_TUPLE)
+            write_varint(len(o))
+            for item in o:
+                encode(item)
+        elif isinstance(o, dict):
+            out.append(TAG_DICT)
+            write_varint(len(o))
+            items = list(o.items())
+            items.sort(key=lambda kv: _encode_sort_bytes(kv[0]))
+            for k, v in items:
+                encode(k)
+                encode(v)
+        elif isinstance(o, set):
+            out.append(TAG_SET)
+            write_varint(len(o))
+            elems = list(o)
+            elems.sort(key=lambda e: _encode_sort_bytes(e))
+            for e in elems:
+                encode(e)
+        else:
+            raise TypeError(f"unsupported type: {type(o).__name__}")
+
+    encode(obj)
+    return bytes(out)
+
+
+def loads(data):
+    if not isinstance(data, (bytes, bytearray)):
+        raise TypeError("data must be bytes")
+    memo = []
+    pos = 0
+    n = len(data)
+
+    def read_varint():
+        nonlocal pos
+        result = 0
+        shift = 0
+        while True:
+            if pos >= n:
+                raise ValueError("truncated varint")
+            b = data[pos]
+            pos += 1
+            result |= (b & 0x

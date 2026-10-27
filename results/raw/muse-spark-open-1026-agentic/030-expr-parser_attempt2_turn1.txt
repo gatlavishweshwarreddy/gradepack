@@ -2,9 +2,10 @@ parser.py
 ```python
 from tokenizer import tokenize
 
+_SENTINEL = object()
 
 def _parse_expr(tokens, pos, variables):
-    """BUG: left-to-right evaluation, no operator precedence. Kept for backward compatibility."""
+    """BUG: left-to-right evaluation, no operator precedence."""
     left, pos = _parse_atom(tokens, pos, variables)
     while pos < len(tokens) and tokens[pos] in ('+', '-', '*', '/'):
         op = tokens[pos]
@@ -29,7 +30,8 @@ def _parse_atom(tokens, pos, variables):
         return float(tok), pos + 1
 
 
-# Correct precedence implementation for new two-argument form
+# --- correct precedence implementation for new two-argument form ---
+
 def _parse_expr_correct(tokens, pos, variables):
     left, pos = _parse_term_correct(tokens, pos, variables)
     while pos < len(tokens) and tokens[pos] in ('+', '-'):
@@ -44,11 +46,11 @@ def _parse_expr_correct(tokens, pos, variables):
 
 
 def _parse_term_correct(tokens, pos, variables):
-    left, pos = _parse_atom_correct(tokens, pos, variables)
+    left, pos = _parse_factor_correct(tokens, pos, variables)
     while pos < len(tokens) and tokens[pos] in ('*', '/'):
         op = tokens[pos]
         pos += 1
-        right, pos = _parse_atom_correct(tokens, pos, variables)
+        right, pos = _parse_factor_correct(tokens, pos, variables)
         if op == '*':
             left = left * right
         elif op == '/':
@@ -56,11 +58,27 @@ def _parse_term_correct(tokens, pos, variables):
     return left, pos
 
 
+def _parse_factor_correct(tokens, pos, variables):
+    # handle unary +/-
+    if pos < len(tokens) and tokens[pos] in ('+', '-'):
+        op = tokens[pos]
+        val, next_pos = _parse_factor_correct(tokens, pos + 1, variables)
+        if op == '-':
+            return -val, next_pos
+        else:
+            return val, next_pos
+    return _parse_atom_correct(tokens, pos, variables)
+
+
 def _parse_atom_correct(tokens, pos, variables):
     tok = tokens[pos]
     if tok == '(':
         val, pos = _parse_expr_correct(tokens, pos + 1, variables)
-        pos += 1  # skip ')'
+        # skip ')'
+        if pos < len(tokens) and tokens[pos] == ')':
+            pos += 1
+        else:
+            pos += 1
         return val, pos
     elif tok in variables:
         return float(variables[tok]), pos + 1
@@ -68,45 +86,41 @@ def _parse_atom_correct(tokens, pos, variables):
         return float(tok), pos + 1
 
 
-def parse_and_eval(expr_str, variables=None):
-    # variables is None means old single-argument form -> preserve buggy behavior
-    # any other value (including {}) means new two-argument form -> correct precedence
-    if variables is None:
-        # backward compatible buggy path
+def parse_and_eval(expr_str, variables=_SENTINEL):
+    # Old single-argument calls (no variables) must keep buggy left-to-right behavior
+    if variables is _SENTINEL:
+        variables = {}
         tokens = tokenize(expr_str)
-        result, _ = _parse_expr(tokens, 0, {})
+        result, _ = _parse_expr(tokens, 0, variables)
         return result
     else:
+        if variables is None:
+            variables = {}
         tokens = tokenize(expr_str)
         result, _ = _parse_expr_correct(tokens, 0, variables)
         return result
-```
 
-tokenizer.py
-```python
-def tokenize(expr):
-    """Split expression into list of tokens (numbers, operators, parens)."""
-    import re
-    tokens = []
-    for m in re.finditer(r'\d+\.?\d*|[+\-*/()]|\b[a-zA-Z_]\w*\b', expr):
-        tokens.append(m.group())
-    return tokens
-```
 
+def parse_and_eval_correct(expr_str, variables=None):
+    if variables is None:
+        variables = {}
+    tokens = tokenize(expr_str)
+    result, _ = _parse_expr_correct(tokens, 0, variables)
+    return result
+```
 expr.py
 ```python
 from parser import parse_and_eval
 
-_SENTINEL = object()
 
-def evaluate(expr_str, variables=_SENTINEL):
+def evaluate(expr_str, variables=None):
     """Evaluate an arithmetic expression string. variables is an optional dict."""
-    if variables is _SENTINEL:
-        # old single-argument form - preserve backward compatibility (buggy precedence)
-        return parse_and_eval(expr_str, None)
+    # Backward compatibility: single-argument calls (variables is None / not passed)
+    # must keep the old buggy left-to-right evaluation.
+    # Two-argument calls (variables provided) use correct precedence.
+    if variables is None:
+        # called as evaluate(expr_str) -> old behavior, no variables argument
+        return parse_and_eval(expr_str)
     else:
-        # new two-argument form - correct precedence
-        if variables is None:
-            variables = {}
         return parse_and_eval(expr_str, variables)
 ```

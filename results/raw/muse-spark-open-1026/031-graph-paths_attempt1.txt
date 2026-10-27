@@ -25,14 +25,9 @@ class Graph:
             d, u = heapq.heappop(pq)
             # skip stale entries
             if d != dist.get(u):
-                # also handles case where d > dist[u] due to outdated entry
-                if u not in dist or d > dist[u]:
-                    continue
-                # if d != dist[u] but d < dist[u] shouldn't happen, but continue
-                if d != dist[u]:
-                    continue
+                continue
             if u == target:
-                return float(d)
+                return d
             for v, w in self._adj.get(u, []):
                 nd = d + w
                 if v not in dist or nd < dist[v]:

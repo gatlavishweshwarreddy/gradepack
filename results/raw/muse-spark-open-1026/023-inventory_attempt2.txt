@@ -19,11 +19,10 @@ class Inventory:
             return self._stock.get(item, 0) - self._log.total_reserved(item)
 
     def reserve(self, item, qty):
-        # guard against non-positive quantities
-        if qty is None or qty <= 0:
-            return False
+        # Atomically check available stock accounting for already committed reservations
         with self._lock:
-            if self.available(item) >= qty:
+            available = self._stock.get(item, 0) - self._log.total_reserved(item)
+            if available >= qty:
                 self._log.record(item, qty)
                 return True
             return False

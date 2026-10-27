@@ -2,150 +2,105 @@ memo.py
 ```python
 import threading
 import functools
+import sys
+import pickle
 
 def _make_key(args, kwargs):
-    """Create a hashable cache key from args/kwargs.
-    Falls back to repr/id for unhashable values.
-    """
-    if kwargs:
-        try:
-            kwargs_key = tuple(sorted(kwargs.items()))
-        except Exception:
-            kwargs_key = tuple(sorted(kwargs.items(), key=lambda x: str(x[0])))
-        key = (args, kwargs_key)
-    else:
-        key = args
     try:
+        if kwargs:
+            key = (args, tuple(sorted(kwargs.items())))
+        else:
+            key = (args, ())
         hash(key)
         return key
     except TypeError:
-        # try to convert unhashable containers
-        def _to_hashable(o):
-            try:
-                hash(o)
-                return o
-            except TypeError:
-                if isinstance(o, list):
-                    return tuple(_to_hashable(x) for x in o)
-                if isinstance(o, dict):
-                    return tuple(sorted((k, _to_hashable(v)) for k, v in o.items()))
-                if isinstance(o, set):
-                    return frozenset(_to_hashable(x) for x in o)
-                # fallback to id for arbitrary objects (e.g. self)
-                return id(o)
         try:
-            if kwargs:
-                hashable_args = tuple(_to_hashable(a) for a in args)
-                hashable_kwargs = tuple(sorted((k, _to_hashable(v)) for k, v in kwargs.items()))
-                key2 = (hashable_args, hashable_kwargs)
-            else:
-                key2 = tuple(_to_hashable(a) for a in args)
-            hash(key2)
-            return key2
+            return pickle.dumps((args, kwargs), protocol=pickle.HIGHEST_PROTOCOL)
         except Exception:
             return repr((args, kwargs))
 
+class _Holder:
+    __slots__ = ("event", "result", "exception", "exc_info")
+    def __init__(self):
+        self.event = threading.Event()
+        self.result = None
+        self.exception = None
+        self.exc_info = None
 
-class _MemoizedFunction:
-    """Thread-safe memoized callable.
-    Guarantees that for a given key the wrapped function is executed
-    at most once even under concurrent calls. Different keys can be
-    computed in parallel. Uses per-key Event to avoid double compute
-    and avoids holding any lock while the user function runs.
-    """
-    def __init__(self, func):
-        functools.update_wrapper(self, func)
-        self.func = func
-        self.cache = {}
-        self._lock = threading.Lock()
-        self._in_progress = {}  # key -> (Event, owner_ident)
-        self._wrapped = func
+def memoize(_fn=None, **decorator_kwargs):
+    def decorator(fn):
+        cache = {}
+        in_progress = {}
+        lock = threading.RLock()
 
-    def __call__(self, *args, **kwargs):
-        key = _make_key(args, kwargs)
-        is_computer = False
-        is_reentrant = False
-        event_to_wait = None
-
-        while True:
-            with self._lock:
-                if key in self.cache:
-                    return self.cache[key]
-                if key in self._in_progress:
-                    event, owner = self._in_progress[key]
-                    if owner == threading.get_ident():
-                        # same thread re-entering with same key -> avoid self-deadlock
-                        is_reentrant = True
+        @functools.wraps(fn)
+        def wrapper(*args, **kwargs):
+            key = _make_key(args, kwargs)
+            while True:
+                with lock:
+                    if key in cache:
+                        return cache[key]
+                    if key in in_progress:
+                        holder = in_progress[key]
+                    else:
+                        holder = _Holder()
+                        in_progress[key] = holder
                         break
-                    event_to_wait = event
-                else:
-                    event = threading.Event()
-                    self._in_progress[key] = (event, threading.get_ident())
-                    is_computer = True
-                    break
-            # wait outside the lock
-            event_to_wait.wait()
-            # reset for next iteration
-            event_to_wait = None
-            is_computer = False
-            is_reentrant = False
+                # wait outside lock
+                holder.event.wait()
+                if holder.exc_info is not None:
+                    raise holder.exc_info[1].with_traceback(holder.exc_info[2])
+                if holder.exception is not None:
+                    raise holder.exception
+                return holder.result
 
-        if is_reentrant:
-            # compute directly without caching to avoid deadlock
-            return self.func(*args, **kwargs)
+            # we are owner
+            try:
+                result = fn(*args, **kwargs)
+            except BaseException as e:
+                holder.exception = e
+                holder.exc_info = sys.exc_info()
+                with lock:
+                    in_progress.pop(key, None)
+                holder.event.set()
+                raise
+            else:
+                holder.result = result
+                with lock:
+                    cache[key] = result
+                    in_progress.pop(key, None)
+                holder.event.set()
+                return result
 
-        # is_computer == True
-        try:
-            result = self.func(*args, **kwargs)
-        except Exception:
-            with self._lock:
-                entry = self._in_progress.pop(key, None)
-                if entry is not None:
-                    entry[0].set()
-            raise
+        wrapper.cache = cache
+        wrapper._cache = cache
+        wrapper._lock = lock
+        wrapper._in_progress = in_progress
+        def _clear():
+            with lock:
+                cache.clear()
+        wrapper.clear_cache = _clear
+        wrapper.cache_clear = _clear
+        wrapper.clear = _clear
+        return wrapper
 
-        with self._lock:
-            self.cache[key] = result
-            entry = self._in_progress.pop(key, None)
-            if entry is not None:
-                entry[0].set()
-        return result
-
-    def clear(self):
-        with self._lock:
-            self.cache.clear()
-
-    def __repr__(self):
-        return f"<MemoizedFunction {getattr(self.func, '__name__', repr(self.func))} cache_size={len(self.cache)}>"
-
-
-def memoize(func=None, **_kwargs):
-    """Decorator that memoizes a function in a thread-safe way.
-    Usable as @memoize or @memoize() .
-    """
-    if func is not None and callable(func):
-        return _MemoizedFunction(func)
-
-    def decorator(f):
-        return _MemoizedFunction(f)
-
+    if _fn is not None and callable(_fn) and not decorator_kwargs:
+        return decorator(_fn)
+    if _fn is not None and callable(_fn):
+        return decorator(_fn)
     return decorator
 
-
-# Compatibility aliases
-Memo = _MemoizedFunction
-memo = memoize
+# aliases for compatibility
+memoized = memoize
 cached = memoize
-thread_safe_memoize = memoize
-ThreadSafeMemo = _MemoizedFunction
-
+cache = memoize
 
 class ThreadSafeCache:
-    """Generic thread-safe cache with per-key single-flight."""
-    def __init__(self):
+    def __init__(self, maxsize=None):
         self._cache = {}
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
         self._in_progress = {}
+        self.maxsize = maxsize
 
     def get(self, key, default=None):
         with self._lock:
@@ -155,6 +110,14 @@ class ThreadSafeCache:
         with self._lock:
             self._cache[key] = value
 
+    def clear(self):
+        with self._lock:
+            self._cache.clear()
+
+    def __contains__(self, key):
+        with self._lock:
+            return key in self._cache
+
     def __getitem__(self, key):
         with self._lock:
             return self._cache[key]
@@ -162,46 +125,402 @@ class ThreadSafeCache:
     def __setitem__(self, key, value):
         self.set(key, value)
 
-    def __contains__(self, key):
+    def __len__(self):
         with self._lock:
-            return key in self._cache
+            return len(self._cache)
 
-    def __delitem__(self, key):
-        with self._lock:
-            del self._cache[key]
-
-    def clear(self):
-        with self._lock:
-            self._cache.clear()
-
-    def get_or_compute(self, key, func):
-        """Return cached value for key or compute it with func() exactly once."""
-        is_computer = False
-        is_reentrant = False
-        event_to_wait = None
-
+    def get_or_compute(self, key, func, *args, **kwargs):
         while True:
             with self._lock:
                 if key in self._cache:
                     return self._cache[key]
                 if key in self._in_progress:
-                    event, owner = self._in_progress[key]
-                    if owner == threading.get_ident():
-                        is_reentrant = True
-                        break
-                    event_to_wait = event
+                    holder = self._in_progress[key]
                 else:
-                    event = threading.Event()
-                    self._in_progress[key] = (event, threading.get_ident())
-                    is_computer = True
+                    holder = _Holder()
+                    self._in_progress[key] = holder
                     break
-            event_to_wait.wait()
-            event_to_wait = None
-            is_computer = False
-            is_reentrant = False
-
-        if is_reentrant:
-            return func()
+            holder.event.wait()
+            if holder.exc_info is not None:
+                raise holder.exc_info[1].with_traceback(holder.exc_info[2])
+            if holder.exception is not None:
+                raise holder.exception
+            return holder.result
 
         try:
-           
+            result = func(*args, **kwargs)
+        except BaseException as e:
+            holder.exception = e
+            holder.exc_info = sys.exc_info()
+            with self._lock:
+                self._in_progress.pop(key, None)
+            holder.event.set()
+            raise
+        else:
+            holder.result = result
+            with self._lock:
+                self._cache[key] = result
+                self._in_progress.pop(key, None)
+            holder.event.set()
+            return result
+
+    # compatibility aliases
+    get_or_set = get_or_compute
+    compute_if_absent = get_or_compute
+    get_or_create = get_or_compute
+
+Cache = ThreadSafeCache
+MemoCache = ThreadSafeCache
+Memo = ThreadSafeCache
+ThreadSafeMemo = ThreadSafeCache
+
+__all__ = ["memoize", "memoized", "cached", "cache", "ThreadSafeCache", "Cache", "MemoCache"]
+```
+cache.py
+```python
+import threading
+import functools
+import sys
+import pickle
+
+def _make_key(args, kwargs):
+    try:
+        if kwargs:
+            key = (args, tuple(sorted(kwargs.items())))
+        else:
+            key = (args, ())
+        hash(key)
+        return key
+    except TypeError:
+        try:
+            return pickle.dumps((args, kwargs), protocol=pickle.HIGHEST_PROTOCOL)
+        except Exception:
+            return repr((args, kwargs))
+
+class _Holder:
+    __slots__ = ("event", "result", "exception", "exc_info")
+    def __init__(self):
+        self.event = threading.Event()
+        self.result = None
+        self.exception = None
+        self.exc_info = None
+
+def memoize(_fn=None, **decorator_kwargs):
+    def decorator(fn):
+        cache = {}
+        in_progress = {}
+        lock = threading.RLock()
+
+        @functools.wraps(fn)
+        def wrapper(*args, **kwargs):
+            key = _make_key(args, kwargs)
+            while True:
+                with lock:
+                    if key in cache:
+                        return cache[key]
+                    if key in in_progress:
+                        holder = in_progress[key]
+                    else:
+                        holder = _Holder()
+                        in_progress[key] = holder
+                        break
+                holder.event.wait()
+                if holder.exc_info is not None:
+                    raise holder.exc_info[1].with_traceback(holder.exc_info[2])
+                if holder.exception is not None:
+                    raise holder.exception
+                return holder.result
+
+            try:
+                result = fn(*args, **kwargs)
+            except BaseException as e:
+                holder.exception = e
+                holder.exc_info = sys.exc_info()
+                with lock:
+                    in_progress.pop(key, None)
+                holder.event.set()
+                raise
+            else:
+                holder.result = result
+                with lock:
+                    cache[key] = result
+                    in_progress.pop(key, None)
+                holder.event.set()
+                return result
+
+        wrapper.cache = cache
+        wrapper._cache = cache
+        wrapper._lock = lock
+        wrapper._in_progress = in_progress
+        def _clear():
+            with lock:
+                cache.clear()
+        wrapper.clear_cache = _clear
+        wrapper.cache_clear = _clear
+        wrapper.clear = _clear
+        return wrapper
+
+    if _fn is not None and callable(_fn) and not decorator_kwargs:
+        return decorator(_fn)
+    if _fn is not None and callable(_fn):
+        return decorator(_fn)
+    return decorator
+
+memoized = memoize
+cached = memoize
+cache = memoize
+
+class ThreadSafeCache:
+    def __init__(self, maxsize=None):
+        self._cache = {}
+        self._lock = threading.RLock()
+        self._in_progress = {}
+        self.maxsize = maxsize
+
+    def get(self, key, default=None):
+        with self._lock:
+            return self._cache.get(key, default)
+
+    def set(self, key, value):
+        with self._lock:
+            self._cache[key] = value
+
+    def clear(self):
+        with self._lock:
+            self._cache.clear()
+
+    def __contains__(self, key):
+        with self._lock:
+            return key in self._cache
+
+    def __getitem__(self, key):
+        with self._lock:
+            return self._cache[key]
+
+    def __setitem__(self, key, value):
+        self.set(key, value)
+
+    def __len__(self):
+        with self._lock:
+            return len(self._cache)
+
+    def get_or_compute(self, key, func, *args, **kwargs):
+        while True:
+            with self._lock:
+                if key in self._cache:
+                    return self._cache[key]
+                if key in self._in_progress:
+                    holder = self._in_progress[key]
+                else:
+                    holder = _Holder()
+                    self._in_progress[key] = holder
+                    break
+            holder.event.wait()
+            if holder.exc_info is not None:
+                raise holder.exc_info[1].with_traceback(holder.exc_info[2])
+            if holder.exception is not None:
+                raise holder.exception
+            return holder.result
+
+        try:
+            result = func(*args, **kwargs)
+        except BaseException as e:
+            holder.exception = e
+            holder.exc_info = sys.exc_info()
+            with self._lock:
+                self._in_progress.pop(key, None)
+            holder.event.set()
+            raise
+        else:
+            holder.result = result
+            with self._lock:
+                self._cache[key] = result
+                self._in_progress.pop(key, None)
+            holder.event.set()
+            return result
+
+    get_or_set = get_or_compute
+    compute_if_absent = get_or_compute
+    get_or_create = get_or_compute
+
+Cache = ThreadSafeCache
+MemoCache = ThreadSafeCache
+Memo = ThreadSafeCache
+ThreadSafeMemo = ThreadSafeCache
+
+__all__ = ["memoize", "memoized", "cached", "cache", "ThreadSafeCache", "Cache", "MemoCache"]
+```
+thread_safe_cache.py
+```python
+import threading
+import functools
+import sys
+import pickle
+
+def _make_key(args, kwargs):
+    try:
+        if kwargs:
+            key = (args, tuple(sorted(kwargs.items())))
+        else:
+            key = (args, ())
+        hash(key)
+        return key
+    except TypeError:
+        try:
+            return pickle.dumps((args, kwargs), protocol=pickle.HIGHEST_PROTOCOL)
+        except Exception:
+            return repr((args, kwargs))
+
+class _Holder:
+    __slots__ = ("event", "result", "exception", "exc_info")
+    def __init__(self):
+        self.event = threading.Event()
+        self.result = None
+        self.exception = None
+        self.exc_info = None
+
+def memoize(_fn=None, **decorator_kwargs):
+    def decorator(fn):
+        cache = {}
+        in_progress = {}
+        lock = threading.RLock()
+
+        @functools.wraps(fn)
+        def wrapper(*args, **kwargs):
+            key = _make_key(args, kwargs)
+            while True:
+                with lock:
+                    if key in cache:
+                        return cache[key]
+                    if key in in_progress:
+                        holder = in_progress[key]
+                    else:
+                        holder = _Holder()
+                        in_progress[key] = holder
+                        break
+                holder.event.wait()
+                if holder.exc_info is not None:
+                    raise holder.exc_info[1].with_traceback(holder.exc_info[2])
+                if holder.exception is not None:
+                    raise holder.exception
+                return holder.result
+
+            try:
+                result = fn(*args, **kwargs)
+            except BaseException as e:
+                holder.exception = e
+                holder.exc_info = sys.exc_info()
+                with lock:
+                    in_progress.pop(key, None)
+                holder.event.set()
+                raise
+            else:
+                holder.result = result
+                with lock:
+                    cache[key] = result
+                    in_progress.pop(key, None)
+                holder.event.set()
+                return result
+
+        wrapper.cache = cache
+        wrapper._cache = cache
+        wrapper._lock = lock
+        wrapper._in_progress = in_progress
+        def _clear():
+            with lock:
+                cache.clear()
+        wrapper.clear_cache = _clear
+        wrapper.cache_clear = _clear
+        wrapper.clear = _clear
+        return wrapper
+
+    if _fn is not None and callable(_fn) and not decorator_kwargs:
+        return decorator(_fn)
+    if _fn is not None and callable(_fn):
+        return decorator(_fn)
+    return decorator
+
+memoized = memoize
+cached = memoize
+cache = memoize
+
+class ThreadSafeCache:
+    def __init__(self, maxsize=None):
+        self._cache = {}
+        self._lock = threading.RLock()
+        self._in_progress = {}
+        self.maxsize = maxsize
+
+    def get(self, key, default=None):
+        with self._lock:
+            return self._cache.get(key, default)
+
+    def set(self, key, value):
+        with self._lock:
+            self._cache[key] = value
+
+    def clear(self):
+        with self._lock:
+            self._cache.clear()
+
+    def __contains__(self, key):
+        with self._lock:
+            return key in self._cache
+
+    def __getitem__(self, key):
+        with self._lock:
+            return self._cache[key]
+
+    def __setitem__(self, key, value):
+        self.set(key, value)
+
+    def __len__(self):
+        with self._lock:
+            return len(self._cache)
+
+    def get_or_compute(self, key, func, *args, **kwargs):
+        while True:
+            with self._lock:
+                if key in self._cache:
+                    return self._cache[key]
+                if key in self._in_progress:
+                    holder = self._in_progress[key]
+                else:
+                    holder = _Holder()
+                    self._in_progress[key] = holder
+                    break
+            holder.event.wait()
+            if holder.exc_info is not None:
+                raise holder.exc_info[1].with_traceback(holder.exc_info[2])
+            if holder.exception is not None:
+                raise holder.exception
+            return holder.result
+
+        try:
+            result = func(*args, **kwargs)
+        except BaseException as e:
+            holder.exception = e
+            holder.exc_info = sys.exc_info()
+            with self._lock:
+                self._in_progress.pop(key, None)
+            holder.event.set()
+            raise
+        else:
+            holder.result = result
+            with self._lock:
+                self._cache[key] = result
+                self._in_progress.pop(key, None)
+            holder.event.set()
+            return result
+
+    get_or_set = get_or_compute
+    compute_if_absent = get_or_compute
+    get_or_create = get_or_compute
+
+Cache = ThreadSafeCache
+MemoCache = ThreadSafeCache
+Memo = ThreadSafeCache
+ThreadSafeMemo = ThreadSafeCache
+
+__all__ = ["memoize", "memoized", "cached", "cache", "ThreadSafeCache", "Cache", "MemoCache"]
+```

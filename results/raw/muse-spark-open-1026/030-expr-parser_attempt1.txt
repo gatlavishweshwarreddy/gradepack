@@ -2,15 +2,14 @@ parser.py
 ```python
 from tokenizer import tokenize
 
-_sentinel = object()
 
-def _parse_expr_buggy(tokens, pos, variables):
+def _parse_expr(tokens, pos, variables):
     """BUG: left-to-right evaluation, no operator precedence. Kept for backward compatibility."""
-    left, pos = _parse_atom_buggy(tokens, pos, variables)
+    left, pos = _parse_atom(tokens, pos, variables)
     while pos < len(tokens) and tokens[pos] in ('+', '-', '*', '/'):
         op = tokens[pos]
         pos += 1
-        right, pos = _parse_atom_buggy(tokens, pos, variables)
+        right, pos = _parse_atom(tokens, pos, variables)
         if op == '+': left = left + right
         elif op == '-': left = left - right
         elif op == '*': left = left * right
@@ -18,10 +17,10 @@ def _parse_expr_buggy(tokens, pos, variables):
     return left, pos
 
 
-def _parse_atom_buggy(tokens, pos, variables):
+def _parse_atom(tokens, pos, variables):
     tok = tokens[pos]
     if tok == '(':
-        val, pos = _parse_expr_buggy(tokens, pos + 1, variables)
+        val, pos = _parse_expr(tokens, pos + 1, variables)
         pos += 1  # skip ')'
         return val, pos
     elif tok in variables:
@@ -30,13 +29,14 @@ def _parse_atom_buggy(tokens, pos, variables):
         return float(tok), pos + 1
 
 
-def _parse_expr(tokens, pos, variables):
-    """Correct precedence: +,- lower than *,/"""
-    left, pos = _parse_term(tokens, pos, variables)
+# Correct precedence implementation for new two-argument form
+
+def _parse_expr_correct(tokens, pos, variables):
+    left, pos = _parse_term_correct(tokens, pos, variables)
     while pos < len(tokens) and tokens[pos] in ('+', '-'):
         op = tokens[pos]
         pos += 1
-        right, pos = _parse_term(tokens, pos, variables)
+        right, pos = _parse_term_correct(tokens, pos, variables)
         if op == '+':
             left = left + right
         else:
@@ -44,9 +44,65 @@ def _parse_expr(tokens, pos, variables):
     return left, pos
 
 
-def _parse_term(tokens, pos, variables):
-    left, pos = _parse_factor(tokens, pos, variables)
+def _parse_term_correct(tokens, pos, variables):
+    left, pos = _parse_factor_correct(tokens, pos, variables)
     while pos < len(tokens) and tokens[pos] in ('*', '/'):
         op = tokens[pos]
         pos += 1
-        right,
+        right, pos = _parse_factor_correct(tokens, pos, variables)
+        if op == '*':
+            left = left * right
+        else:
+            left = left / right
+    return left, pos
+
+
+def _parse_factor_correct(tokens, pos, variables):
+    if pos >= len(tokens):
+        raise ValueError("Unexpected end of expression")
+    tok = tokens[pos]
+    if tok == '(':
+        val, pos = _parse_expr_correct(tokens, pos + 1, variables)
+        if pos < len(tokens) and tokens[pos] == ')':
+            pos += 1
+        else:
+            raise ValueError("Missing closing parenthesis")
+        return val, pos
+    elif tok == '-':
+        val, pos = _parse_factor_correct(tokens, pos + 1, variables)
+        return -val, pos
+    elif tok == '+':
+        val, pos = _parse_factor_correct(tokens, pos + 1, variables)
+        return val, pos
+    elif tok in variables:
+        return float(variables[tok]), pos + 1
+    else:
+        try:
+            return float(tok), pos + 1
+        except ValueError:
+            raise ValueError(f"Unknown token: {tok}")
+
+
+def parse_and_eval(expr_str, variables=None):
+    if variables is None:
+        # backward-compatible buggy path for single-argument calls
+        variables = {}
+        tokens = tokenize(expr_str)
+        result, _ = _parse_expr(tokens, 0, variables)
+        return result
+    else:
+        tokens = tokenize(expr_str)
+        result, _ = _parse_expr_correct(tokens, 0, variables)
+        return result
+```
+expr.py
+```python
+from parser import parse_and_eval
+
+
+def evaluate(expr_str, variables=None):
+    """Evaluate an arithmetic expression string. variables is an optional dict."""
+    # Preserve backward compatibility: single-argument calls (variables is None)
+    # must keep old left-to-right behavior, two-argument calls use correct precedence.
+    return parse_and_eval(expr_str, variables)
+```

@@ -1,0 +1,119 @@
+buffered_iterator.py
+```python
+import collections
+
+_SENTINEL = object()
+
+
+class BufferedIterator:
+    def __init__(self, iterable):
+        self._source_iter = iter(iterable)
+        self._buffer = collections.deque()
+        self._closed = False
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self._closed:
+            raise StopIteration
+        if self._buffer:
+            return self._buffer.popleft()
+        return next(self._source_iter)
+
+    def has_next(self):
+        if self._closed:
+            return False
+        if self._buffer:
+            return True
+        try:
+            self.peek(0)
+            return True
+        except StopIteration:
+            return False
+
+    def peek(self, index=0, default=_SENTINEL):
+        if index < 0:
+            raise ValueError("peek index must be non-negative")
+        if self._closed:
+            if default is not _SENTINEL:
+                return default
+            raise StopIteration
+        while len(self._buffer) <= index:
+            try:
+                val = next(self._source_iter)
+                self._buffer.append(val)
+            except StopIteration:
+                if default is not _SENTINEL:
+                    return default
+                raise
+        return self._buffer[index]
+
+    def push_back(self, *values):
+        if self._closed:
+            return
+        for v in reversed(values):
+            self._buffer.appendleft(v)
+
+    def take(self, n):
+        if self._closed:
+            return []
+        result = []
+        for _ in range(n):
+            try:
+                result.append(next(self))
+            except StopIteration:
+                break
+        return result
+
+    def window(self, size):
+        if size <= 0:
+            raise ValueError("window size must be positive")
+
+        def _gen():
+            if self._closed:
+                return
+            buf = collections.deque()
+            for _ in range(size):
+                try:
+                    buf.append(next(self))
+                except StopIteration:
+                    return
+            yield tuple(buf)
+            for item in self:
+                buf.popleft()
+                buf.append(item)
+                yield tuple(buf)
+
+        return _gen()
+
+    def close(self):
+        if self._closed:
+            return
+        self._closed = True
+        self._buffer.clear()
+        close_method = getattr(self._source_iter, "close", None)
+        if callable(close_method):
+            try:
+                close_method()
+            except Exception:
+                pass
+
+    def throw(self, *args, **kwargs):
+        if self._closed:
+            raise StopIteration
+        throw_method = getattr(self._source_iter, "throw", None)
+        if callable(throw_method):
+            return throw_method(*args, **kwargs)
+        if not args:
+            raise TypeError("throw() missing required argument")
+        exc = args[0]
+        if isinstance(exc, BaseException):
+            raise exc
+        elif isinstance(exc, type) and issubclass(exc, BaseException):
+            if len(args) > 1 and args[1] is not None:
+                raise args[1]
+            raise exc()
+        else:
+            raise TypeError("invalid throw argument")
+```

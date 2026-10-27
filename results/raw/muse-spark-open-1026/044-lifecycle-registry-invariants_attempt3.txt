@@ -85,13 +85,14 @@ class LifecycleRegistry:
             return
         if self._state != "OPEN":
             raise RegistryClosed("registry not open")
-        # If any non-DISPOSED resource has ref_count > 0, raise and leave OPEN
+        # check refcounts first - must not mutate if any in use
         for rid, state in self._states.items():
-            if state != "DISPOSED" and self._refcounts.get(rid, 0) > 0:
-                raise ResourceInUse(f"refcount {self._refcounts.get(rid,0)}")
-        # Transition every non-DISPOSED to DISPOSED
-        for rid in list(self._states.keys()):
-            if self._states[rid] != "DISPOSED":
+            if state != "DISPOSED":
+                if self._refcounts.get(rid, 0) > 0:
+                    raise ResourceInUse(f"refcount {self._refcounts.get(rid,0)} for {rid}")
+        # transition every non-DISPOSED to DISPOSED
+        for rid, state in list(self._states.items()):
+            if state != "DISPOSED":
                 self._states[rid] = "DISPOSED"
         self._state = "CLOSED"
 
@@ -120,10 +121,9 @@ class LifecycleRegistry:
         state = self._states.get(rid)
         if state is None:
             raise KeyError(rid)
-        if state == "ACTIVE":
-            self._states[rid] = "SUSPENDED"
-        else:
+        if state != "ACTIVE":
             raise InvalidTransition(f"suspend from {state}")
+        self._states[rid] = "SUSPENDED"
 
     def resume(self, rid):
         if self._state != "OPEN":
@@ -131,10 +131,9 @@ class LifecycleRegistry:
         state = self._states.get(rid)
         if state is None:
             raise KeyError(rid)
-        if state == "SUSPENDED":
-            self._states[rid] = "ACTIVE"
-        else:
+        if state != "SUSPENDED":
             raise InvalidTransition(f"resume from {state}")
+        self._states[rid] = "ACTIVE"
 
     def fail(self, rid):
         if self._state != "OPEN":
@@ -144,6 +143,8 @@ class LifecycleRegistry:
             raise KeyError(rid)
         if state in ("PENDING", "ACTIVE", "SUSPENDED"):
             self._states[rid] = "FAILED"
+        elif state == "FAILED":
+            raise InvalidTransition("already failed")
         else:
             raise InvalidTransition(f"fail from {state}")
 
@@ -153,10 +154,10 @@ class LifecycleRegistry:
         state = self._states.get(rid)
         if state is None:
             raise KeyError(rid)
-        if self._refcounts.get(rid, 0) != 0:
-            raise ResourceInUse(f"refcount {self._refcounts.get(rid,0)}")
         if state == "DISPOSED":
             raise InvalidTransition("already disposed")
+        if self._refcounts.get(rid, 0) > 0:
+            raise ResourceInUse(f"refcount {self._refcounts.get(rid,0)}")
         if state in ("ACTIVE", "SUSPENDED", "FAILED", "PENDING"):
             self._states[rid] = "DISPOSED"
         else:
@@ -222,11 +223,7 @@ class LifecycleRegistry:
         class _Session:
             def __enter__(self):
                 registry.acquire(rid)
-                try:
-                    return registry.get(rid)
-                except Exception:
-                    registry.release(rid)
-                    raise
+                return registry.get(rid)
             def __exit__(self, exc_type, exc, tb):
                 registry.release(rid)
                 return False

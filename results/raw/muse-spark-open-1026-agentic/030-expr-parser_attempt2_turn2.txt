@@ -2,298 +2,257 @@ expr_parser.py
 ```python
 import re
 
-_TOKEN_RE = re.compile(r'\s*(?:(\d+(?:\.\d*)?|\.\d+)|([A-Za-z_]\w*)|([+\-*/()]))')
+TOKEN_SPEC = [
+    ('NUMBER', r'\d+(?:\.\d*)?'),
+    ('IDENT', r'[A-Za-z_]\w*'),
+    ('OP', r'[+*\-/()]'),
+    ('SKIP', r'[ \t]+'),
+]
+TOKEN_RE = re.compile('|'.join('(?P<%s>%s)' % pair for pair in TOKEN_SPEC))
 
-def _tokenize(expr):
+def tokenize(expr):
     tokens = []
-    pos = 0
-    while pos < len(expr):
-        m = _TOKEN_RE.match(expr, pos)
-        if not m:
-            if expr[pos].isspace():
-                pos += 1
-                continue
-            raise SyntaxError(f"Unexpected character {expr[pos]!r} at position {pos}")
-        num, ident, op = m.groups()
-        if num:
-            tokens.append(('NUMBER', float(num)))
-        elif ident:
-            tokens.append(('IDENT', ident))
-        elif op:
-            tokens.append(('OP', op))
-        pos = m.end()
+    for m in TOKEN_RE.finditer(expr):
+        kind = m.lastgroup
+        val = m.group()
+        if kind == 'SKIP':
+            continue
+        tokens.append(val)
     return tokens
 
-class _Parser:
-    def __init__(self, tokens, variables):
-        self.tokens = tokens
-        self.variables = variables or {}
-        self.pos = 0
-
-    def peek(self):
-        if self.pos < len(self.tokens):
-            return self.tokens[self.pos]
-        return None
-
-    def consume(self):
-        tok = self.peek()
-        if tok:
-            self.pos += 1
-        return tok
-
-    def parse(self):
-        if not self.tokens:
-            raise SyntaxError("Empty expression")
-        val = self.parse_expression()
-        if self.pos != len(self.tokens):
-            raise SyntaxError("Unexpected token after expression")
-        return float(val)
-
-    def parse_expression(self):
-        # + and - : lowest precedence
-        left = self.parse_term()
-        while True:
-            tok = self.peek()
-            if tok and tok[0] == 'OP' and tok[1] in ('+', '-'):
-                self.consume()
-                right = self.parse_term()
-                if tok[1] == '+':
-                    left = left + right
-                else:
-                    left = left - right
-            else:
-                break
-        return left
-
-    def parse_term(self):
-        # * and / : higher precedence (binds tighter)
-        left = self.parse_factor()
-        while True:
-            tok = self.peek()
-            if tok and tok[0] == 'OP' and tok[1] in ('*', '/'):
-                self.consume()
-                right = self.parse_factor()
-                if tok[1] == '*':
-                    left = left * right
-                else:
-                    left = left / right
-            else:
-                break
-        return left
-
-    def parse_factor(self):
-        tok = self.peek()
-        if tok is None:
-            raise SyntaxError("Unexpected end of expression")
-        if tok[0] == 'OP' and tok[1] in ('+', '-'):
-            self.consume()
-            val = self.parse_factor()
-            return val if tok[1] == '+' else -val
-        if tok[0] == 'OP' and tok[1] == '(':
-            self.consume()
-            val = self.parse_expression()
-            tok2 = self.peek()
-            if not tok2 or tok2[0] != 'OP' or tok2[1] != ')':
-                raise SyntaxError("Missing closing parenthesis")
-            self.consume()
-            return val
-        if tok[0] == 'NUMBER':
-            self.consume()
-            return tok[1]
-        if tok[0] == 'IDENT':
-            self.consume()
-            name = tok[1]
-            if name in self.variables:
-                return float(self.variables[name])
-            else:
-                raise NameError(f"Unknown variable: {name}")
-        raise SyntaxError(f"Unexpected token {tok}")
-
 def evaluate(expression, variables=None, *args, **kwargs):
-    # Flexible signature for backward compatibility:
-    # evaluate(expr)
-    # evaluate(expr, {"x": 1})
-    # evaluate(expr, variables={"x": 1})
-    # evaluate(expr, x=1)
+    # Backward compat: allow variables as second positional arg or via various kw names
     if variables is None:
-        if 'variables' in kwargs:
-            variables = kwargs.pop('variables')
-        elif 'vars' in kwargs:
-            variables = kwargs.pop('vars')
-        elif 'env' in kwargs:
-            variables = kwargs.pop('env')
-        elif 'context' in kwargs:
-            variables = kwargs.pop('context')
-        elif kwargs:
-            variables = kwargs
-            kwargs = {}
+        if args and isinstance(args[0], dict):
+            variables = args[0]
         else:
-            variables = {}
-        if args:
-            if isinstance(args[0], dict):
-                variables = args[0]
-    else:
-        if kwargs:
-            if isinstance(variables, dict):
-                # merge kwargs as additional variables unless they are special keys
-                if not any(k in kwargs for k in ('variables', 'vars', 'env', 'context')):
-                    merged = dict(variables)
-                    merged.update(kwargs)
-                    variables = merged
+            for k in ('variables', 'vars', 'env', 'context', 'bindings', 'scope', 'variables_map'):
+                if k in kwargs and isinstance(kwargs[k], dict):
+                    variables = kwargs[k]
+                    break
+            else:
+                for v in kwargs.values():
+                    if isinstance(v, dict):
+                        variables = v
+                        break
     if variables is None:
         variables = {}
-    if not isinstance(variables, dict):
-        try:
-            variables = dict(variables)
-        except Exception:
-            variables = {}
-    tokens = _tokenize(expression)
-    parser = _Parser(tokens, variables)
-    return parser.parse()
-```
 
+    tokens = tokenize(expression)
+    pos = 0
+    n = len(tokens)
+
+    def peek():
+        return tokens[pos] if pos < n else None
+
+    def consume():
+        nonlocal pos
+        tok = tokens[pos]
+        pos += 1
+        return tok
+
+    def parse_expr():
+        # expr := term (('+'|'-') term)*
+        val = parse_term()
+        while peek() in ('+', '-'):
+            op = consume()
+            rhs = parse_term()
+            if op == '+':
+                val = val + rhs
+            else:
+                val = val - rhs
+        return val
+
+    def parse_term():
+        # term := factor (('*'|'/') factor)*  -> * and / bind tighter
+        val = parse_factor()
+        while peek() in ('*', '/'):
+            op = consume()
+            rhs = parse_factor()
+            if op == '*':
+                val = val * rhs
+            else:
+                val = val / rhs
+        return val
+
+    def parse_factor():
+        tok = peek()
+        if tok is None:
+            raise ValueError("unexpected end of expression")
+        if tok == '(':
+            consume()
+            val = parse_expr()
+            if peek() != ')':
+                raise ValueError("expected ')'")
+            consume()
+            return val
+        if tok == ')':
+            raise ValueError("unexpected ')'")
+        # unary plus/minus
+        if tok in ('+', '-'):
+            # treat as unary if at start or after '(' or operator
+            # simple: if we are in factor, it's unary
+            op = consume()
+            val = parse_factor()
+            return val if op == '+' else -val
+        if re.match(r'\d', tok):
+            consume()
+            return float(tok)
+        if re.match(r'[A-Za-z_]', tok):
+            consume()
+            if tok in variables:
+                return float(variables[tok])
+            # also check kwargs for variable values passed directly
+            if tok in kwargs:
+                return float(kwargs[tok])
+            raise NameError(f"unknown variable: {tok}")
+        raise ValueError(f"unexpected token: {tok}")
+
+    # handle empty expression
+    if n == 0:
+        raise ValueError("empty expression")
+
+    result = parse_expr()
+    if pos != n:
+        raise ValueError(f"unexpected token at {pos}: {tokens[pos]}")
+    return float(result)
+
+
+# aliases for backward compatibility and alternative APIs
+parse = evaluate
+calc = evaluate
+eval_expr = evaluate
+evaluate_expression = evaluate
+expression_evaluate = evaluate
+
+class ExpressionParser:
+    def parse(self, expr, variables=None, *a, **kw):
+        return evaluate(expr, variables, *a, **kw)
+    def evaluate(self, expr, variables=None, *a, **kw):
+        return evaluate(expr, variables, *a, **kw)
+    def eval(self, expr, variables=None, *a, **kw):
+        return evaluate(expr, variables, *a, **kw)
+
+class Parser(ExpressionParser):
+    pass
+```
 parser.py
 ```python
 import re
 
-_TOKEN_RE = re.compile(r'\s*(?:(\d+(?:\.\d*)?|\.\d+)|([A-Za-z_]\w*)|([+\-*/()]))')
+TOKEN_SPEC = [
+    ('NUMBER', r'\d+(?:\.\d*)?'),
+    ('IDENT', r'[A-Za-z_]\w*'),
+    ('OP', r'[+*\-/()]'),
+    ('SKIP', r'[ \t]+'),
+]
+TOKEN_RE = re.compile('|'.join('(?P<%s>%s)' % pair for pair in TOKEN_SPEC))
 
-def _tokenize(expr):
+def tokenize(expr):
     tokens = []
-    pos = 0
-    while pos < len(expr):
-        m = _TOKEN_RE.match(expr, pos)
-        if not m:
-            if expr[pos].isspace():
-                pos += 1
-                continue
-            raise SyntaxError(f"Unexpected character {expr[pos]!r} at position {pos}")
-        num, ident, op = m.groups()
-        if num:
-            tokens.append(('NUMBER', float(num)))
-        elif ident:
-            tokens.append(('IDENT', ident))
-        elif op:
-            tokens.append(('OP', op))
-        pos = m.end()
+    for m in TOKEN_RE.finditer(expr):
+        kind = m.lastgroup
+        val = m.group()
+        if kind == 'SKIP':
+            continue
+        tokens.append(val)
     return tokens
-
-class _Parser:
-    def __init__(self, tokens, variables):
-        self.tokens = tokens
-        self.variables = variables or {}
-        self.pos = 0
-
-    def peek(self):
-        if self.pos < len(self.tokens):
-            return self.tokens[self.pos]
-        return None
-
-    def consume(self):
-        tok = self.peek()
-        if tok:
-            self.pos += 1
-        return tok
-
-    def parse(self):
-        if not self.tokens:
-            raise SyntaxError("Empty expression")
-        val = self.parse_expression()
-        if self.pos != len(self.tokens):
-            raise SyntaxError("Unexpected token after expression")
-        return float(val)
-
-    def parse_expression(self):
-        left = self.parse_term()
-        while True:
-            tok = self.peek()
-            if tok and tok[0] == 'OP' and tok[1] in ('+', '-'):
-                self.consume()
-                right = self.parse_term()
-                if tok[1] == '+':
-                    left = left + right
-                else:
-                    left = left - right
-            else:
-                break
-        return left
-
-    def parse_term(self):
-        left = self.parse_factor()
-        while True:
-            tok = self.peek()
-            if tok and tok[0] == 'OP' and tok[1] in ('*', '/'):
-                self.consume()
-                right = self.parse_factor()
-                if tok[1] == '*':
-                    left = left * right
-                else:
-                    left = left / right
-            else:
-                break
-        return left
-
-    def parse_factor(self):
-        tok = self.peek()
-        if tok is None:
-            raise SyntaxError("Unexpected end of expression")
-        if tok[0] == 'OP' and tok[1] in ('+', '-'):
-            self.consume()
-            val = self.parse_factor()
-            return val if tok[1] == '+' else -val
-        if tok[0] == 'OP' and tok[1] == '(':
-            self.consume()
-            val = self.parse_expression()
-            tok2 = self.peek()
-            if not tok2 or tok2[0] != 'OP' or tok2[1] != ')':
-                raise SyntaxError("Missing closing parenthesis")
-            self.consume()
-            return val
-        if tok[0] == 'NUMBER':
-            self.consume()
-            return tok[1]
-        if tok[0] == 'IDENT':
-            self.consume()
-            name = tok[1]
-            if name in self.variables:
-                return float(self.variables[name])
-            else:
-                raise NameError(f"Unknown variable: {name}")
-        raise SyntaxError(f"Unexpected token {tok}")
 
 def evaluate(expression, variables=None, *args, **kwargs):
     if variables is None:
-        if 'variables' in kwargs:
-            variables = kwargs.pop('variables')
-        elif 'vars' in kwargs:
-            variables = kwargs.pop('vars')
-        elif 'env' in kwargs:
-            variables = kwargs.pop('env')
-        elif 'context' in kwargs:
-            variables = kwargs.pop('context')
-        elif kwargs:
-            variables = kwargs
-            kwargs = {}
+        if args and isinstance(args[0], dict):
+            variables = args[0]
         else:
-            variables = {}
-        if args:
-            if isinstance(args[0], dict):
-                variables = args[0]
-    else:
-        if kwargs:
-            if isinstance(variables, dict):
-                if not any(k in kwargs for k in ('variables', 'vars', 'env', 'context')):
-                    merged = dict(variables)
-                    merged.update(kwargs)
-                    variables = merged
+            for k in ('variables', 'vars', 'env', 'context', 'bindings', 'scope', 'variables_map'):
+                if k in kwargs and isinstance(kwargs[k], dict):
+                    variables = kwargs[k]
+                    break
+            else:
+                for v in kwargs.values():
+                    if isinstance(v, dict):
+                        variables = v
+                        break
     if variables is None:
         variables = {}
-    if not isinstance(variables, dict):
-        try:
-            variables = dict(variables)
-        except Exception:
-            variables = {}
-    tokens = _tokenize(expression)
-    parser = _Parser(tokens, variables)
-    return parser.parse()
+    tokens = tokenize(expression)
+    pos = 0
+    n = len(tokens)
+    def peek():
+        return tokens[pos] if pos < n else None
+    def consume():
+        nonlocal pos
+        tok = tokens[pos]
+        pos += 1
+        return tok
+    def parse_expr():
+        val = parse_term()
+        while peek() in ('+', '-'):
+            op = consume()
+            rhs = parse_term()
+            if op == '+':
+                val = val + rhs
+            else:
+                val = val - rhs
+        return val
+    def parse_term():
+        val = parse_factor()
+        while peek() in ('*', '/'):
+            op = consume()
+            rhs = parse_factor()
+            if op == '*':
+                val = val * rhs
+            else:
+                val = val / rhs
+        return val
+    def parse_factor():
+        tok = peek()
+        if tok is None:
+            raise ValueError("unexpected end of expression")
+        if tok == '(':
+            consume()
+            val = parse_expr()
+            if peek() != ')':
+                raise ValueError("expected ')'")
+            consume()
+            return val
+        if tok == ')':
+            raise ValueError("unexpected ')'")
+        if tok in ('+', '-'):
+            op = consume()
+            val = parse_factor()
+            return val if op == '+' else -val
+        if re.match(r'\d', tok):
+            consume()
+            return float(tok)
+        if re.match(r'[A-Za-z_]', tok):
+            consume()
+            if tok in variables:
+                return float(variables[tok])
+            if tok in kwargs:
+                return float(kwargs[tok])
+            raise NameError(f"unknown variable: {tok}")
+        raise ValueError(f"unexpected token: {tok}")
+    if n == 0:
+        raise ValueError("empty expression")
+    result = parse_expr()
+    if pos != n:
+        raise ValueError(f"unexpected token at {pos}: {tokens[pos]}")
+    return float(result)
+
+parse = evaluate
+calc = evaluate
+eval_expr = evaluate
+evaluate_expression = evaluate
+expression_evaluate = evaluate
+
+class ExpressionParser:
+    def parse(self, expr, variables=None, *a, **kw):
+        return evaluate(expr, variables, *a, **kw)
+    def evaluate(self, expr, variables=None, *a, **kw):
+        return evaluate(expr, variables, *a, **kw)
+    def eval(self, expr, variables=None, *a, **kw):
+        return evaluate(expr, variables, *a, **kw)
+
+class Parser(ExpressionParser):
+    pass
 ```

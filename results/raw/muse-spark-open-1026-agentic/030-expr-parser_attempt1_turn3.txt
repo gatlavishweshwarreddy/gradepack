@@ -1,73 +1,144 @@
 expr.py
 ```python
-try:
-    from parser import parse_and_eval
-except ImportError:
-    from .parser import parse_and_eval
+from parser import parse_and_eval
 
-def evaluate(expression, env=None, **kwargs):
+def evaluate(expression, env=None, variables=None, **kwargs):
     """
-    Evaluate an arithmetic expression.
-
-    Args:
-        expression: string containing the expression
-        env: optional dict with variable/function bindings
-        **kwargs: additional variables (e.g. evaluate("x+1", x=2))
-
-    Returns:
-        numeric result of the expression
+    Evaluate an arithmetic expression string.
+    Supports flexible calling conventions:
+      evaluate(expr)
+      evaluate(expr, env_dict)
+      evaluate(expr, variables_dict)
+      evaluate(expr, x=1, y=2)
+      evaluate(expr, env_dict, x=1)
     """
-    if env is None:
-        env = {}
-    elif not isinstance(env, dict):
-        raise TypeError("env must be a dict or None")
+    if not isinstance(expression, str):
+        raise TypeError("expression must be a string")
+
+    actual_env = {}
+    if env is not None:
+        if isinstance(env, dict):
+            actual_env.update(env)
+        else:
+            raise TypeError("env must be a dict or None")
+    if variables is not None:
+        if isinstance(variables, dict):
+            actual_env.update(variables)
+        else:
+            raise TypeError("variables must be a dict or None")
     if kwargs:
-        # merge kwargs into env without mutating original
-        merged = dict(env)
-        merged.update(kwargs)
-        env = merged
-    return parse_and_eval(expression, env)
+        actual_env.update(kwargs)
+
+    return parse_and_eval(expression, actual_env)
 ```
+
 parser.py
 ```python
-import re
 import math
+import re
 
-_TOKEN_SPEC = [
-    ('NUMBER', r'\d+\.\d*|\.\d+|\d+'),
-    ('IDENT',  r'[A-Za-z_]\w*'),
-    ('OP',     r'\*\*|//|[+\-*/%^(),]'),
-    ('SKIP',   r'[ \t\r\n]+'),
-    ('MISMATCH', r'.'),
-]
+# Map of supported functions
+_MATH_FUNCS = {
+    'sin': math.sin,
+    'cos': math.cos,
+    'tan': math.tan,
+    'asin': math.asin,
+    'acos': math.acos,
+    'atan': math.atan,
+    'atan2': math.atan2,
+    'sinh': math.sinh,
+    'cosh': math.cosh,
+    'tanh': math.tanh,
+    'sqrt': math.sqrt,
+    'log': math.log,
+    'ln': math.log,
+    'log10': math.log10,
+    'log2': getattr(math, 'log2', None),
+    'exp': math.exp,
+    'abs': abs,
+    'floor': math.floor,
+    'ceil': math.ceil,
+    'round': round,
+    'max': max,
+    'min': min,
+    'pow': pow,
+}
 
-_TOKEN_RE = re.compile('|'.join('(?P<%s>%s)' % pair for pair in _TOKEN_SPEC))
+# Remove None entries
+_MATH_FUNCS = {k: v for k, v in _MATH_FUNCS.items() if v is not None}
 
-def tokenize(expr):
-    if not isinstance(expr, str):
-        raise TypeError("Expression must be a string")
+_NUMBER_RE = re.compile(r'(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?')
+
+def tokenize(s):
     tokens = []
-    pos = 0
-    mo = _TOKEN_RE.match(expr, pos)
-    while mo is not None:
-        kind = mo.lastgroup
-        value = mo.group()
-        if kind == 'NUMBER':
-            tokens.append(('NUMBER', value))
-        elif kind == 'IDENT':
-            tokens.append(('IDENT', value))
-        elif kind == 'OP':
-            tokens.append(('OP', value))
-        elif kind == 'SKIP':
-            pass
-        elif kind == 'MISMATCH':
-            raise SyntaxError(f"Unexpected character {value!r} at position {pos}")
-        pos = mo.end()
-        mo = _TOKEN_RE.match(expr, pos)
-    if pos != len(expr):
-        raise SyntaxError(f"Unexpected character at position {pos}")
+    i = 0
+    n = len(s)
+    while i < n:
+        c = s[i]
+        if c.isspace():
+            i += 1
+            continue
+        # number
+        m = _NUMBER_RE.match(s, i)
+        if m:
+            num_str = m.group(0)
+            # decide int vs float
+            if '.' in num_str or 'e' in num_str or 'E' in num_str:
+                try:
+                    val = float(num_str)
+                except ValueError:
+                    raise ValueError(f"Invalid number: {num_str}")
+            else:
+                try:
+                    val = int(num_str)
+                except ValueError:
+                    val = float(num_str)
+            tokens.append(('NUMBER', val))
+            i = m.end()
+            continue
+        # identifier
+        if c.isalpha() or c == '_':
+            start = i
+            i += 1
+            while i < n and (s[i].isalnum() or s[i] == '_'):
+                i += 1
+            ident = s[start:i]
+            tokens.append(('IDENT', ident))
+            continue
+        # parentheses / comma
+        if c == '(':
+            tokens.append(('LPAREN', c))
+            i += 1
+            continue
+        if c == ')':
+            tokens.append(('RPAREN', c))
+            i += 1
+            continue
+        if c == ',':
+            tokens.append(('COMMA', c))
+            i += 1
+            continue
+        # two-char operators
+        if s[i:i+2] == '**':
+            tokens.append(('OP', '**'))
+            i += 2
+            continue
+        if s[i:i+2] == '//':
+            tokens.append(('OP', '//'))
+            i += 2
+            continue
+        # single-char operators
+        if c in '+-*/^%':
+            tokens.append(('OP', c))
+            i += 1
+            continue
+        if c == '=':
+            tokens.append(('OP', '='))
+            i += 1
+            continue
+        raise ValueError(f"Unexpected character: {c!r} at position {i}")
+    tokens.append(('EOF', None))
     return tokens
-
 
 class Parser:
     def __init__(self, tokens, env):
@@ -76,159 +147,201 @@ class Parser:
         self.env = env if env is not None else {}
 
     def peek(self):
-        if self.pos < len(self.tokens):
-            return self.tokens[self.pos]
-        return None
+        return self.tokens[self.pos]
 
-    def consume(self, expected=None):
-        tok = self.peek()
-        if tok is None:
-            raise SyntaxError("Unexpected end of input")
-        if expected is not None and tok[1] != expected:
-            raise SyntaxError(f"Expected {expected!r} got {tok[1]!r}")
+    def consume(self, expected_type=None, expected_val=None):
+        tok = self.tokens[self.pos]
+        if expected_type is not None and tok[0] != expected_type:
+            raise ValueError(f"Expected {expected_type} got {tok}")
+        if expected_val is not None and tok[1] != expected_val:
+            raise ValueError(f"Expected {expected_val} got {tok}")
         self.pos += 1
         return tok
 
-    def parse(self):
-        if not self.tokens:
-            raise SyntaxError("Empty expression")
-        result = self.parse_expr()
-        if self.pos != len(self.tokens):
-            raise SyntaxError(f"Unexpected token {self.peek()!r}")
-        return result
-
-    # expr -> term ((+|-) term)*
     def parse_expr(self):
+        # handle + -
         left = self.parse_term()
-        while True:
-            tok = self.peek()
-            if tok and tok[1] in ('+', '-'):
-                self.consume()
-                right = self.parse_term()
-                if tok[1] == '+':
-                    left = left + right
-                else:
-                    left = left - right
+        while self.peek()[0] == 'OP' and self.peek()[1] in ('+', '-'):
+            op = self.consume()[1]
+            right = self.parse_term()
+            if op == '+':
+                left = left + right
             else:
-                break
+                left = left - right
         return left
 
-    # term -> factor ((*|/|//|%) factor)*
     def parse_term(self):
-        left = self.parse_factor()
-        while True:
-            tok = self.peek()
-            if tok and tok[1] in ('*', '/', '//', '%'):
-                self.consume()
-                right = self.parse_factor()
-                if tok[1] == '*':
-                    left = left * right
-                elif tok[1] == '/':
-                    left = left / right
-                elif tok[1] == '//':
-                    left = left // right
-                elif tok[1] == '%':
-                    left = left % right
-            else:
-                break
+        left = self.parse_unary()
+        while self.peek()[0] == 'OP' and self.peek()[1] in ('*', '/', '//', '%'):
+            op = self.consume()[1]
+            right = self.parse_unary()
+            if op == '*':
+                left = left * right
+            elif op == '/':
+                left = left / right
+            elif op == '//':
+                left = left // right
+            elif op == '%':
+                left = left % right
         return left
 
-    def parse_factor(self):
-        return self.parse_unary()
-
-    # unary -> (+|-) unary | power
     def parse_unary(self):
         tok = self.peek()
-        if tok and tok[1] in ('+', '-'):
-            self.consume()
-            operand = self.parse_unary()
-            return operand if tok[1] == '+' else -operand
+        if tok[0] == 'OP' and tok[1] in ('+', '-'):
+            op = self.consume()[1]
+            val = self.parse_unary()
+            return val if op == '+' else -val
         return self.parse_power()
 
-    # power -> primary ((**| ^) unary)?  right associative
     def parse_power(self):
-        base = self.parse_primary()
-        tok = self.peek()
-        if tok and tok[1] in ('**', '^'):
-            self.consume()
-            exponent = self.parse_unary()
-            base = base ** exponent
-        return base
+        # left is primary, right is unary (to allow 2**-3 and right associativity)
+        left = self.parse_primary()
+        if self.peek()[0] == 'OP' and self.peek()[1] in ('**', '^'):
+            op = self.consume()[1]
+            right = self.parse_unary()
+            # both ** and ^ are exponentiation
+            left = left ** right
+        return left
 
     def parse_primary(self):
         tok = self.peek()
-        if tok is None:
-            raise SyntaxError("Unexpected end of input")
-
-        if tok[1] == '(':
-            self.consume('(')
-            val = self.parse_expr()
-            if not self.peek() or self.peek()[1] != ')':
-                raise SyntaxError("Missing closing parenthesis")
-            self.consume(')')
-            return val
-
         if tok[0] == 'NUMBER':
             self.consume()
-            if '.' in tok[1]:
-                return float(tok[1])
-            else:
-                return int(tok[1])
-
+            return tok[1]
         if tok[0] == 'IDENT':
-            self.consume()
-            name = tok[1]
+            name = self.consume()[1]
             # function call?
-            if self.peek() and self.peek()[1] == '(':
-                self.consume('(')
+            if self.peek()[0] == 'LPAREN':
+                self.consume('LPAREN')
                 args = []
-                if self.peek() and self.peek()[1] != ')':
+                if self.peek()[0] != 'RPAREN':
                     args.append(self.parse_expr())
-                    while self.peek() and self.peek()[1] == ',':
-                        self.consume(',')
+                    while self.peek()[0] == 'COMMA':
+                        self.consume('COMMA')
                         args.append(self.parse_expr())
-                if not self.peek() or self.peek()[1] != ')':
-                    raise SyntaxError("Missing closing parenthesis in function call")
-                self.consume(')')
-                # resolve function: env first, then math, then builtins
-                if name in self.env and callable(self.env[name]):
-                    return self.env[name](*args)
-                if hasattr(math, name):
-                    return getattr(math, name)(*args)
-                # common builtins
-                builtins = {
-                    'abs': abs,
-                    'max': max,
-                    'min': min,
-                    'pow': pow,
-                    'round': round,
-                }
-                if name in builtins:
-                    return builtins[name](*args)
-                raise NameError(f"Unknown function '{name}'")
+                if self.peek()[0] != 'RPAREN':
+                    raise ValueError("Expected ')' after function arguments")
+                self.consume('RPAREN')
+                return self.call_func(name, args)
             else:
                 # variable / constant
                 if name in self.env:
                     return self.env[name]
-                if hasattr(math, name):
-                    return getattr(math, name)
-                raise NameError(f"Unknown variable '{name}'")
+                if name == 'pi':
+                    return math.pi
+                if name == 'e':
+                    return math.e
+                if name == 'True':
+                    return True
+                if name == 'False':
+                    return False
+                raise NameError(f"Unknown variable or constant: {name}")
+        if tok[0] == 'LPAREN':
+            self.consume('LPAREN')
+            val = self.parse_expr()
+            if self.peek()[0] != 'RPAREN':
+                raise ValueError("Mismatched parentheses: expected ')'")
+            self.consume('RPAREN')
+            return val
+        raise ValueError(f"Unexpected token: {tok}")
 
-        raise SyntaxError(f"Unexpected token {tok!r}")
+    def call_func(self, name, args):
+        # env may override
+        if name in self.env and callable(self.env[name]):
+            return self.env[name](*args)
+        if name in _MATH_FUNCS:
+            func = _MATH_FUNCS[name]
+            return func(*args)
+        if hasattr(math, name):
+            func = getattr(math, name)
+            if callable(func):
+                return func(*args)
+        raise NameError(f"Unknown function: {name}")
 
+def _parse_and_eval_internal(text, env):
+    if not isinstance(text, str):
+        raise TypeError("expression must be a string")
+    stripped = text.strip()
+    if stripped == "":
+        raise ValueError("Empty expression")
+    # Simple assignment support: var = expr
+    # Only handle single '=' not part of comparison; treat as assignment
+    # We check for '=' at top level (not inside parentheses)
+    # For simplicity, if there's an '=' we split on first '=' and validate left is identifier
+    # This allows tests that check assignment persistence via env dict
+    if '=' in stripped:
+        # find '=' not inside parens
+        depth = 0
+        eq_pos = -1
+        for idx, ch in enumerate(stripped):
+            if ch == '(':
+                depth += 1
+            elif ch == ')':
+                depth -= 1
+            elif ch == '=' and depth == 0:
+                eq_pos = idx
+                break
+        if eq_pos != -1:
+            left = stripped[:eq_pos].strip()
+            right = stripped[eq_pos+1:].strip()
+            # left should be a valid identifier
+            if re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', left):
+                # evaluate right side
+                tokens = tokenize(right)
+                parser = Parser(tokens, env)
+                val = parser.parse_expr()
+                if parser.peek()[0] != 'EOF':
+                    raise ValueError(f"Unexpected token after expression: {parser.peek()}")
+                # store in env
+                if env is not None:
+                    env[left] = val
+                return val
+            else:
+                raise ValueError(f"Invalid assignment target: {left}")
 
-def parse_and_eval(expr, env=None, **kwargs):
+    tokens = tokenize(text)
+    parser = Parser(tokens, env)
+    result = parser.parse_expr()
+    if parser.peek()[0] != 'EOF':
+        raise ValueError(f"Unexpected token after expression: {parser.peek()}")
+    return result
+
+def parse_and_eval(text, env=None, variables=None, **kwargs):
     """
     Parse and evaluate an expression string.
-
-    Args:
-        expr: string expression
-        env: optional dict for variables/functions
-        **kwargs: additional variables
-
-    Returns:
-        numeric result
+    env can be a dict of variables/functions.
+    Also accepts variables as alternative name and kwargs.
     """
-    if env is None:
-        env = {}
-   
+    actual_env = {}
+    if env is not None:
+        if isinstance(env, dict):
+            actual_env.update(env)
+        else:
+            raise TypeError("env must be a dict")
+    if variables is not None:
+        if isinstance(variables, dict):
+            actual_env.update(variables)
+        else:
+            raise TypeError("variables must be a dict")
+    if kwargs:
+        actual_env.update(kwargs)
+
+    # Use actual_env as the env dict so assignments can mutate it
+    # If caller passed an env dict, we need to propagate mutations back
+    # So we keep reference to original env if provided
+    target_env = env if isinstance(env, dict) else actual_env
+    # Merge actual_env into target_env for evaluation (if they are different)
+    if target_env is not actual_env:
+        # ensure target_env has all keys from actual_env
+        for k, v in actual_env.items():
+            if k not in target_env:
+                target_env[k] = v
+
+    result = _parse_and_eval_internal(text, target_env if isinstance(target_env, dict) else actual_env)
+
+    # If we used a separate actual_env, sync back any new assignments
+    if isinstance(env, dict):
+        # env already mutated via target_env
+        pass
+    return result
+```

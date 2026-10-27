@@ -7,8 +7,6 @@ def dedup(strings: list[str]) -> list[str]:
     seen = set()
     result = []
     for s in strings:
-        # Normalize to NFC for comparison so canonically equivalent
-        # strings (e.g., precomposed vs base+combining) are treated as duplicates
         key = unicodedata.normalize('NFC', s)
         if key not in seen:
             seen.add(key)

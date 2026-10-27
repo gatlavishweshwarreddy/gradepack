@@ -20,13 +20,14 @@ class Graph:
 
         dist = {source: 0.0}
         pq = [(0.0, source)]
+
         while pq:
             d, u = heapq.heappop(pq)
-            # Skip stale entries
-            if d != dist.get(u, float('inf')):
+            # skip stale entries
+            if d != dist.get(u):
                 continue
             if u == target:
-                return d
+                return float(d)
             for v, w in self._adj.get(u, []):
                 nd = d + w
                 if v not in dist or nd < dist[v]:

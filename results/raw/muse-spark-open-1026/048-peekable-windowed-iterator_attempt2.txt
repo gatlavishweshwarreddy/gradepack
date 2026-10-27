@@ -85,76 +85,43 @@ class BufferedIterator:
             return []
         result = []
         for _ in range(n):
-            if self._buffer:
-                result.append(self._buffer.popleft())
-            elif self._exhausted:
+            try:
+                result.append(next(self))
+            except StopIteration:
                 break
-            else:
-                try:
-                    result.append(next(self._source_iter))
-                except StopIteration:
-                    self._exhausted = True
-                    break
         return result
 
     def window(self, size, step=1):
         if size <= 0 or step <= 0:
             raise ValueError("size and step must be positive")
-
-        def _next_item():
-            if self._buffer:
-                return self._buffer.popleft()
-            if self._exhausted:
-                raise StopIteration
-            try:
-                return next(self._source_iter)
-            except StopIteration:
-                self._exhausted = True
-                raise
-
-        # first window
-        buf = []
+        buf = deque()
         for _ in range(size):
             try:
-                buf.append(_next_item())
+                buf.append(next(self))
             except StopIteration:
                 return
         yield tuple(buf)
-
         while True:
-            if step < size:
-                # keep overlap
-                buf = buf[step:]
-                for _ in range(step):
-                    try:
-                        buf.append(_next_item())
-                    except StopIteration:
-                        return
-                yield tuple(buf)
-            else:
-                # step >= size : skip gap between windows
-                gap = step - size
-                for _ in range(gap):
-                    try:
-                        _next_item()
-                    except StopIteration:
-                        return
-                buf = []
-                for _ in range(size):
-                    try:
-                        buf.append(_next_item())
-                    except StopIteration:
-                        return
-                yield tuple(buf)
+            for i in range(step):
+                try:
+                    self.peek(i)
+                except StopIteration:
+                    return
+            for _ in range(step):
+                try:
+                    nxt = next(self)
+                except StopIteration:
+                    return
+                buf.append(nxt)
+                if len(buf) > size:
+                    buf.popleft()
+            yield tuple(buf)
 
     def close(self):
         if hasattr(self._source_iter, 'close'):
             try:
                 self._source_iter.close()
             except Exception:
-                # close should not mask, but we still need to clear state
-                self._buffer.clear()
-                self._exhausted = True
                 raise
         self._buffer.clear()
         self._exhausted = True
@@ -166,6 +133,8 @@ class BufferedIterator:
                 return self._source_iter.throw(exc_type, exc_val, tb)
             except StopIteration:
                 self._exhausted = True
+                raise
+            except BaseException:
                 raise
         if isinstance(exc_type, BaseException):
             raise exc_type.with_traceback(tb)

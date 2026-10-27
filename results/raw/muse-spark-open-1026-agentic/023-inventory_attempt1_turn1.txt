@@ -20,7 +20,6 @@ class Inventory:
 
     def reserve(self, item, qty):
         with self._lock:
-            # atomically check available (stock - already reserved) and record
             available = self._stock.get(item, 0) - self._log.total_reserved(item)
             if available >= qty:
                 self._log.record(item, qty)
@@ -39,7 +38,7 @@ import threading
 class ReservationLog:
     def __init__(self):
         self._log = []
-        self._lock = threading.RLock()
+        self._lock = threading.Lock()
 
     def record(self, item, qty):
         with self._lock:

@@ -9,12 +9,12 @@ def coerce(value, type_name):
         try:
             return int(float(value))
         except (ValueError, TypeError, OverflowError) as e:
-            raise ValueError(str(e)) from e
+            raise ValueError(f"invalid literal for int(): {value!r}") from e
     elif type_name == "float":
         try:
             return float(value)
         except (ValueError, TypeError) as e:
-            raise ValueError(str(e)) from e
+            raise ValueError(f"could not convert string to float: {value!r}") from e
     else:
         return str(value)
 ```

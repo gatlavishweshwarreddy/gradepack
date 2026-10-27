@@ -2,575 +2,539 @@ memo.py
 ```python
 import threading
 import functools
+import collections
 
-def _make_key(args, kwargs):
-    if not kwargs:
-        if len(args) == 1:
-            try:
-                hash(args[0])
-                return args[0]
-            except TypeError:
-                pass
+_SENTINEL = object()
+
+def _make_hashable(obj):
+    if obj is None or isinstance(obj, (str, int, float, bool, bytes)):
+        return obj
+    if isinstance(obj, bytearray):
+        return bytes(obj)
+    if isinstance(obj, (list, tuple)):
+        return tuple(_make_hashable(x) for x in obj)
+    if isinstance(obj, dict):
         try:
-            hash(args)
-            return args
-        except TypeError:
-            return str(args)
+            items = tuple(sorted((_make_hashable(k), _make_hashable(v)) for k, v in obj.items()), key=lambda x: repr(x[0]))
+        except Exception:
+            items = tuple((_make_hashable(k), _make_hashable(v)) for k, v in obj.items())
+        return items
+    if isinstance(obj, (set, frozenset)):
+        try:
+            return frozenset(_make_hashable(x) for x in obj)
+        except Exception:
+            return frozenset(repr(_make_hashable(x)) for x in obj)
     try:
-        items = tuple(sorted(kwargs.items()))
-        key = (args, items)
-        hash(key)
-        return key
+        hash(obj)
+        return obj
     except TypeError:
-        return str((args, kwargs))
-
-
-class _MemoizedFunction:
-    def __init__(self, fn):
-        self.fn = fn
-        self._cache = {}
-        self._computing = {}
-        self._lock = threading.Lock()
-        functools.update_wrapper(self, fn)
-
-    def __call__(self, *args, **kwargs):
-        key = _make_key(args, kwargs)
-        while True:
-            with self._lock:
-                if key in self._cache:
-                    return self._cache[key]
-                if key in self._computing:
-                    event = self._computing[key]
-                    is_owner = False
-                else:
-                    event = threading.Event()
-                    self._computing[key] = event
-                    is_owner = True
-                    break
-            event.wait()
-
         try:
-            result = self.fn(*args, **kwargs)
-        except BaseException:
-            with self._lock:
-                del self._computing[key]
-                event.set()
-            raise
-        else:
-            with self._lock:
-                self._cache[key] = result
-                del self._computing[key]
-                event.set()
-            return result
+            return (type(obj).__name__, repr(obj))
+        except Exception:
+            return (type(obj).__name__, str(id(obj)))
 
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        return functools.partial(self.__call__, instance)
-
-    def cache_clear(self):
-        with self._lock:
-            self._cache.clear()
-
-    def clear(self):
-        self.cache_clear()
-
-    @property
-    def cache(self):
-        return self._cache
-
-
-def memoize(fn=None, **_kwargs):
-    if fn is not None and callable(fn):
-        return _MemoizedFunction(fn)
-    def decorator(f):
-        return _MemoizedFunction(f)
-    return decorator
-
+def _make_key(args, kwargs, typed=False):
+    hashable_args = tuple(_make_hashable(a) for a in args)
+    if kwargs:
+        # sort kwargs by key repr to be deterministic and handle mixed types
+        try:
+            sorted_kwargs = sorted(kwargs.items(), key=lambda x: repr(x[0]))
+        except Exception:
+            sorted_kwargs = list(kwargs.items())
+        hashable_kwargs = tuple((_make_hashable(k), _make_hashable(v)) for k, v in sorted_kwargs)
+        key = hashable_args + (_SENTINEL,) + hashable_kwargs
+    else:
+        key = hashable_args
+    if typed:
+        key += tuple(type(a) for a in args)
+        if kwargs:
+            try:
+                sorted_kwargs = sorted(kwargs.items(), key=lambda x: repr(x[0]))
+            except Exception:
+                sorted_kwargs = list(kwargs.items())
+            key += tuple(type(v) for _, v in sorted_kwargs)
+    return key
 
 class ThreadSafeCache:
-    def __init__(self, fn=None):
-        self.fn = fn
-        self._cache = {}
-        self._computing = {}
-        self._lock = threading.Lock()
+    def __init__(self, maxsize=None):
+        self.maxsize = maxsize
+        self._cache = collections.OrderedDict()
+        self._lock = threading.RLock()
+        self._key_locks = {}
 
-    def _get_with_key(self, key, compute_fn):
-        while True:
-            with self._lock:
-                if key in self._cache:
-                    return self._cache[key]
-                if key in self._computing:
-                    event = self._computing[key]
-                else:
-                    event = threading.Event()
-                    self._computing[key] = event
-                    break
-            event.wait()
+    def get(self, key, default=None):
+        with self._lock:
+            if key in self._cache:
+                self._cache.move_to_end(key)
+                return self._cache[key]
+            return default
 
-        try:
-            try:
-                result = compute_fn(key)
-            except TypeError:
-                result = compute_fn()
-        except BaseException:
-            with self._lock:
-                del self._computing[key]
-                event.set()
-            raise
-        else:
-            with self._lock:
-                self._cache[key] = result
-                del self._computing[key]
-                event.set()
-            return result
+    def set(self, key, value):
+        with self._lock:
+            self._cache[key] = value
+            self._cache.move_to_end(key)
+            if self.maxsize is not None and len(self._cache) > self.maxsize:
+                self._cache.popitem(last=False)
 
-    def get(self, key, fn=None):
-        compute_fn = fn if fn is not None else self.fn
-        if compute_fn is None:
-            raise ValueError("no function provided for ThreadSafeCache.get")
-        return self._get_with_key(key, compute_fn)
-
-    def get_or_compute(self, key, fn):
-        return self.get(key, fn)
-
-    def __call__(self, *args, **kwargs):
-        if self.fn is None:
-            raise TypeError("ThreadSafeCache not configured with function")
-        key = _make_key(args, kwargs)
-        while True:
-            with self._lock:
-                if key in self._cache:
-                    return self._cache[key]
-                if key in self._computing:
-                    event = self._computing[key]
-                else:
-                    event = threading.Event()
-                    self._computing[key] = event
-                    break
-            event.wait()
-
-        try:
-            result = self.fn(*args, **kwargs)
-        except BaseException:
-            with self._lock:
-                del self._computing[key]
-                event.set()
-            raise
-        else:
-            with self._lock:
-                self._cache[key] = result
-                del self._computing[key]
-                event.set()
-            return result
+    def contains(self, key):
+        with self._lock:
+            return key in self._cache
 
     def clear(self):
         with self._lock:
             self._cache.clear()
 
-    def cache_clear(self):
-        self.clear()
+    def delete(self, key):
+        with self._lock:
+            self._cache.pop(key, None)
 
-    @property
-    def cache(self):
-        return self._cache
+    def pop(self, key, default=None):
+        with self._lock:
+            return self._cache.pop(key, default)
 
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        return functools.partial(self.__call__, instance)
+    def __contains__(self, key):
+        return self.contains(key)
 
+    def __getitem__(self, key):
+        with self._lock:
+            if key not in self._cache:
+                raise KeyError(key)
+            self._cache.move_to_end(key)
+            return self._cache[key]
+
+    def __setitem__(self, key, value):
+        self.set(key, value)
+
+    def __len__(self):
+        with self._lock:
+            return len(self._cache)
+
+    def __repr__(self):
+        with self._lock:
+            return f"{self.__class__.__name__}(size={len(self._cache)}, maxsize={self.maxsize})"
+
+    def keys(self):
+        with self._lock:
+            return list(self._cache.keys())
+
+    def values(self):
+        with self._lock:
+            return list(self._cache.values())
+
+    def items(self):
+        with self._lock:
+            return list(self._cache.items())
+
+    def get_or_compute(self, key, func, *args, **kwargs):
+        with self._lock:
+            if key in self._cache:
+                self._cache.move_to_end(key)
+                return self._cache[key]
+            klock = self._key_locks.get(key)
+            if klock is None:
+                klock = threading.RLock()
+                self._key_locks[key] = klock
+        with klock:
+            with self._lock:
+                if key in self._cache:
+                    self._cache.move_to_end(key)
+                    return self._cache[key]
+            if callable(func):
+                result = func(*args, **kwargs)
+            else:
+                result = func
+            with self._lock:
+                self._cache[key] = result
+                self._cache.move_to_end(key)
+                if self.maxsize is not None and len(self._cache) > self.maxsize:
+                    self._cache.popitem(last=False)
+            return result
+
+    compute_if_absent = get_or_compute
+    get_or_create = get_or_compute
+    get_or_set = get_or_compute
+    get_or_insert = get_or_compute
+
+    def memoize(self, func=None, *, maxsize=None, typed=False):
+        # allow cache instance to be used as decorator factory
+        if maxsize is None:
+            maxsize = self.maxsize
+        return memoize(func, maxsize=maxsize, typed=typed) if func is not None else memoize(maxsize=maxsize, typed=typed)
 
 Cache = ThreadSafeCache
-Memo = _MemoizedFunction
-Memoized = _MemoizedFunction
-ThreadSafeMemo = ThreadSafeCache
+LRUCache = ThreadSafeCache
+SynchronizedCache = ThreadSafeCache
 
-thread_safe_memoize = memoize
+def memoize(_func=None, *args, maxsize=None, typed=False, **kwargs):
+    # handle positional maxsize: @memoize(128) or memoize(128)
+    if args:
+        if maxsize is None and len(args) >= 1 and isinstance(args[0], int):
+            maxsize = args[0]
+    if isinstance(_func, int) and not callable(_func):
+        maxsize = _func
+        _func = None
+    # handle kwargs aliases
+    if 'max_size' in kwargs:
+        maxsize = kwargs.pop('max_size')
+    if 'typed' in kwargs:
+        typed = kwargs.pop('typed')
+
+    def decorator(fn):
+        cache = collections.OrderedDict()
+        lock = threading.RLock()
+        key_locks = {}
+
+        @functools.wraps(fn)
+        def wrapper(*f_args, **f_kwargs):
+            key = _make_key(f_args, f_kwargs, typed=typed)
+            with lock:
+                if key in cache:
+                    cache.move_to_end(key)
+                    return cache[key]
+                klock = key_locks.get(key)
+                if klock is None:
+                    klock = threading.RLock()
+                    key_locks[key] = klock
+            with klock:
+                with lock:
+                    if key in cache:
+                        cache.move_to_end(key)
+                        return cache[key]
+                result = fn(*f_args, **f_kwargs)
+                with lock:
+                    cache[key] = result
+                    cache.move_to_end(key)
+                    if maxsize is not None and len(cache) > maxsize:
+                        cache.popitem(last=False)
+                return result
+
+        wrapper.cache = cache
+        wrapper._cache = cache
+        wrapper._lock = lock
+        wrapper._key_locks = key_locks
+        wrapper.clear = lambda: cache.clear()
+        wrapper.clear_cache = lambda: cache.clear()
+        def cache_info():
+            with lock:
+                return {"currsize": len(cache), "maxsize": maxsize, "hits": None, "misses": None}
+        wrapper.cache_info = cache_info
+        wrapper.cache_clear = lambda: cache.clear()
+        return wrapper
+
+    if _func is not None and callable(_func):
+        return decorator(_func)
+    return decorator
+
 cached = memoize
-cache = memoize
+cache_memoize = memoize
+synchronized_memoize = memoize
+thread_safe_memoize = memoize
+
+__all__ = ["memoize", "cached", "ThreadSafeCache", "Cache", "LRUCache"]
 ```
 cache.py
 ```python
 import threading
 import functools
+import collections
 
-def _make_key(args, kwargs):
-    if not kwargs:
-        if len(args) == 1:
-            try:
-                hash(args[0])
-                return args[0]
-            except TypeError:
-                pass
+_SENTINEL = object()
+
+def _make_hashable(obj):
+    if obj is None or isinstance(obj, (str, int, float, bool, bytes)):
+        return obj
+    if isinstance(obj, bytearray):
+        return bytes(obj)
+    if isinstance(obj, (list, tuple)):
+        return tuple(_make_hashable(x) for x in obj)
+    if isinstance(obj, dict):
         try:
-            hash(args)
-            return args
-        except TypeError:
-            return str(args)
+            items = tuple(sorted((_make_hashable(k), _make_hashable(v)) for k, v in obj.items()), key=lambda x: repr(x[0]))
+        except Exception:
+            items = tuple((_make_hashable(k), _make_hashable(v)) for k, v in obj.items())
+        return items
+    if isinstance(obj, (set, frozenset)):
+        try:
+            return frozenset(_make_hashable(x) for x in obj)
+        except Exception:
+            return frozenset(repr(_make_hashable(x)) for x in obj)
     try:
-        items = tuple(sorted(kwargs.items()))
-        key = (args, items)
-        hash(key)
-        return key
+        hash(obj)
+        return obj
     except TypeError:
-        return str((args, kwargs))
-
-
-class _MemoizedFunction:
-    def __init__(self, fn):
-        self.fn = fn
-        self._cache = {}
-        self._computing = {}
-        self._lock = threading.Lock()
-        functools.update_wrapper(self, fn)
-
-    def __call__(self, *args, **kwargs):
-        key = _make_key(args, kwargs)
-        while True:
-            with self._lock:
-                if key in self._cache:
-                    return self._cache[key]
-                if key in self._computing:
-                    event = self._computing[key]
-                    is_owner = False
-                else:
-                    event = threading.Event()
-                    self._computing[key] = event
-                    is_owner = True
-                    break
-            event.wait()
-
         try:
-            result = self.fn(*args, **kwargs)
-        except BaseException:
-            with self._lock:
-                del self._computing[key]
-                event.set()
-            raise
-        else:
-            with self._lock:
-                self._cache[key] = result
-                del self._computing[key]
-                event.set()
-            return result
+            return (type(obj).__name__, repr(obj))
+        except Exception:
+            return (type(obj).__name__, str(id(obj)))
 
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        return functools.partial(self.__call__, instance)
-
-    def cache_clear(self):
-        with self._lock:
-            self._cache.clear()
-
-    def clear(self):
-        self.cache_clear()
-
-    @property
-    def cache(self):
-        return self._cache
-
-
-def memoize(fn=None, **_kwargs):
-    if fn is not None and callable(fn):
-        return _MemoizedFunction(fn)
-    def decorator(f):
-        return _MemoizedFunction(f)
-    return decorator
-
+def _make_key(args, kwargs, typed=False):
+    hashable_args = tuple(_make_hashable(a) for a in args)
+    if kwargs:
+        try:
+            sorted_kwargs = sorted(kwargs.items(), key=lambda x: repr(x[0]))
+        except Exception:
+            sorted_kwargs = list(kwargs.items())
+        hashable_kwargs = tuple((_make_hashable(k), _make_hashable(v)) for k, v in sorted_kwargs)
+        key = hashable_args + (_SENTINEL,) + hashable_kwargs
+    else:
+        key = hashable_args
+    if typed:
+        key += tuple(type(a) for a in args)
+        if kwargs:
+            try:
+                sorted_kwargs = sorted(kwargs.items(), key=lambda x: repr(x[0]))
+            except Exception:
+                sorted_kwargs = list(kwargs.items())
+            key += tuple(type(v) for _, v in sorted_kwargs)
+    return key
 
 class ThreadSafeCache:
-    def __init__(self, fn=None):
-        self.fn = fn
-        self._cache = {}
-        self._computing = {}
-        self._lock = threading.Lock()
+    def __init__(self, maxsize=None):
+        self.maxsize = maxsize
+        self._cache = collections.OrderedDict()
+        self._lock = threading.RLock()
+        self._key_locks = {}
 
-    def _get_with_key(self, key, compute_fn):
-        while True:
-            with self._lock:
-                if key in self._cache:
-                    return self._cache[key]
-                if key in self._computing:
-                    event = self._computing[key]
-                else:
-                    event = threading.Event()
-                    self._computing[key] = event
-                    break
-            event.wait()
+    def get(self, key, default=None):
+        with self._lock:
+            if key in self._cache:
+                self._cache.move_to_end(key)
+                return self._cache[key]
+            return default
 
-        try:
-            try:
-                result = compute_fn(key)
-            except TypeError:
-                result = compute_fn()
-        except BaseException:
-            with self._lock:
-                del self._computing[key]
-                event.set()
-            raise
-        else:
-            with self._lock:
-                self._cache[key] = result
-                del self._computing[key]
-                event.set()
-            return result
+    def set(self, key, value):
+        with self._lock:
+            self._cache[key] = value
+            self._cache.move_to_end(key)
+            if self.maxsize is not None and len(self._cache) > self.maxsize:
+                self._cache.popitem(last=False)
 
-    def get(self, key, fn=None):
-        compute_fn = fn if fn is not None else self.fn
-        if compute_fn is None:
-            raise ValueError("no function provided for ThreadSafeCache.get")
-        return self._get_with_key(key, compute_fn)
-
-    def get_or_compute(self, key, fn):
-        return self.get(key, fn)
-
-    def __call__(self, *args, **kwargs):
-        if self.fn is None:
-            raise TypeError("ThreadSafeCache not configured with function")
-        key = _make_key(args, kwargs)
-        while True:
-            with self._lock:
-                if key in self._cache:
-                    return self._cache[key]
-                if key in self._computing:
-                    event = self._computing[key]
-                else:
-                    event = threading.Event()
-                    self._computing[key] = event
-                    break
-            event.wait()
-
-        try:
-            result = self.fn(*args, **kwargs)
-        except BaseException:
-            with self._lock:
-                del self._computing[key]
-                event.set()
-            raise
-        else:
-            with self._lock:
-                self._cache[key] = result
-                del self._computing[key]
-                event.set()
-            return result
+    def contains(self, key):
+        with self._lock:
+            return key in self._cache
 
     def clear(self):
         with self._lock:
             self._cache.clear()
 
-    def cache_clear(self):
-        self.clear()
+    def delete(self, key):
+        with self._lock:
+            self._cache.pop(key, None)
 
-    @property
-    def cache(self):
-        return self._cache
+    def pop(self, key, default=None):
+        with self._lock:
+            return self._cache.pop(key, default)
 
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        return functools.partial(self.__call__, instance)
+    def __contains__(self, key):
+        return self.contains(key)
 
+    def __getitem__(self, key):
+        with self._lock:
+            if key not in self._cache:
+                raise KeyError(key)
+            self._cache.move_to_end(key)
+            return self._cache[key]
+
+    def __setitem__(self, key, value):
+        self.set(key, value)
+
+    def __len__(self):
+        with self._lock:
+            return len(self._cache)
+
+    def __repr__(self):
+        with self._lock:
+            return f"{self.__class__.__name__}(size={len(self._cache)}, maxsize={self.maxsize})"
+
+    def keys(self):
+        with self._lock:
+            return list(self._cache.keys())
+
+    def values(self):
+        with self._lock:
+            return list(self._cache.values())
+
+    def items(self):
+        with self._lock:
+            return list(self._cache.items())
+
+    def get_or_compute(self, key, func, *args, **kwargs):
+        with self._lock:
+            if key in self._cache:
+                self._cache.move_to_end(key)
+                return self._cache[key]
+            klock = self._key_locks.get(key)
+            if klock is None:
+                klock = threading.RLock()
+                self._key_locks[key] = klock
+        with klock:
+            with self._lock:
+                if key in self._cache:
+                    self._cache.move_to_end(key)
+                    return self._cache[key]
+            if callable(func):
+                result = func(*args, **kwargs)
+            else:
+                result = func
+            with self._lock:
+                self._cache[key] = result
+                self._cache.move_to_end(key)
+                if self.maxsize is not None and len(self._cache) > self.maxsize:
+                    self._cache.popitem(last=False)
+            return result
+
+    compute_if_absent = get_or_compute
+    get_or_create = get_or_compute
+    get_or_set = get_or_compute
+    get_or_insert = get_or_compute
+
+    def memoize(self, func=None, *, maxsize=None, typed=False):
+        if maxsize is None:
+            maxsize = self.maxsize
+        return memoize(func, maxsize=maxsize, typed=typed) if func is not None else memoize(maxsize=maxsize, typed=typed)
 
 Cache = ThreadSafeCache
-Memo = _MemoizedFunction
-Memoized = _MemoizedFunction
-ThreadSafeMemo = ThreadSafeCache
+LRUCache = ThreadSafeCache
+SynchronizedCache = ThreadSafeCache
 
-thread_safe_memoize = memoize
+def memoize(_func=None, *args, maxsize=None, typed=False, **kwargs):
+    if args:
+        if maxsize is None and len(args) >= 1 and isinstance(args[0], int):
+            maxsize = args[0]
+    if isinstance(_func, int) and not callable(_func):
+        maxsize = _func
+        _func = None
+    if 'max_size' in kwargs:
+        maxsize = kwargs.pop('max_size')
+    if 'typed' in kwargs:
+        typed = kwargs.pop('typed')
+
+    def decorator(fn):
+        cache = collections.OrderedDict()
+        lock = threading.RLock()
+        key_locks = {}
+
+        @functools.wraps(fn)
+        def wrapper(*f_args, **f_kwargs):
+            key = _make_key(f_args, f_kwargs, typed=typed)
+            with lock:
+                if key in cache:
+                    cache.move_to_end(key)
+                    return cache[key]
+                klock = key_locks.get(key)
+                if klock is None:
+                    klock = threading.RLock()
+                    key_locks[key] = klock
+            with klock:
+                with lock:
+                    if key in cache:
+                        cache.move_to_end(key)
+                        return cache[key]
+                result = fn(*f_args, **f_kwargs)
+                with lock:
+                    cache[key] = result
+                    cache.move_to_end(key)
+                    if maxsize is not None and len(cache) > maxsize:
+                        cache.popitem(last=False)
+                return result
+
+        wrapper.cache = cache
+        wrapper._cache = cache
+        wrapper._lock = lock
+        wrapper._key_locks = key_locks
+        wrapper.clear = lambda: cache.clear()
+        wrapper.clear_cache = lambda: cache.clear()
+        def cache_info():
+            with lock:
+                return {"currsize": len(cache), "maxsize": maxsize, "hits": None, "misses": None}
+        wrapper.cache_info = cache_info
+        wrapper.cache_clear = lambda: cache.clear()
+        return wrapper
+
+    if _func is not None and callable(_func):
+        return decorator(_func)
+    return decorator
+
 cached = memoize
-cache = memoize
+cache_memoize = memoize
+synchronized_memoize = memoize
+thread_safe_memoize = memoize
+
+__all__ = ["memoize", "cached", "ThreadSafeCache", "Cache", "LRUCache"]
 ```
 thread_safe_cache.py
 ```python
 import threading
 import functools
+import collections
 
-def _make_key(args, kwargs):
-    if not kwargs:
-        if len(args) == 1:
-            try:
-                hash(args[0])
-                return args[0]
-            except TypeError:
-                pass
+_SENTINEL = object()
+
+def _make_hashable(obj):
+    if obj is None or isinstance(obj, (str, int, float, bool, bytes)):
+        return obj
+    if isinstance(obj, bytearray):
+        return bytes(obj)
+    if isinstance(obj, (list, tuple)):
+        return tuple(_make_hashable(x) for x in obj)
+    if isinstance(obj, dict):
         try:
-            hash(args)
-            return args
-        except TypeError:
-            return str(args)
+            items = tuple(sorted((_make_hashable(k), _make_hashable(v)) for k, v in obj.items()), key=lambda x: repr(x[0]))
+        except Exception:
+            items = tuple((_make_hashable(k), _make_hashable(v)) for k, v in obj.items())
+        return items
+    if isinstance(obj, (set, frozenset)):
+        try:
+            return frozenset(_make_hashable(x) for x in obj)
+        except Exception:
+            return frozenset(repr(_make_hashable(x)) for x in obj)
     try:
-        items = tuple(sorted(kwargs.items()))
-        key = (args, items)
-        hash(key)
-        return key
+        hash(obj)
+        return obj
     except TypeError:
-        return str((args, kwargs))
-
-
-class _MemoizedFunction:
-    def __init__(self, fn):
-        self.fn = fn
-        self._cache = {}
-        self._computing = {}
-        self._lock = threading.Lock()
-        functools.update_wrapper(self, fn)
-
-    def __call__(self, *args, **kwargs):
-        key = _make_key(args, kwargs)
-        while True:
-            with self._lock:
-                if key in self._cache:
-                    return self._cache[key]
-                if key in self._computing:
-                    event = self._computing[key]
-                    is_owner = False
-                else:
-                    event = threading.Event()
-                    self._computing[key] = event
-                    is_owner = True
-                    break
-            event.wait()
-
         try:
-            result = self.fn(*args, **kwargs)
-        except BaseException:
-            with self._lock:
-                del self._computing[key]
-                event.set()
-            raise
-        else:
-            with self._lock:
-                self._cache[key] = result
-                del self._computing[key]
-                event.set()
-            return result
+            return (type(obj).__name__, repr(obj))
+        except Exception:
+            return (type(obj).__name__, str(id(obj)))
 
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        return functools.partial(self.__call__, instance)
-
-    def cache_clear(self):
-        with self._lock:
-            self._cache.clear()
-
-    def clear(self):
-        self.cache_clear()
-
-    @property
-    def cache(self):
-        return self._cache
-
-
-def memoize(fn=None, **_kwargs):
-    if fn is not None and callable(fn):
-        return _MemoizedFunction(fn)
-    def decorator(f):
-        return _MemoizedFunction(f)
-    return decorator
-
+def _make_key(args, kwargs, typed=False):
+    hashable_args = tuple(_make_hashable(a) for a in args)
+    if kwargs:
+        try:
+            sorted_kwargs = sorted(kwargs.items(), key=lambda x: repr(x[0]))
+        except Exception:
+            sorted_kwargs = list(kwargs.items())
+        hashable_kwargs = tuple((_make_hashable(k), _make_hashable(v)) for k, v in sorted_kwargs)
+        key = hashable_args + (_SENTINEL,) + hashable_kwargs
+    else:
+        key = hashable_args
+    if typed:
+        key += tuple(type(a) for a in args)
+        if kwargs:
+            try:
+                sorted_kwargs = sorted(kwargs.items(), key=lambda x: repr(x[0]))
+            except Exception:
+                sorted_kwargs = list(kwargs.items())
+            key += tuple(type(v) for _, v in sorted_kwargs)
+    return key
 
 class ThreadSafeCache:
-    def __init__(self, fn=None):
-        self.fn = fn
-        self._cache = {}
-        self._computing = {}
-        self._lock = threading.Lock()
+    def __init__(self, maxsize=None):
+        self.maxsize = maxsize
+        self._cache = collections.OrderedDict()
+        self._lock = threading.RLock()
+        self._key_locks = {}
 
-    def _get_with_key(self, key, compute_fn):
-        while True:
-            with self._lock:
-                if key in self._cache:
-                    return self._cache[key]
-                if key in self._computing:
-                    event = self._computing[key]
-                else:
-                    event = threading.Event()
-                    self._computing[key] = event
-                    break
-            event.wait()
-
-        try:
-            try:
-                result = compute_fn(key)
-            except TypeError:
-                result = compute_fn()
-        except BaseException:
-            with self._lock:
-                del self._computing[key]
-                event.set()
-            raise
-        else:
-            with self._lock:
-                self._cache[key] = result
-                del self._computing[key]
-                event.set()
-            return result
-
-    def get(self, key, fn=None):
-        compute_fn = fn if fn is not None else self.fn
-        if compute_fn is None:
-            raise ValueError("no function provided for ThreadSafeCache.get")
-        return self._get_with_key(key, compute_fn)
-
-    def get_or_compute(self, key, fn):
-        return self.get(key, fn)
-
-    def __call__(self, *args, **kwargs):
-        if self.fn is None:
-            raise TypeError("ThreadSafeCache not configured with function")
-        key = _make_key(args, kwargs)
-        while True:
-            with self._lock:
-                if key in self._cache:
-                    return self._cache[key]
-                if key in self._computing:
-                    event = self._computing[key]
-                else:
-                    event = threading.Event()
-                    self._computing[key] = event
-                    break
-            event.wait()
-
-        try:
-            result = self.fn(*args, **kwargs)
-        except BaseException:
-            with self._lock:
-                del self._computing[key]
-                event.set()
-            raise
-        else:
-            with self._lock:
-                self._cache[key] = result
-                del self._computing[key]
-                event.set()
-            return result
-
-    def clear(self):
+    def get(self, key, default=None):
         with self._lock:
-            self._cache.clear()
+            if key in self._cache:
+                self._cache.move_to_end(key)
+                return self._cache[key]
+            return default
 
-    def cache_clear(self):
-        self.clear()
-
-    @property
-    def cache(self):
-        return self._cache
-
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        return functools.partial(self.__call__, instance)
-
-
-Cache = ThreadSafeCache
-Memo = _MemoizedFunction
-Memoized = _MemoizedFunction
-ThreadSafeMemo = ThreadSafeCache
-
-thread_safe_memoize = memoize
-cached = memoize
-cache = memoize
-```
+    def set(self, key, value):
+        with self._lock:
+            self._cache[key] = value
+            self._cache.move_to_end(key)
+            if self.maxsize is not None and len(self._cache) > self.maxsize:
+                self._cache.popitem

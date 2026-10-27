@@ -1,26 +1,19 @@
 memo.py
 ```python
 import threading
-import functools
 
 
 def memoize(fn):
     """Cache results of fn. Thread-safe."""
     cache = {}
-    lock = threading.RLock()
+    lock = threading.Lock()
 
-    @functools.wraps(fn)
-    def wrapper(*args, **kwargs):
-        # Build a hashable key from args and kwargs
-        if kwargs:
-            key = (args, tuple(sorted(kwargs.items())))
-        else:
-            key = args
+    def wrapper(*args):
         with lock:
-            if key in cache:
-                return cache[key]
-            result = fn(*args, **kwargs)
-            cache[key] = result
+            if args in cache:
+                return cache[args]
+            result = fn(*args)
+            cache[args] = result
             return result
 
     return wrapper

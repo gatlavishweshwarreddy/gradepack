@@ -7,12 +7,12 @@ import functools
 def memoize(fn):
     """Cache results of fn. Thread-safe."""
     cache = {}
-    lock = threading.RLock()
+    lock = threading.Lock()
 
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-        # Build a hashable key from args and kwargs
         if kwargs:
+            # kwargs are sorted to make key deterministic and hashable
             key = (args, tuple(sorted(kwargs.items())))
         else:
             key = args

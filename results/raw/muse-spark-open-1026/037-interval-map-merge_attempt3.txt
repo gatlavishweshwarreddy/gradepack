@@ -67,9 +67,7 @@ class IntervalMap:
         for a, b, v in self._intervals:
             if b <= l or a >= r:
                 continue
-            cl = max(a, l)
-            cr = min(b, r)
-            result.append((cl, cr, v))
+            result.append((max(a, l), min(b, r), v))
         return result
 
     def __len__(self):

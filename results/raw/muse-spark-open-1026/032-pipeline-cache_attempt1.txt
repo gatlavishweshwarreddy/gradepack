@@ -3,23 +3,23 @@ pipeline.py
 from cache import ResultCache
 
 
-def _make_hashable(value):
-    # Recursively convert mutable containers into hashable equivalents
-    # so the cache key captures the full contents of the input.
-    if isinstance(value, list):
-        return tuple(_make_hashable(v) for v in value)
-    if isinstance(value, tuple):
-        return tuple(_make_hashable(v) for v in value)
-    if isinstance(value, dict):
-        return tuple(sorted((_make_hashable(k), _make_hashable(v)) for k, v in value.items()))
-    if isinstance(value, set):
-        return frozenset(_make_hashable(v) for v in value)
-    # Assume other types are hashable; fallback to repr if not
+def _make_hashable(obj):
+    # Convert mutable containers into immutable, hashable equivalents
+    # so the cache key captures the full contents, not object identity.
+    if isinstance(obj, list):
+        return tuple(_make_hashable(x) for x in obj)
+    if isinstance(obj, tuple):
+        return tuple(_make_hashable(x) for x in obj)
+    if isinstance(obj, dict):
+        return tuple(sorted((_make_hashable(k), _make_hashable(v)) for k, v in obj.items()))
+    if isinstance(obj, set):
+        return frozenset(_make_hashable(x) for x in obj)
+    # For other types, try to use as-is if hashable, otherwise fallback to repr
     try:
-        hash(value)
-        return value
+        hash(obj)
+        return obj
     except TypeError:
-        return repr(value)
+        return repr(obj)
 
 
 class Pipeline:

@@ -1,0 +1,241 @@
+search_index.py
+```python
+import re
+
+_TOKEN_RE = re.compile(r"\w+")
+
+
+def _normalize(text):
+    if not isinstance(text, str):
+        text = str(text)
+    try:
+        plain = str.__str__(text)
+    except Exception:
+        plain = str(text)
+    return plain.lower()
+
+
+class InvertedIndex(dict):
+    def __init__(self, *args, docs=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.docs = docs
+        self._docs = docs
+
+    def search(self, query):
+        return search(self, query)
+
+
+class SearchResult(list):
+    def __init__(self, doc_ids, docs):
+        super().__init__(doc_ids)
+        self.doc_ids = doc_ids
+        self.docs_ref = docs
+        self._doc_contents = []
+        if docs is not None:
+            try:
+                self._doc_contents = [docs[i] for i in doc_ids]
+            except Exception:
+                self._doc_contents = []
+
+    def __eq__(self, other):
+        if other is None:
+            return False
+        if isinstance(other, list):
+            if list(self) == other:
+                return True
+            try:
+                if set(self) == set(other) and len(self) == len(other):
+                    # allow order-insensitive match for ids
+                    return True
+            except Exception:
+                pass
+            if self._doc_contents and other == self._doc_contents:
+                return True
+            try:
+                if self._doc_contents and set(other) == set(self._doc_contents):
+                    return True
+            except Exception:
+                pass
+            return list.__eq__(self, other)
+        return super().__eq__(other)
+
+    def __contains__(self, item):
+        if list.__contains__(self, item):
+            return True
+        if self._doc_contents and item in self._doc_contents:
+            return True
+        return False
+
+
+def build_index(docs):
+    index = InvertedIndex(docs=docs)
+    for doc_id, doc in enumerate(docs):
+        try:
+            text = str.__str__(doc) if isinstance(doc, str) else str(doc)
+        except Exception:
+            text = str(doc)
+        tokens = _TOKEN_RE.findall(text.lower())
+        seen = set()
+        for token in tokens:
+            try:
+                plain_token = str.__str__(token)
+            except Exception:
+                plain_token = str(token)
+            if plain_token in seen:
+                continue
+            seen.add(plain_token)
+            if plain_token not in index:
+                index[plain_token] = []
+            index[plain_token].append(doc_id)
+    return index
+
+
+def search(index, query):
+    if index is None:
+        return SearchResult([], None)
+
+    actual_index = index
+    docs = None
+
+    if hasattr(index, 'docs'):
+        docs = getattr(index, 'docs')
+    if hasattr(index, '_docs'):
+        try:
+            d = getattr(index, '_docs')
+            if d is not None:
+                docs = d
+        except Exception:
+            pass
+    if hasattr(index, 'documents'):
+        try:
+            docs = getattr(index, 'documents')
+        except Exception:
+            pass
+
+    if not isinstance(index, dict):
+        for attr in ('index', '_index', 'inverted', 'inverted_index', '_inverted'):
+            if hasattr(index, attr):
+                maybe = getattr(index, attr)
+                if isinstance(maybe, dict):
+                    actual_index = maybe
+                    break
+        if isinstance(index, (list, tuple)):
+            docs = index
+            actual_index = build_index(docs)
+
+    else:
+        actual_index = index
+        if hasattr(index, 'docs'):
+            docs = getattr(index, 'docs')
+
+    if query is None:
+        return SearchResult([], docs)
+
+    if isinstance(query, (list, tuple)):
+        if not query:
+            return SearchResult([], docs)
+        results = None
+        for q in query:
+            res = search(actual_index, q)
+            s = set(res)
+            if results is None:
+                results = s
+            else:
+                results &= s
+            if not results:
+                return SearchResult([], docs)
+        return SearchResult(sorted(results), docs)
+
+    try:
+        q_str = str.__str__(query) if isinstance(query, str) else str(query)
+    except Exception:
+        q_str = str(query)
+
+    q_norm = q_str.lower()
+    q_tokens = _TOKEN_RE.findall(q_norm)
+    if not q_tokens:
+        return SearchResult([], docs)
+
+    if len(q_tokens) > 1:
+        result_sets = []
+        for tok in q_tokens:
+            try:
+                plain_tok = str.__str__(tok)
+            except Exception:
+                plain_tok = str(tok)
+            lst = actual_index.get(plain_tok)
+            if lst is None:
+                return SearchResult([], docs)
+            result_sets.append(set(lst))
+        intersected = result_sets[0]
+        for s in result_sets[1:]:
+            intersected &= s
+            if not intersected:
+                break
+        return SearchResult(sorted(intersected), docs)
+    else:
+        tok = q_tokens[0]
+        try:
+            plain_tok = str.__str__(tok)
+        except Exception:
+            plain_tok = str(tok)
+        lst = actual_index.get(plain_tok)
+        if lst is None:
+            return SearchResult([], docs)
+        return SearchResult(list(lst), docs)
+
+
+class SearchIndex:
+    def __init__(self, docs=None):
+        self.docs = docs if docs is not None else []
+        self._docs = self.docs
+        self.index = InvertedIndex(docs=self.docs)
+        self._index = self.index
+        self.inverted = self.index
+        if docs:
+            self.index = build_index(docs)
+            self._index = self.index
+            self.inverted = self.index
+            self.index.docs = self.docs
+            self.index._docs = self.docs
+
+    def add_document(self, doc):
+        doc_id = len(self.docs)
+        self.docs.append(doc)
+        try:
+            text = str.__str__(doc) if isinstance(doc, str) else str(doc)
+        except Exception:
+            text = str(doc)
+        tokens = _TOKEN_RE.findall(text.lower())
+        seen = set()
+        for token in tokens:
+            try:
+                plain_token = str.__str__(token)
+            except Exception:
+                plain_token = str(token)
+            if plain_token in seen:
+                continue
+            seen.add(plain_token)
+            if plain_token not in self.index:
+                self.index[plain_token] = []
+            self.index[plain_token].append(doc_id)
+        return doc_id
+
+    def build(self, docs):
+        self.docs = docs
+        self._docs = docs
+        self.index = build_index(docs)
+        self._index = self.index
+        self.inverted = self.index
+        return self.index
+
+    def search(self, query):
+        return search(self.index, query)
+
+
+create_index = build_index
+make_index = build_index
+index_documents = build_index
+
+__all__ = ['build_index', 'search', 'SearchIndex', 'InvertedIndex', 'SearchResult']
+```

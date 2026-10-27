@@ -1,3 +1,31 @@
+dtype.py
+```python
+def coerce_element(v):
+    """
+    Convert v to an appropriate numeric type.
+    Preserves fractional values instead of truncating to int.
+    """
+    # bool is a subclass of int, handle explicitly
+    if isinstance(v, bool):
+        return int(v)
+    if isinstance(v, int):
+        return int(v)
+    if isinstance(v, float):
+        return float(v)
+    # For strings or other types, infer int vs float without truncation
+    try:
+        f = float(v)
+        i = int(f)
+        if f == i:
+            return i
+        return f
+    except (TypeError, ValueError):
+        try:
+            return int(v)
+        except (TypeError, ValueError):
+            return float(v)
+```
+
 matrix.py
 ```python
 from dtype import coerce_element
@@ -31,35 +59,4 @@ class Matrix:
 
     def __repr__(self):
         return f"Matrix({self.rows!r})"
-```
-
-dtype.py
-```python
-def coerce_element(v):
-    """
-    Convert v to an appropriate numeric type.
-    Preserves fractional values instead of truncating to int.
-    """
-    # Handle bool explicitly (bool is subclass of int)
-    if isinstance(v, bool):
-        return int(v)
-    # Native int -> keep as int
-    if isinstance(v, int):
-        return v
-    # Native float -> keep as float, normalize integer-valued floats to int
-    if isinstance(v, float):
-        if v.is_integer():
-            return int(v)
-        return float(v)
-    # For other types (e.g., strings), try int first then float without truncation
-    try:
-        return int(v)
-    except (TypeError, ValueError):
-        try:
-            fv = float(v)
-            if fv.is_integer():
-                return int(fv)
-            return fv
-        except (TypeError, ValueError):
-            return v
 ```

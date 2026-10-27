@@ -74,10 +74,10 @@ class LifecycleRegistry:
         return self._state == "CLOSED"
 
     def open(self):
+        if self._state == "CLOSED":
+            raise RegistryClosed("registry is closed")
         if self._state == "OPEN":
             return
-        if self._state == "CLOSED":
-            raise RegistryClosed("registry closed")
         self._state = "OPEN"
 
     def close(self):
@@ -85,11 +85,10 @@ class LifecycleRegistry:
             return
         if self._state != "OPEN":
             raise RegistryClosed("registry not open")
-        # Check for refcount > 0 before transitioning
+        # If any non-DISPOSED resource has ref_count>0, raise and leave OPEN
         for rid, state in self._states.items():
             if state != "DISPOSED" and self._refcounts.get(rid, 0) > 0:
-                raise ResourceInUse(f"refcount {self._refcounts.get(rid, 0)} for {rid}")
-        # Transition every non-DISPOSED to DISPOSED
+                raise ResourceInUse(f"refcount {self._refcounts.get(rid,0)} for {rid}")
         for rid, state in list(self._states.items()):
             if state != "DISPOSED":
                 self._states[rid] = "DISPOSED"
@@ -157,10 +156,10 @@ class LifecycleRegistry:
         state = self._states.get(rid)
         if state is None:
             raise KeyError(rid)
+        if self._refcounts.get(rid, 0) != 0:
+            raise ResourceInUse(f"refcount {self._refcounts.get(rid,0)}")
         if state == "DISPOSED":
             raise InvalidTransition("already disposed")
-        if self._refcounts.get(rid, 0) > 0:
-            raise ResourceInUse(f"refcount {self._refcounts.get(rid,0)}")
         if state in ("ACTIVE", "SUSPENDED", "FAILED", "PENDING"):
             self._states[rid] = "DISPOSED"
         else:
@@ -226,17 +225,17 @@ class LifecycleRegistry:
         class _Session:
             def __enter__(self):
                 registry.acquire(rid)
-                return registry.get(rid)
+                return registry.get(rid) if registry.get_resource_state(rid) in ("ACTIVE", "SUSPENDED") else None
             def __exit__(self, exc_type, exc, tb):
                 registry.release(rid)
                 return False
         return _Session()
 
     def __enter__(self):
+        if self._state == "CLOSED":
+            raise RegistryClosed("cannot enter closed registry")
         if self._state == "CREATED":
             self.open()
-        elif self._state == "CLOSED":
-            raise RegistryClosed("cannot enter closed registry")
         return self
 
     def __exit__(self, exc_type, exc, tb):

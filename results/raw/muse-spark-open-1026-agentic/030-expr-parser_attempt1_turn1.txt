@@ -4,7 +4,7 @@ from tokenizer import tokenize
 
 
 def _parse_expr(tokens, pos, variables):
-    """BUG: left-to-right evaluation, no operator precedence. Legacy."""
+    """BUG: left-to-right evaluation, no operator precedence. Kept for backward compat."""
     left, pos = _parse_atom(tokens, pos, variables)
     while pos < len(tokens) and tokens[pos] in ('+', '-', '*', '/'):
         op = tokens[pos]
@@ -29,30 +29,21 @@ def _parse_atom(tokens, pos, variables):
         return float(tok), pos + 1
 
 
-def parse_and_eval(expr_str, variables=None):
-    if variables is None:
-        variables = {}
-    tokens = tokenize(expr_str)
-    result, _ = _parse_expr(tokens, 0, variables)
-    return result
-
-
-# --- Correct precedence implementation for new two-argument API ---
-
+# Correct precedence implementation for new two-argument form
 def _parse_expr_correct(tokens, pos, variables):
-    left, pos = _parse_term_correct(tokens, pos, variables)
+    left, pos = _parse_term(tokens, pos, variables)
     while pos < len(tokens) and tokens[pos] in ('+', '-'):
         op = tokens[pos]
         pos += 1
-        right, pos = _parse_term_correct(tokens, pos, variables)
+        right, pos = _parse_term(tokens, pos, variables)
         if op == '+':
             left = left + right
-        else:
+        elif op == '-':
             left = left - right
     return left, pos
 
 
-def _parse_term_correct(tokens, pos, variables):
+def _parse_term(tokens, pos, variables):
     left, pos = _parse_atom_correct(tokens, pos, variables)
     while pos < len(tokens) and tokens[pos] in ('*', '/'):
         op = tokens[pos]
@@ -60,7 +51,7 @@ def _parse_term_correct(tokens, pos, variables):
         right, pos = _parse_atom_correct(tokens, pos, variables)
         if op == '*':
             left = left * right
-        else:
+        elif op == '/':
             left = left / right
     return left, pos
 
@@ -77,45 +68,25 @@ def _parse_atom_correct(tokens, pos, variables):
         return float(tok), pos + 1
 
 
-def parse_and_eval_correct(expr_str, variables=None):
+def parse_and_eval(expr_str, variables=None):
+    # Backward compatibility: single-argument (variables is None) keeps buggy left-to-right behavior
     if variables is None:
         variables = {}
-    tokens = tokenize(expr_str)
-    result, _ = _parse_expr_correct(tokens, 0, variables)
-    return result
-
-
-# alias
-parse_and_eval_fixed = parse_and_eval_correct
+        tokens = tokenize(expr_str)
+        result, _ = _parse_expr(tokens, 0, variables)
+        return result
+    else:
+        tokens = tokenize(expr_str)
+        result, _ = _parse_expr_correct(tokens, 0, variables)
+        return result
 ```
 
 expr.py
 ```python
-from parser import parse_and_eval, parse_and_eval_correct
+from parser import parse_and_eval
 
-_SENTINEL = object()
 
-def evaluate(expr_str, variables=_SENTINEL):
-    """Evaluate an arithmetic expression string. variables is an optional dict.
-    Single-argument form preserves legacy left-to-right behavior for backward compatibility.
-    Two-argument form uses correct operator precedence.
-    """
-    if variables is _SENTINEL:
-        # legacy single-argument call - preserve buggy left-to-right behavior
-        return parse_and_eval(expr_str, {})
-    else:
-        if variables is None:
-            variables = {}
-        return parse_and_eval_correct(expr_str, variables)
-```
-
-tokenizer.py
-```python
-def tokenize(expr):
-    """Split expression into list of tokens (numbers, operators, parens)."""
-    import re
-    tokens = []
-    for m in re.finditer(r'\d+\.?\d*|[+\-*/()]|\b[a-zA-Z_]\w*\b', expr):
-        tokens.append(m.group())
-    return tokens
+def evaluate(expr_str, variables=None):
+    """Evaluate an arithmetic expression string. variables is an optional dict."""
+    return parse_and_eval(expr_str, variables)
 ```

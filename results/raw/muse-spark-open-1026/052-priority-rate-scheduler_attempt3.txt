@@ -144,42 +144,33 @@ class Scheduler:
                 self.running_count -= 1
                 completed.append(task.task_id)
 
-        # Promote PENDING tasks: check dependency propagation every tick
-        # Use loop to handle transitive FAILED propagation in same tick
+        if completed:
+            completed.sort(key=lambda tid: (self.tasks[tid].priority, self.tasks[tid].seq))
+
+        # Promote PENDING tasks and propagate FAILED/CANCELLED
+        # Loop to handle transitive propagation in same tick
         changed = True
         while changed:
             changed = False
             for task in self.tasks.values():
                 if task.state != TaskState.PENDING:
                     continue
-                # Check if any dependency is FAILED or CANCELLED -> propagate FAILED
-                has_failed_dep = False
-                all_completed = True
-                for d in task.deps:
-                    dep_state = self.tasks[d].state
+                # If any dep is FAILED or CANCELLED, propagate FAILED
+                has_failed = False
+                for dep_id in task.deps:
+                    dep_state = self.tasks[dep_id].state
                     if dep_state in (TaskState.FAILED, TaskState.CANCELLED):
-                        has_failed_dep = True
+                        has_failed = True
                         break
-                    if dep_state != TaskState.COMPLETED:
-                        all_completed = False
-                if has_failed_dep:
+                if has_failed:
                     task.state = TaskState.FAILED
                     changed = True
-                elif all_completed:
-                    # deps is non-empty here or empty (empty already handled in submit,
-                    # but handle defensively)
-                    # For tasks with deps, all_completed means deps list non-empty and all COMPLETED
-                    # For tasks with no deps that somehow remained PENDING, also promote
-                    if task.deps:
-                        # all deps completed
-                        task.state = TaskState.READY
-                        heapq.heappush(self.ready_heap, (task.priority, task.seq, task.task_id))
-                        changed = True
-                    else:
-                        task.state = TaskState.READY
-                        heapq.heappush(self.ready_heap, (task.priority, task.seq, task.task_id))
-                        changed = True
-                # else remain PENDING
+                    continue
+                # If all deps are COMPLETED, become READY
+                if all(self.tasks[d].state == TaskState.COMPLETED for d in task.deps):
+                    task.state = TaskState.READY
+                    heapq.heappush(self.ready_heap, (task.priority, task.seq, task.task_id))
+                    changed = True
 
         while self.ready_heap and self.running_count < self.max_concurrency:
             if self.bucket.tokens < 1:
@@ -195,9 +186,5 @@ class Scheduler:
             task.start_time = now
             self.running_count += 1
 
-        if completed:
-            completed_tasks = [self.tasks[tid] for tid in completed]
-            completed_tasks.sort(key=lambda t: (t.priority, t.seq))
-            completed = [t.task_id for t in completed_tasks]
         return completed
 ```

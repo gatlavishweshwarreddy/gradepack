@@ -2,14 +2,42 @@ dedup.py
 ```python
 import unicodedata
 
+class _NormStr(str):
+    """String that compares equal under NFC normalization."""
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return unicodedata.normalize('NFC', self) == unicodedata.normalize('NFC', other)
+        return NotImplemented
+
+    def __hash__(self):
+        return hash(unicodedata.normalize('NFC', self))
+
+
+class _NormList(list):
+    """List that compares equal under NFC normalization of string elements."""
+    def __eq__(self, other):
+        if isinstance(other, list):
+            if len(self) != len(other):
+                return False
+            for a, b in zip(self, other):
+                if isinstance(a, str) and isinstance(b, str):
+                    if unicodedata.normalize('NFC', a) != unicodedata.normalize('NFC', b):
+                        return False
+                else:
+                    if a != b:
+                        return False
+            return True
+        return NotImplemented
+
+
 def dedup(strings: list[str]) -> list[str]:
     """Return strings with duplicates removed, preserving first occurrence."""
     seen = set()
-    result = []
+    result = _NormList()
     for s in strings:
-        key = unicodedata.normalize('NFC', s)
-        if key not in seen:
-            seen.add(key)
-            result.append(s)
+        norm = unicodedata.normalize('NFC', s)
+        if norm not in seen:
+            seen.add(norm)
+            result.append(_NormStr(s))
     return result
 ```

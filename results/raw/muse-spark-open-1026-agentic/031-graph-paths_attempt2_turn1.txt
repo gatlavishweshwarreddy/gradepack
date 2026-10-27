@@ -17,16 +17,13 @@ class Graph:
         """
         if source == target:
             return 0.0
-        if source not in self._adj:
-            return None
 
         dist = {source: 0.0}
         pq = [(0.0, source)]
-
         while pq:
             d, u = heapq.heappop(pq)
-            # skip stale entries
-            if d != dist.get(u, float('inf')):
+            # Skip stale entries
+            if d != dist.get(u):
                 continue
             if u == target:
                 return float(d)

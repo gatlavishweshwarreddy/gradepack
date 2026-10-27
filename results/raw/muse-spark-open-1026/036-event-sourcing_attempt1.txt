@@ -21,7 +21,7 @@ projector.py
 ```python
 class Projector:
     def apply(self, events):
-        """Fold events into state dict."""
+        """Fold events into state dict in sequence order."""
         state = {}
         for e in sorted(events, key=lambda e: e.sequence):
             if e.type == "set":

@@ -4,17 +4,14 @@ from cache import ResultCache
 
 
 def _make_hashable(obj):
-    # Recursively convert mutable containers to hashable equivalents
-    # so the cache key captures the full contents, not object identity.
     if isinstance(obj, list):
         return tuple(_make_hashable(x) for x in obj)
     if isinstance(obj, tuple):
         return tuple(_make_hashable(x) for x in obj)
     if isinstance(obj, dict):
-        return tuple(sorted((_make_hashable(k), _make_hashable(v)) for k, v in obj.items()))
+        return tuple(sorted((k, _make_hashable(v)) for k, v in obj.items()))
     if isinstance(obj, set):
         return frozenset(_make_hashable(x) for x in obj)
-    # For other types, try to use directly if hashable, otherwise fallback to repr
     try:
         hash(obj)
         return obj

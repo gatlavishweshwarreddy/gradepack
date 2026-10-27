@@ -2,7 +2,7 @@ expr_parser.py
 ```python
 import re
 
-def tokenize(expr):
+def _tokenize(expr):
     tokens = []
     i = 0
     n = len(expr)
@@ -13,165 +13,154 @@ def tokenize(expr):
             continue
         if c.isdigit() or c == '.':
             start = i
-            dot_seen = False
-            while i < n and (expr[i].isdigit() or expr[i] == '.'):
+            has_dot = (c == '.')
+            i += 1
+            while i < n and (expr[i].isdigit() or (expr[i] == '.' and not has_dot)):
                 if expr[i] == '.':
-                    if dot_seen:
-                        break
-                    dot_seen = True
+                    has_dot = True
                 i += 1
-            tokens.append(('NUMBER', expr[start:i]))
+            tokens.append(expr[start:i])
             continue
         if c.isalpha() or c == '_':
             start = i
+            i += 1
             while i < n and (expr[i].isalnum() or expr[i] == '_'):
                 i += 1
-            tokens.append(('IDENT', expr[start:i]))
+            tokens.append(expr[start:i])
             continue
-        if c == '+':
-            tokens.append(('PLUS', '+'))
+        if c in '+-*/()':
+            tokens.append(c)
             i += 1
             continue
-        if c == '-':
-            tokens.append(('MINUS', '-'))
-            i += 1
-            continue
-        if c == '*':
-            tokens.append(('MUL', '*'))
-            i += 1
-            continue
-        if c == '/':
-            tokens.append(('DIV', '/'))
-            i += 1
-            continue
-        if c == '(':
-            tokens.append(('LPAREN', '('))
-            i += 1
-            continue
-        if c == ')':
-            tokens.append(('RPAREN', ')'))
-            i += 1
-            continue
-        raise SyntaxError(f"Invalid character {c!r}")
+        raise ValueError(f"Unexpected character: {c!r}")
     return tokens
 
-class Parser:
+def _is_number(tok):
+    try:
+        float(tok)
+        return True
+    except ValueError:
+        return False
+
+class _Parser:
     def __init__(self, tokens, variables):
         self.tokens = tokens
         self.pos = 0
-        self.vars = variables if variables is not None else {}
+        self.vars = variables
 
     def peek(self):
         if self.pos < len(self.tokens):
             return self.tokens[self.pos]
-        return ('EOF', None)
+        return None
 
-    def consume(self, expected_type=None):
+    def consume(self, expected=None):
         tok = self.peek()
-        if expected_type and tok[0] != expected_type:
-            raise SyntaxError(f"Expected {expected_type} got {tok[0]}")
+        if tok is None:
+            raise ValueError("Unexpected end of expression")
+        if expected is not None and tok != expected:
+            raise ValueError(f"Expected {expected!r} but got {tok!r}")
         self.pos += 1
         return tok
 
     def parse_expression(self):
-        # expression handles + and - (lowest precedence)
-        left = self.parse_term()
+        # expression := term (('+'|'-') term)*
+        val = self.parse_term()
         while True:
-            tok = self.peek()
-            if tok[0] == 'PLUS':
-                self.consume('PLUS')
+            op = self.peek()
+            if op == '+' or op == '-':
+                self.consume()
                 right = self.parse_term()
-                left = left + right
-            elif tok[0] == 'MINUS':
-                self.consume('MINUS')
-                right = self.parse_term()
-                left = left - right
+                if op == '+':
+                    val = val + right
+                else:
+                    val = val - right
             else:
                 break
-        return left
+        return val
 
     def parse_term(self):
-        # term handles * and / (higher precedence)
-        left = self.parse_factor()
+        # term := factor (('*'|'/') factor)*
+        val = self.parse_factor()
         while True:
-            tok = self.peek()
-            if tok[0] == 'MUL':
-                self.consume('MUL')
+            op = self.peek()
+            if op == '*' or op == '/':
+                self.consume()
                 right = self.parse_factor()
-                left = left * right
-            elif tok[0] == 'DIV':
-                self.consume('DIV')
-                right = self.parse_factor()
-                left = left / right
+                if op == '*':
+                    val = val * right
+                else:
+                    val = val / right
             else:
                 break
-        return left
+        return val
 
     def parse_factor(self):
         tok = self.peek()
-        if tok[0] == 'NUMBER':
-            self.consume('NUMBER')
-            return float(tok[1])
-        elif tok[0] == 'IDENT':
-            self.consume('IDENT')
-            name = tok[1]
-            if name in self.vars:
-                return float(self.vars[name])
-            else:
-                raise NameError(f"Undefined variable: {name}")
-        elif tok[0] == 'LPAREN':
-            self.consume('LPAREN')
+        if tok is None:
+            raise ValueError("Unexpected end of expression")
+        if tok == '(':
+            self.consume('(')
             val = self.parse_expression()
-            self.consume('RPAREN')
+            self.consume(')')
             return val
-        elif tok[0] == 'MINUS':
-            self.consume('MINUS')
+        if tok == '-':
+            self.consume('-')
             return -self.parse_factor()
-        elif tok[0] == 'PLUS':
-            self.consume('PLUS')
+        if tok == '+':
+            self.consume('+')
             return self.parse_factor()
-        else:
-            raise SyntaxError(f"Unexpected token {tok}")
+        if _is_number(tok):
+            self.consume()
+            return float(tok)
+        # variable
+        if tok not in ('+', '-', '*', '/', '(', ')'):
+            self.consume()
+            if tok in self.vars:
+                return float(self.vars[tok])
+            raise NameError(f"Unknown variable: {tok}")
+        raise ValueError(f"Unexpected token: {tok}")
 
-def evaluate(expr, variables=None, *args, **kwargs):
-    # backward compat: allow variables to be passed via different names or positions
-    if variables is None:
-        for key in ('variables', 'vars', 'env', 'context', 'values', 'variables_dict', 'var', 'bindings'):
-            if key in kwargs:
-                variables = kwargs[key]
-                break
-    if variables is None and args:
-        if isinstance(args[0], dict):
-            variables = args[0]
-    # also if variables passed as kwarg directly like x=1 (unlikely but handle)
-    # if still None, check if kwargs contains variable bindings (e.g., evaluate("x+1", x=1))
-    if variables is None and kwargs:
-        # treat remaining kwargs as variables if they look like bindings
-        # but only if we didn't already find a dict
-        # Heuristic: if kwargs not empty and no known key, use them
-        variables = kwargs
+def evaluate(expression, variables=None, **kwargs):
+    """
+    Evaluate an arithmetic expression with correct precedence.
+
+    Supports +, -, *, /, parentheses, unary +/-,
+    and variable substitution.
+
+    Backward compatible: can be called with just the expression.
+    Variables can be passed as a dict positional arg or as kwargs:
+        evaluate("x + 2", {"x": 5})
+        evaluate("x + 2", x=5)
+        evaluate("x + y * 2", {"x": 1, "y": 3})
+    """
     if variables is None:
         variables = {}
-    if not isinstance(variables, dict):
-        try:
-            variables = dict(variables)
-        except Exception:
-            variables = {}
+    elif not isinstance(variables, dict):
+        # allow other mapping types
+        variables = dict(variables)
+    else:
+        variables = dict(variables)  # copy
 
-    tokens = tokenize(expr)
+    if kwargs:
+        variables.update(kwargs)
+
+    if not isinstance(expression, str):
+        raise TypeError("expression must be a string")
+
+    tokens = _tokenize(expression)
     if not tokens:
         raise ValueError("Empty expression")
-    parser = Parser(tokens, variables)
+    parser = _Parser(tokens, variables)
     result = parser.parse_expression()
-    if parser.pos != len(tokens):
-        raise SyntaxError("Unexpected tokens at end of expression")
+    if parser.peek() is not None:
+        raise ValueError(f"Unexpected token: {parser.peek()!r}")
     return float(result)
 ```
 parser.py
 ```python
 import re
 
-def tokenize(expr):
+def _tokenize(expr):
     tokens = []
     i = 0
     n = len(expr)
@@ -182,151 +171,266 @@ def tokenize(expr):
             continue
         if c.isdigit() or c == '.':
             start = i
-            dot_seen = False
-            while i < n and (expr[i].isdigit() or expr[i] == '.'):
+            has_dot = (c == '.')
+            i += 1
+            while i < n and (expr[i].isdigit() or (expr[i] == '.' and not has_dot)):
                 if expr[i] == '.':
-                    if dot_seen:
-                        break
-                    dot_seen = True
+                    has_dot = True
                 i += 1
-            tokens.append(('NUMBER', expr[start:i]))
+            tokens.append(expr[start:i])
             continue
         if c.isalpha() or c == '_':
             start = i
+            i += 1
             while i < n and (expr[i].isalnum() or expr[i] == '_'):
                 i += 1
-            tokens.append(('IDENT', expr[start:i]))
+            tokens.append(expr[start:i])
             continue
-        if c == '+':
-            tokens.append(('PLUS', '+'))
+        if c in '+-*/()':
+            tokens.append(c)
             i += 1
             continue
-        if c == '-':
-            tokens.append(('MINUS', '-'))
-            i += 1
-            continue
-        if c == '*':
-            tokens.append(('MUL', '*'))
-            i += 1
-            continue
-        if c == '/':
-            tokens.append(('DIV', '/'))
-            i += 1
-            continue
-        if c == '(':
-            tokens.append(('LPAREN', '('))
-            i += 1
-            continue
-        if c == ')':
-            tokens.append(('RPAREN', ')'))
-            i += 1
-            continue
-        raise SyntaxError(f"Invalid character {c!r}")
+        raise ValueError(f"Unexpected character: {c!r}")
     return tokens
 
-class Parser:
+def _is_number(tok):
+    try:
+        float(tok)
+        return True
+    except ValueError:
+        return False
+
+class _Parser:
     def __init__(self, tokens, variables):
         self.tokens = tokens
         self.pos = 0
-        self.vars = variables if variables is not None else {}
+        self.vars = variables
 
     def peek(self):
         if self.pos < len(self.tokens):
             return self.tokens[self.pos]
-        return ('EOF', None)
+        return None
 
-    def consume(self, expected_type=None):
+    def consume(self, expected=None):
         tok = self.peek()
-        if expected_type and tok[0] != expected_type:
-            raise SyntaxError(f"Expected {expected_type} got {tok[0]}")
+        if tok is None:
+            raise ValueError("Unexpected end of expression")
+        if expected is not None and tok != expected:
+            raise ValueError(f"Expected {expected!r} but got {tok!r}")
         self.pos += 1
         return tok
 
     def parse_expression(self):
-        # expression handles + and - (lowest precedence)
-        left = self.parse_term()
+        val = self.parse_term()
         while True:
-            tok = self.peek()
-            if tok[0] == 'PLUS':
-                self.consume('PLUS')
+            op = self.peek()
+            if op == '+' or op == '-':
+                self.consume()
                 right = self.parse_term()
-                left = left + right
-            elif tok[0] == 'MINUS':
-                self.consume('MINUS')
-                right = self.parse_term()
-                left = left - right
+                if op == '+':
+                    val = val + right
+                else:
+                    val = val - right
             else:
                 break
-        return left
+        return val
 
     def parse_term(self):
-        # term handles * and / (higher precedence)
-        left = self.parse_factor()
+        val = self.parse_factor()
         while True:
-            tok = self.peek()
-            if tok[0] == 'MUL':
-                self.consume('MUL')
+            op = self.peek()
+            if op == '*' or op == '/':
+                self.consume()
                 right = self.parse_factor()
-                left = left * right
-            elif tok[0] == 'DIV':
-                self.consume('DIV')
-                right = self.parse_factor()
-                left = left / right
+                if op == '*':
+                    val = val * right
+                else:
+                    val = val / right
             else:
                 break
-        return left
+        return val
 
     def parse_factor(self):
         tok = self.peek()
-        if tok[0] == 'NUMBER':
-            self.consume('NUMBER')
-            return float(tok[1])
-        elif tok[0] == 'IDENT':
-            self.consume('IDENT')
-            name = tok[1]
-            if name in self.vars:
-                return float(self.vars[name])
-            else:
-                raise NameError(f"Undefined variable: {name}")
-        elif tok[0] == 'LPAREN':
-            self.consume('LPAREN')
+        if tok is None:
+            raise ValueError("Unexpected end of expression")
+        if tok == '(':
+            self.consume('(')
             val = self.parse_expression()
-            self.consume('RPAREN')
+            self.consume(')')
             return val
-        elif tok[0] == 'MINUS':
-            self.consume('MINUS')
+        if tok == '-':
+            self.consume('-')
             return -self.parse_factor()
-        elif tok[0] == 'PLUS':
-            self.consume('PLUS')
+        if tok == '+':
+            self.consume('+')
             return self.parse_factor()
-        else:
-            raise SyntaxError(f"Unexpected token {tok}")
+        if _is_number(tok):
+            self.consume()
+            return float(tok)
+        if tok not in ('+', '-', '*', '/', '(', ')'):
+            self.consume()
+            if tok in self.vars:
+                return float(self.vars[tok])
+            raise NameError(f"Unknown variable: {tok}")
+        raise ValueError(f"Unexpected token: {tok}")
 
-def evaluate(expr, variables=None, *args, **kwargs):
-    if variables is None:
-        for key in ('variables', 'vars', 'env', 'context', 'values', 'variables_dict', 'var', 'bindings'):
-            if key in kwargs:
-                variables = kwargs[key]
-                break
-    if variables is None and args:
-        if isinstance(args[0], dict):
-            variables = args[0]
-    if variables is None and kwargs:
-        variables = kwargs
+def evaluate(expression, variables=None, **kwargs):
     if variables is None:
         variables = {}
-    if not isinstance(variables, dict):
-        try:
-            variables = dict(variables)
-        except Exception:
-            variables = {}
-
-    tokens = tokenize(expr)
+    elif not isinstance(variables, dict):
+        variables = dict(variables)
+    else:
+        variables = dict(variables)
+    if kwargs:
+        variables.update(kwargs)
+    if not isinstance(expression, str):
+        raise TypeError("expression must be a string")
+    tokens = _tokenize(expression)
     if not tokens:
         raise ValueError("Empty expression")
-    parser = Parser(tokens, variables)
+    parser = _Parser(tokens, variables)
     result = parser.parse_expression()
-    if parser.pos != len(tokens):
-        raise SyntaxError("Unexpected tokens at end of expression")
+    if parser.peek() is not None:
+        raise ValueError(f"Unexpected token: {parser.peek()!r}")
+    return float(result)
+```
+solution.py
+```python
+import re
+
+def _tokenize(expr):
+    tokens = []
+    i = 0
+    n = len(expr)
+    while i < n:
+        c = expr[i]
+        if c.isspace():
+            i += 1
+            continue
+        if c.isdigit() or c == '.':
+            start = i
+            has_dot = (c == '.')
+            i += 1
+            while i < n and (expr[i].isdigit() or (expr[i] == '.' and not has_dot)):
+                if expr[i] == '.':
+                    has_dot = True
+                i += 1
+            tokens.append(expr[start:i])
+            continue
+        if c.isalpha() or c == '_':
+            start = i
+            i += 1
+            while i < n and (expr[i].isalnum() or expr[i] == '_'):
+                i += 1
+            tokens.append(expr[start:i])
+            continue
+        if c in '+-*/()':
+            tokens.append(c)
+            i += 1
+            continue
+        raise ValueError(f"Unexpected character: {c!r}")
+    return tokens
+
+def _is_number(tok):
+    try:
+        float(tok)
+        return True
+    except ValueError:
+        return False
+
+class _Parser:
+    def __init__(self, tokens, variables):
+        self.tokens = tokens
+        self.pos = 0
+        self.vars = variables
+
+    def peek(self):
+        if self.pos < len(self.tokens):
+            return self.tokens[self.pos]
+        return None
+
+    def consume(self, expected=None):
+        tok = self.peek()
+        if tok is None:
+            raise ValueError("Unexpected end of expression")
+        if expected is not None and tok != expected:
+            raise ValueError(f"Expected {expected!r} but got {tok!r}")
+        self.pos += 1
+        return tok
+
+    def parse_expression(self):
+        val = self.parse_term()
+        while True:
+            op = self.peek()
+            if op == '+' or op == '-':
+                self.consume()
+                right = self.parse_term()
+                if op == '+':
+                    val = val + right
+                else:
+                    val = val - right
+            else:
+                break
+        return val
+
+    def parse_term(self):
+        val = self.parse_factor()
+        while True:
+            op = self.peek()
+            if op == '*' or op == '/':
+                self.consume()
+                right = self.parse_factor()
+                if op == '*':
+                    val = val * right
+                else:
+                    val = val / right
+            else:
+                break
+        return val
+
+    def parse_factor(self):
+        tok = self.peek()
+        if tok is None:
+            raise ValueError("Unexpected end of expression")
+        if tok == '(':
+            self.consume('(')
+            val = self.parse_expression()
+            self.consume(')')
+            return val
+        if tok == '-':
+            self.consume('-')
+            return -self.parse_factor()
+        if tok == '+':
+            self.consume('+')
+            return self.parse_factor()
+        if _is_number(tok):
+            self.consume()
+            return float(tok)
+        if tok not in ('+', '-', '*', '/', '(', ')'):
+            self.consume()
+            if tok in self.vars:
+                return float(self.vars[tok])
+            raise NameError(f"Unknown variable: {tok}")
+        raise ValueError(f"Unexpected token: {tok}")
+
+def evaluate(expression, variables=None, **kwargs):
+    if variables is None:
+        variables = {}
+    elif not isinstance(variables, dict):
+        variables = dict(variables)
+    else:
+        variables = dict(variables)
+    if kwargs:
+        variables.update(kwargs)
+    if not isinstance(expression, str):
+        raise TypeError("expression must be a string")
+    tokens = _tokenize(expression)
+    if not tokens:
+        raise ValueError("Empty expression")
+    parser = _Parser(tokens, variables)
+    result = parser.parse_expression()
+    if parser.peek() is not None:
+        raise ValueError(f"Unexpected token: {parser.peek()!r}")
     return float(result)
 ```
