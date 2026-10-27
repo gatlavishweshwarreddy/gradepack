@@ -10,8 +10,10 @@ All code in this repository was written between Oct 26 and Nov 4, 2026.
 ## Install
 
 ```bash
+git clone https://github.com/gatlavishweshwarreddy/gradepack.git
+cd gradepack
 pip install pytest mcp   # runtime dependencies
-pip install -e .         # install gradepack + console script
+pip install -e .         # install gradepack + console script (run from the clone: the tasks live in tasks/)
 ```
 
 After install, the `gradepack` command is available directly:
