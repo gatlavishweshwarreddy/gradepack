@@ -18,18 +18,19 @@ class Graph:
         if source == target:
             return 0.0
 
-        if source not in self._adj:
-            # source isolated / unknown - no path unless source == target
-            return None
-
         dist = {source: 0.0}
         pq = [(0.0, source)]
 
         while pq:
             d, u = heapq.heappop(pq)
             # skip stale entries
-            if d != dist.get(u, None):
-                continue
+            if d != dist.get(u):
+                # also handles case where d > dist[u] due to outdated entry
+                if u not in dist or d > dist[u]:
+                    continue
+                # if d != dist[u] but d < dist[u] shouldn't happen, but continue
+                if d != dist[u]:
+                    continue
             if u == target:
                 return float(d)
             for v, w in self._adj.get(u, []):

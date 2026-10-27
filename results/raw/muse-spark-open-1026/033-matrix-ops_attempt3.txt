@@ -3,7 +3,7 @@ dtype.py
 def coerce_element(v):
     """
     Convert v to an appropriate numeric type.
-    Preserves fractional values as float, integral values as int.
+    Preserves fractional values as float instead of truncating to int.
     """
     # bool is subclass of int, handle explicitly
     if isinstance(v, bool):
@@ -11,19 +11,11 @@ def coerce_element(v):
     if isinstance(v, int):
         return int(v)
     if isinstance(v, float):
-        if v.is_integer():
-            return int(v)
         return float(v)
     try:
-        fv = float(v)
-        if fv.is_integer():
-            return int(fv)
-        return fv
+        return int(v)
     except (TypeError, ValueError):
-        try:
-            return int(v)
-        except Exception:
-            return float(v)
+        return float(v)
 ```
 
 matrix.py

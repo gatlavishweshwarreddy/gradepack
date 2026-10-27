@@ -1,6 +1,7 @@
 workqueue.py
 ```python
 import threading
+# workqueue.py (not queue.py — avoids shadowing stdlib queue)
 
 
 class WorkQueue:
@@ -27,26 +28,29 @@ class WorkQueue:
         with self._lock:
             return self._done and not self._items
 ```
-
 worker.py
 ```python
 import threading
 
-_results_lock = threading.Lock()
+_results_locks = {}
+_results_locks_lock = threading.Lock()
 
 
 class Worker:
     def __init__(self, queue, results):
         self._queue = queue
         self._results = results
+        # ensure all workers sharing the same results list share the same lock
+        with _results_locks_lock:
+            key = id(results)
+            if key not in _results_locks:
+                _results_locks[key] = threading.Lock()
+            self._results_lock = _results_locks[key]
 
     def run(self):
-        while True:
+        while not self._queue.is_done():
             item = self._queue.get()
             if item is not None:
-                with _results_lock:
+                with self._results_lock:
                     self._results.append(item * 2)
-            else:
-                if self._queue.is_done():
-                    break
 ```

@@ -7,23 +7,25 @@ def duration_seconds(entries):
     """
     Return elapsed seconds between first and last entry.
     Returns 0 if fewer than 2 entries.
-    Handles spans crossing midnight.
+    Correctly handles logs that span midnight by advancing the date
+    when the time appears to go backwards.
     """
     if len(entries) < 2:
         return 0
+
     base = datetime.date(2000, 1, 1)
-    first = datetime.datetime.combine(base, entries[0].time)
-
-    # Track midnight crossings by detecting when time goes backwards
-    days_offset = 0
+    current_date = base
     prev_time = entries[0].time
-    for e in entries[1:]:
-        if e.time < prev_time:
-            days_offset += 1
-        prev_time = e.time
+    first = datetime.datetime.combine(current_date, prev_time)
+    last = first
 
-    last_date = base + datetime.timedelta(days=days_offset)
-    last = datetime.datetime.combine(last_date, entries[-1].time)
+    for entry in entries[1:]:
+        if entry.time < prev_time:
+            # crossed midnight, move to next day
+            current_date += datetime.timedelta(days=1)
+        last = datetime.datetime.combine(current_date, entry.time)
+        prev_time = entry.time
+
     delta = last - first
     return delta.total_seconds()
 ```

@@ -18,7 +18,8 @@ class Schema:
     def expand(self):
         """
         Resolve $ref references.
-        Returns a deep-copied expanded schema without mutating the original.
+        Returns a deep copy with references inlined without mutating
+        the original definition.
         """
         expanded = copy.deepcopy(self._definition)
         self._resolve(expanded)
@@ -30,9 +31,8 @@ class Schema:
         if "$ref" in node:
             ref_name = node["$ref"]
             if ref_name in self._definitions:
-                ref_copy = copy.deepcopy(self._definitions[ref_name])
+                node.update(copy.deepcopy(self._definitions[ref_name]))
                 del node["$ref"]
-                node.update(ref_copy)
         for v in list(node.values()):
             self._resolve(v)
 ```

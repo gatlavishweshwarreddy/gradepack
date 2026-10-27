@@ -1,9 +1,101 @@
 {
   "completed": [
     {
+      "status": "rejected_verify",
+      "task_id": "000-tmp-verify"
+    },
+    {
+      "status": "rejected_lint",
+      "task_id": "?"
+    },
+    {
+      "status": "rejected_lint",
+      "task_id": "?"
+    },
+    {
+      "status": "rejected_lint",
+      "task_id": "?"
+    },
+    {
+      "status": "rejected_lint",
+      "task_id": "?"
+    },
+    {
+      "status": "rejected_verify",
+      "task_id": "000-tmp-verify"
+    },
+    {
+      "status": "rejected_verify",
+      "task_id": "000-tmp-verify"
+    },
+    {
+      "status": "rejected_verify",
+      "task_id": "000-tmp-verify"
+    },
+    {
+      "status": "rejected_lint",
+      "task_id": "?"
+    },
+    {
+      "status": "rejected_verify",
+      "task_id": "000-tmp-verify"
+    },
+    {
+      "status": "rejected_verify",
+      "task_id": "000-tmp-verify"
+    },
+    {
+      "status": "accepted",
+      "task_id": "048-lifecycle-registry-invariants"
+    },
+    {
+      "status": "rejected_verify",
+      "task_id": "000-tmp-verify"
+    },
+    {
       "status": "too_easy",
-      "task_id": "037-example"
+      "task_id": "049-crypto-utils-fix"
+    },
+    {
+      "status": "rejected_verify",
+      "task_id": "000-tmp-verify"
+    },
+    {
+      "status": "rejected_verify",
+      "task_id": "000-tmp-verify"
+    },
+    {
+      "status": "rejected_lint",
+      "task_id": "?"
+    },
+    {
+      "status": "rejected_lint",
+      "task_id": "?"
+    },
+    {
+      "status": "rejected_verify",
+      "task_id": "000-tmp-verify"
+    },
+    {
+      "status": "rejected_lint",
+      "task_id": "?"
+    },
+    {
+      "status": "rejected_verify",
+      "task_id": "000-tmp-verify"
+    },
+    {
+      "status": "rejected_lint",
+      "task_id": "?"
+    },
+    {
+      "status": "accepted",
+      "task_id": "050-peekable-windowed-iterator"
+    },
+    {
+      "status": "accepted",
+      "task_id": "051-canonical-binary-codec"
     }
   ],
-  "kept": 0
+  "kept": 3
 }

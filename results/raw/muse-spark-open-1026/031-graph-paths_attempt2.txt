@@ -23,74 +23,15 @@ class Graph:
 
         while pq:
             d, u = heapq.heappop(pq)
-
             # Skip stale entries
             if d != dist.get(u):
                 continue
-
             if u == target:
-                return float(d)
-
+                return d
             for v, w in self._adj.get(u, []):
                 nd = d + w
                 if v not in dist or nd < dist[v]:
                     dist[v] = nd
                     heapq.heappush(pq, (nd, v))
-
         return None
-```
-heap.py
-```python
-import heapq
-
-
-class MinHeap:
-    """Correct min-heap implementation backed by heapq."""
-
-    def __init__(self, iterable=None):
-        self._data = []
-        if iterable is not None:
-            for item in iterable:
-                self.push(item)
-
-    def push(self, item):
-        heapq.heappush(self._data, item)
-
-    def pop(self):
-        if not self._data:
-            raise IndexError("pop from empty heap")
-        return heapq.heappop(self._data)
-
-    def peek(self):
-        if not self._data:
-            raise IndexError("peek from empty heap")
-        return self._data[0]
-
-    def __len__(self):
-        return len(self._data)
-
-    def __bool__(self):
-        return bool(self._data)
-
-    def empty(self):
-        return len(self._data) == 0
-
-    def is_empty(self):
-        return self.empty()
-
-    # Compatibility aliases
-    def insert(self, item):
-        self.push(item)
-
-    def extract_min(self):
-        return self.pop()
-
-    def get_min(self):
-        return self.peek()
-
-    def pushpop(self, item):
-        return heapq.heappushpop(self._data, item)
-
-    def replace(self, item):
-        return heapq.heapreplace(self._data, item)
 ```

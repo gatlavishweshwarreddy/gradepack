@@ -1,12 +1,12 @@
 {
-  "drafted": 27,
+  "drafted": 51,
   "failed_draft_stage": 10,
-  "failed_verify": 7,
+  "failed_verify": 18,
   "judge_rejected": 2,
-  "judge_accepted": 8,
-  "probed": 8,
-  "too_easy": 1,
-  "discriminating": 7,
+  "judge_accepted": 12,
+  "probed": 12,
+  "too_easy": 2,
+  "discriminating": 10,
   "drafts": {
     "039-token-gated-orchestrator": {
       "classification": "discriminating",
@@ -85,6 +85,50 @@
       ],
       "probe_solve_count": 0,
       "draft_retried": false
+    },
+    "048-lifecycle-registry-invariants": {
+      "classification": "discriminating",
+      "probe_results": [
+        false,
+        false,
+        false
+      ],
+      "probe_solve_count": 0,
+      "draft_retried": false,
+      "domain": "class invariants and object lifecycle"
+    },
+    "049-crypto-utils-fix": {
+      "classification": "too_easy",
+      "probe_results": [
+        true,
+        true,
+        true
+      ],
+      "probe_solve_count": 3,
+      "draft_retried": false,
+      "domain": "cryptographic utilities (hashing, encoding)"
+    },
+    "050-peekable-windowed-iterator": {
+      "classification": "discriminating",
+      "probe_results": [
+        true,
+        false,
+        false
+      ],
+      "probe_solve_count": 1,
+      "draft_retried": false,
+      "domain": "iterator and generator protocols"
+    },
+    "051-canonical-binary-codec": {
+      "classification": "discriminating",
+      "probe_results": [
+        false,
+        false,
+        false
+      ],
+      "probe_solve_count": 0,
+      "draft_retried": false,
+      "domain": "serialisation / deserialisation"
     }
   },
   "draft_fail_reasons": {
@@ -92,5 +136,14 @@
     "truncated_json": 0,
     "invalid_json": 0,
     "other": 0
-  }
+  },
+  "lint_fail_reasons": {
+    "private_attr": 4,
+    "bug_comment": 2,
+    "short_title": 1,
+    "time_assertion": 0,
+    "prompt_too_long": 0,
+    "few_tests": 4
+  },
+  "lint_rejected": 9
 }

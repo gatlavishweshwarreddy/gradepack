@@ -7,8 +7,7 @@ def dedup(strings: list[str]) -> list[str]:
     seen = set()
     result = []
     for s in strings:
-        # normalize to NFC so that precomposed and decomposed forms compare equal
-        key = unicodedata.normalize('NFC', s)
+        key = unicodedata.normalize("NFC", s)
         if key not in seen:
             seen.add(key)
             result.append(s)

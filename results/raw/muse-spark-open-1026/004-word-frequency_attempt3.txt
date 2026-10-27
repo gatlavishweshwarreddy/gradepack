@@ -4,11 +4,8 @@ def word_frequency(text):
     """Return a dict of word -> count."""
     counts = {}
     for word in text.split():
-        # Remove punctuation (any character that is not a letter or digit) and lower-case
-        cleaned = ''.join(ch for ch in word if ch.isalnum())
-        cleaned = cleaned.lower()
-        if not cleaned:
-            continue
-        counts[cleaned] = counts.get(cleaned, 0) + 1
+        cleaned = ''.join(ch for ch in word.lower() if ch.isalnum())
+        if cleaned:
+            counts[cleaned] = counts.get(cleaned, 0) + 1
     return counts
 ```

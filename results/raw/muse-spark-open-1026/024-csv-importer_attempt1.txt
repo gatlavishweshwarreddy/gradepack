@@ -6,7 +6,6 @@ def coerce(value, type_name):
     Raises ValueError for non-numeric values when type is int or float.
     """
     if type_name == "int":
-        # Allow float-formatted integers like '1.0' by converting via float first
         return int(float(value))
     elif type_name == "float":
         return float(value)

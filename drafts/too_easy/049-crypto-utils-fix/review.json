@@ -1,0 +1,16 @@
+{
+  "verdict": "accept",
+  "fair": true,
+  "fully_specified": true,
+  "issues": [],
+  "summary": "Well-scoped repair task with docstring-specified contracts, deterministic grader covering all listed bugs (padding, counter, iterations, canonicalization, constant-time checks), and correct reference solution.",
+  "date": "2026-10-27T17:10:33Z",
+  "domain": "cryptographic utilities (hashing, encoding)",
+  "task_id": "049-crypto-utils-fix",
+  "probe_results": [
+    true,
+    true,
+    true
+  ],
+  "classification": "too_easy"
+}

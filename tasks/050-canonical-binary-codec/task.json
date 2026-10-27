@@ -1,0 +1,19 @@
+{
+  "id": "050-canonical-binary-codec",
+  "title": "Canonical Binary Codec Repair",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "Fix `codec.py` so `Codec.dumps`/`loads` correctly round-trip Python values with canonical, compact encoding. The codec uses varint/ZigZag for ints, length-prefixed UTF-8 for str/bytes, little-endian IEEE-754 for floats, and back-references for shared/cyclic structures. Dumps must be deterministic and compact; loads must validate input and preserve identity/cycles. Read the starter source and its docstrings for the full contract \u2014 the prompt is intentionally brief.",
+  "grader": "grader/test_codec.py",
+  "version": "1.0.0",
+  "tags": [
+    "serialisation / deserialisation",
+    "serialization",
+    "deserialization",
+    "varint",
+    "canonical-encoding",
+    "reference-sharing"
+  ],
+  "estimated_minutes": 45,
+  "license": "MIT"
+}

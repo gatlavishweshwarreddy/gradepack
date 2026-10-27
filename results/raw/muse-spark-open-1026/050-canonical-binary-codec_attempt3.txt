@@ -1,0 +1,149 @@
+codec.py
+```python
+import struct
+import math
+
+TAG_NULL = 0x00
+TAG_TRUE = 0x01
+TAG_FALSE = 0x02
+TAG_INT = 0x03
+TAG_FLOAT = 0x04
+TAG_STR = 0x05
+TAG_BYTES = 0x06
+TAG_LIST = 0x07
+TAG_DICT = 0x08
+TAG_SET = 0x09
+TAG_REF = 0x0A
+
+
+def _encode_varint(n):
+    out = bytearray()
+    while n >= 0x80:
+        out.append((n & 0x7F) | 0x80)
+        n >>= 7
+    out.append(n & 0x7F)
+    return bytes(out)
+
+
+def _decode_varint(buf, pos):
+    result = 0
+    shift = 0
+    while True:
+        if pos >= len(buf):
+            raise ValueError("truncated varint")
+        b = buf[pos]
+        pos += 1
+        result |= (b & 0x7F) << shift
+        if (b & 0x80) == 0:
+            break
+        shift += 7
+        if shift >= 64:
+            # allow arbitrary Python ints but still guard against malformed streams
+            # 64 bits is enough for 64-bit ints; larger ints need more bytes
+            # use a much larger limit to support big ints while preventing DoS
+            if shift >= 100000:
+                raise ValueError("varint too long")
+    return result, pos
+
+
+def _encode_zigzag(n):
+    if n >= 0:
+        return n << 1
+    else:
+        return (-n << 1) - 1
+
+
+def _decode_zigzag(n):
+    return (n >> 1) ^ -(n & 1)
+
+
+def _sort_key(x):
+    # canonical type order based on TAG order: None < bool < int < float < str < bytes
+    if x is None:
+        return (0, 0)
+    if isinstance(x, bool):
+        return (1, int(x))
+    if isinstance(x, int):
+        return (2, x)
+    if isinstance(x, float):
+        if math.isnan(x):
+            return (3, (1, 0))
+        return (3, (0, x))
+    if isinstance(x, str):
+        return (4, x)
+    if isinstance(x, bytes):
+        return (5, x)
+    # fallback for unexpected hashable types (should not occur for dict keys / set elements)
+    return (6, repr(x))
+
+
+class Codec:
+    """
+    Binary codec for Python values.
+
+    Public API:
+      dumps(obj) -> bytes
+      loads(data) -> obj
+
+    Supported types: None, bool, int, float, str, bytes, list, dict, set.
+    Shared references and cyclic structures are preserved via back-references.
+    Dict keys and set elements are serialized in canonical sorted order.
+    Internal helpers _encode, _decode, _encode_varint, _decode_varint,
+    _encode_zigzag, _decode_zigzag may be instrumented for performance checks.
+    Floats are little-endian IEEE-754. Strings are UTF-8 with byte-length prefix.
+    The decoder validates input and rejects trailing/unknown/truncated data.
+    """
+
+    def dumps(self, obj):
+        buf = bytearray()
+        memo = {}
+        next_id = [0]
+        self._encode(obj, buf, memo, next_id)
+        return bytes(buf)
+
+    def loads(self, data):
+        if not isinstance(data, (bytes, bytearray)):
+            raise TypeError("data must be bytes")
+        if len(data) == 0:
+            raise ValueError("empty data")
+        memo = []
+        obj, pos = self._decode(data, 0, memo)
+        if pos != len(data):
+            raise ValueError("trailing bytes")
+        return obj
+
+    def _encode(self, obj, buf, memo, next_id):
+        obj_id = id(obj)
+        if obj_id in memo:
+            buf.append(TAG_REF)
+            buf.extend(_encode_varint(memo[obj_id]))
+            return
+        if obj is None:
+            buf.append(TAG_NULL)
+        elif isinstance(obj, bool):
+            buf.append(TAG_TRUE if obj else TAG_FALSE)
+        elif isinstance(obj, int):
+            buf.append(TAG_INT)
+            zz = _encode_zigzag(obj)
+            buf.extend(_encode_varint(zz))
+        elif isinstance(obj, float):
+            buf.append(TAG_FLOAT)
+            buf.extend(struct.pack('<d', obj))
+        elif isinstance(obj, str):
+            b = obj.encode('utf-8')
+            buf.append(TAG_STR)
+            buf.extend(_encode_varint(len(b)))
+            buf.extend(b)
+        elif isinstance(obj, bytes):
+            buf.append(TAG_BYTES)
+            buf.extend(_encode_varint(len(obj)))
+            buf.extend(obj)
+        elif isinstance(obj, list):
+            memo[obj_id] = next_id[0]
+            next_id[0] += 1
+            buf.append(TAG_LIST)
+            buf.extend(_encode_varint(len(obj)))
+            for item in obj:
+                self._encode(item, buf, memo, next_id)
+        elif isinstance(obj, dict):
+            memo[obj_id] = next_id[0

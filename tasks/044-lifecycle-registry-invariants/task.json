@@ -1,0 +1,18 @@
+{
+  "id": "044-lifecycle-registry-invariants",
+  "title": "Lifecycle Registry Invariants",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "Fix LifecycleRegistry to satisfy its documented invariants. The starter violates several state-machine and lifecycle rules and has a performance regression in get/put. Read starter/managed_registry.py docstring and code for the full contract. Correctness is measured by state invariants and lookup_steps must stay O(1) per operation (instrumented counter).",
+  "grader": "grader/test_managed_registry.py",
+  "version": "1.0.0",
+  "tags": [
+    "class invariants and object lifecycle",
+    "class-invariants",
+    "object-lifecycle",
+    "state-machine",
+    "performance"
+  ],
+  "estimated_minutes": 60,
+  "license": "MIT"
+}

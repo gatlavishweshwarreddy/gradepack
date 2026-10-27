@@ -501,5 +501,102 @@
     "estimated_minutes": 30,
     "version": "1.0",
     "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/036-event-sourcing.json"
+  },
+  {
+    "id": "037-interval-map-merge",
+    "title": "IntervalMap with Adjacent Merge and Clipped Overlap Queries",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "interval-map",
+      "data-structure",
+      "half-open-intervals",
+      "bisect",
+      "edge-cases"
+    ],
+    "estimated_minutes": 60,
+    "version": "1.0.0",
+    "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/037-interval-map-merge.json"
+  },
+  {
+    "id": "043-deterministic-throttled-runner",
+    "title": "Deterministic Throttled Runner",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "concurrency",
+      "rate-limiting",
+      "state-machine",
+      "priority-queue"
+    ],
+    "estimated_minutes": 45,
+    "version": "1.0.0",
+    "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/043-deterministic-throttled-runner.json"
+  },
+  {
+    "id": "044-lifecycle-registry-invariants",
+    "title": "Lifecycle Registry Invariants",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "class invariants and object lifecycle",
+      "class-invariants",
+      "object-lifecycle",
+      "state-machine",
+      "performance"
+    ],
+    "estimated_minutes": 60,
+    "version": "1.0.0",
+    "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/044-lifecycle-registry-invariants.json"
+  },
+  {
+    "id": "048-peekable-windowed-iterator",
+    "title": "Peekable Windowed Iterator Protocol Fix",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "iterator and generator protocols",
+      "iterator",
+      "generator",
+      "protocol",
+      "buffering",
+      "state-machine"
+    ],
+    "estimated_minutes": 45,
+    "version": "1.0.0",
+    "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/048-peekable-windowed-iterator.json"
+  },
+  {
+    "id": "050-canonical-binary-codec",
+    "title": "Canonical Binary Codec Repair",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "serialisation / deserialisation",
+      "serialization",
+      "deserialization",
+      "varint",
+      "canonical-encoding",
+      "reference-sharing"
+    ],
+    "estimated_minutes": 45,
+    "version": "1.0.0",
+    "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/050-canonical-binary-codec.json"
+  },
+  {
+    "id": "052-priority-rate-scheduler",
+    "title": "Priority Task Scheduler with Rate Limiting and Dependencies",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "state-machine",
+      "priority-queue",
+      "rate-limiting",
+      "concurrency",
+      "performance"
+    ],
+    "estimated_minutes": 60,
+    "version": "1.0.0",
+    "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/052-priority-rate-scheduler.json"
   }
 ]

@@ -1,25 +1,20 @@
 pipeline.py
 ```python
 from cache import ResultCache
+import copy
 
 
 def _make_hashable(obj):
-    # Recursively convert mutable containers into hashable equivalents
-    # so the cache key captures the full contents of the list.
     if isinstance(obj, list):
         return tuple(_make_hashable(x) for x in obj)
-    if isinstance(obj, tuple):
+    elif isinstance(obj, tuple):
         return tuple(_make_hashable(x) for x in obj)
-    if isinstance(obj, dict):
-        return tuple(sorted((k, _make_hashable(v)) for k, v in obj.items()))
-    if isinstance(obj, set):
+    elif isinstance(obj, dict):
+        return tuple(sorted((_make_hashable(k), _make_hashable(v)) for k, v in obj.items()))
+    elif isinstance(obj, set):
         return frozenset(_make_hashable(x) for x in obj)
-    # For other types try to use directly if hashable, otherwise fallback to repr
-    try:
-        hash(obj)
+    else:
         return obj
-    except TypeError:
-        return repr(obj)
 
 
 class Pipeline:
@@ -32,9 +27,9 @@ class Pipeline:
         for t in self._transforms:
             key = (t.name, _make_hashable(result))
             if self._cache.has(key):
-                result = self._cache.get(key)
+                result = copy.deepcopy(self._cache.get(key))
             else:
                 result = t.apply(result)
-                self._cache.set(key, result)
+                self._cache.set(key, copy.deepcopy(result))
         return result
 ```

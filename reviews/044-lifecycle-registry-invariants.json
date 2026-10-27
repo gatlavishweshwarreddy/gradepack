@@ -1,0 +1,16 @@
+{
+  "verdict": "accept",
+  "fair": true,
+  "fully_specified": true,
+  "issues": [],
+  "summary": "Task docstring fully specifies registry/resource lifecycles, refcounting, close and O(1) requirements; starter has intentional state-machine and performance bugs, grader covers all invariants including reopen, suspend/resume strictness, dispose/close refcount checks and lookup_steps, and solution correctly restores all invariants.",
+  "date": "2026-10-27T17:07:59Z",
+  "domain": "class invariants and object lifecycle",
+  "task_id": "048-lifecycle-registry-invariants",
+  "probe_results": [
+    false,
+    false,
+    false
+  ],
+  "classification": "discriminating"
+}

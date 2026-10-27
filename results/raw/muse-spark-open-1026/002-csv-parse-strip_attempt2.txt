@@ -2,6 +2,8 @@ parse_csv.py
 ```python
 def parse_csv(text):
     """Parse a CSV string and return a list of dicts."""
+    if not text.strip():
+        return []
     lines = text.strip().splitlines()
     if not lines:
         return []

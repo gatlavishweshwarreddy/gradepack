@@ -1,0 +1,183 @@
+scheduler.py
+```python
+"""
+Priority Task Scheduler with Dependencies and Rate Limiting.
+
+Invariants (must hold for correct implementation):
+
+- State machine:
+    PENDING -> READY -> RUNNING -> COMPLETED
+                          RUNNING -> FAILED
+    PENDING -> CANCELLED, READY -> CANCELLED
+    RUNNING is non-cancellable: cancel() returns False and state unchanged.
+    COMPLETED/FAILED/CANCELLED are terminal.
+
+- Dependencies:
+    A task becomes READY only when ALL deps are COMPLETED.
+    If ANY dep is FAILED or CANCELLED, the task becomes FAILED immediately
+    (propagation). This must be checked every tick.
+
+- Priority:
+    READY tasks start in order of (priority, submission_seq) where lower
+    priority number = higher priority. FIFO tie-break by submission order.
+
+- Max concurrency:
+    At most max_concurrency tasks in RUNNING at any time.
+
+- Rate limiting (TokenBucket):
+    Tokens refill continuously: tokens = min(burst, tokens + elapsed * rate)
+    Initially tokens == burst. Each task start consumes 1 token.
+    If insufficient tokens, task remains READY.
+
+- Tick semantics:
+    tick(now) advances time to `now` (monotonic), completes RUNNING tasks
+    whose start_time + duration <= now (executing func to determine
+    COMPLETED/FAILED), then promotes PENDING tasks, then starts as many
+    READY tasks as allowed by concurrency and tokens.
+    Returns list of task_ids that completed in this tick, in deterministic
+    priority order (sorted by priority, seq).
+
+- Performance:
+    Ready queue must be heap-based O(log n) per operation. The module
+    variable _expensive_sort_calls counts expensive sorts; correct
+    implementation never increments it.
+"""
+
+import heapq
+from enum import Enum
+from dataclasses import dataclass, field
+from typing import Dict, List, Callable, Any, Optional
+
+_expensive_sort_calls = 0
+
+class TaskState(Enum):
+    PENDING = "PENDING"
+    READY = "READY"
+    RUNNING = "RUNNING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
+
+@dataclass
+class Task:
+    task_id: str
+    priority: int
+    deps: List[str]
+    func: Callable
+    duration: float
+    state: TaskState = TaskState.PENDING
+    seq: int = 0
+    start_time: Optional[float] = None
+    result: Any = None
+    error: Any = None
+
+class TokenBucket:
+    def __init__(self, rate: float, capacity: int):
+        self.rate = rate
+        self.capacity = capacity
+        self.tokens = float(capacity)
+        self.last_refill = 0.0
+
+    def refill(self, now: float):
+        elapsed = now - self.last_refill
+        if elapsed > 0:
+            self.tokens = min(self.capacity, self.tokens + elapsed * self.rate)
+            self.last_refill = now
+
+    def consume(self, n=1) -> bool:
+        if self.tokens >= n:
+            self.tokens -= n
+            return True
+        return False
+
+class Scheduler:
+    def __init__(self, max_concurrency: int, rate_per_sec: float, burst: int):
+        self.max_concurrency = max_concurrency
+        self.bucket = TokenBucket(rate_per_sec, burst)
+        self.tasks: Dict[str, Task] = {}
+        self.ready_heap = []
+        self.seq_counter = 0
+        self.running_count = 0
+        self._now = 0.0
+
+    def submit(self, task_id: str, priority: int, deps: List[str], func: Callable, duration: float = 1.0):
+        if task_id in self.tasks:
+            raise ValueError(f"duplicate task {task_id}")
+        for d in deps:
+            if d not in self.tasks:
+                raise ValueError(f"unknown dep {d}")
+        task = Task(task_id=task_id, priority=priority, deps=list(deps), func=func, duration=duration, seq=self.seq_counter)
+        self.seq_counter += 1
+        self.tasks[task_id] = task
+        if not deps:
+            task.state = TaskState.READY
+            heapq.heappush(self.ready_heap, (task.priority, task.seq, task.task_id))
+
+    def cancel(self, task_id: str) -> bool:
+        if task_id not in self.tasks:
+            return False
+        task = self.tasks[task_id]
+        if task.state in (TaskState.PENDING, TaskState.READY):
+            task.state = TaskState.CANCELLED
+            return True
+        return False
+
+    def get_state(self, task_id: str) -> TaskState:
+        return self.tasks[task_id].state
+
+    def tick(self, now: float) -> List[str]:
+        if now < self._now:
+            raise ValueError("time cannot go backwards")
+        self._now = now
+        self.bucket.refill(now)
+
+        completed_tasks = []
+
+        for task in list(self.tasks.values()):
+            if task.state == TaskState.RUNNING and task.start_time is not None and now >= task.start_time + task.duration:
+                try:
+                    task.result = task.func()
+                    task.state = TaskState.COMPLETED
+                except Exception as e:
+                    task.error = e
+                    task.state = TaskState.FAILED
+                self.running_count -= 1
+                completed_tasks.append(task)
+
+        completed_tasks.sort(key=lambda t: (t.priority, t.seq))
+        completed = [t.task_id for t in completed_tasks]
+
+        for task in self.tasks.values():
+            if task.state != TaskState.PENDING:
+                continue
+            has_failed = False
+            all_completed = True
+            for d in task.deps:
+                dep_state = self.tasks[d].state
+                if dep_state in (TaskState.FAILED, TaskState.CANCELLED):
+                    has_failed = True
+                    break
+                if dep_state != TaskState.COMPLETED:
+                    all_completed = False
+            if has_failed:
+                task.state = TaskState.FAILED
+            elif all_completed:
+                task.state = TaskState.READY
+                heapq.heappush(self.ready_heap, (task.priority, task.seq, task.task_id))
+
+        while self.ready_heap and self.running_count < self.max_concurrency:
+            if self.bucket.tokens < 1:
+                break
+            priority, seq, task_id = heapq.heappop(self.ready_heap)
+            task = self.tasks.get(task_id)
+            if task is None or task.state != TaskState.READY:
+                continue
+            if not self.bucket.consume(1):
+                heapq.heappush(self.ready_heap, (priority, seq, task_id))
+                break
+            task.state = TaskState.RUNNING
+            task.start_time = now
+            self.running_count += 1
+
+        return completed
+```

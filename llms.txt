@@ -258,3 +258,67 @@ Difficulty: hard
 Tags: event-sourcing, ordering, off-by-one
 Estimated minutes: 30
 Prompt: The package in starter/ implements an event sourcing system. event.py provides Event(sequence, type, payload). store.py provides EventStore with append(event) and replay(from_seq) which returns all events with sequence >= from_seq in order. projector.py provides Projector with apply(events) which folds a list of events into a state dict. The state is wrong when events are not appended in sequence order and replay is called with a non-zero from_seq — the projector processes events in insertion order rather than sequence order, and replay uses '> from_seq' instead of '>= from_seq' causing the boundary event to be skipped. The grader inserts events out of order and checks that replaying from various sequence numbers produces correct state. Do not edit the tests.
+
+### 037-interval-map-merge
+Title: IntervalMap with Adjacent Merge and Clipped Overlap Queries
+Difficulty: hard
+Tags: interval-map, data-structure, half-open-intervals, bisect, edge-cases
+Estimated minutes: 60
+Prompt: You must debug the IntervalMap class in interval_map.py. It stores half-open intervals [l, r) (l < r, integers) each with a hashable non-None value. Intervals are non-overlapping, sorted by l, and adjacent intervals with the SAME value must be merged into one (e.g., [0,5)->a and [5,10)->a becomes [0,10)->a). Different values are never merged even if adjacent.
+
+Required API:
+- __init__(): empty map.
+- set(l, r, value): assign value to [l,r). Overwrites any existing values in that range. Splits existing intervals that partially overlap, discards overlapped parts, inserts new interval, then merges adjacent equal-value intervals. Must raise ValueError if l>=r or value is None.
+- remove(l, r): clear coverage in [l,r) (set to None). Splits intervals that straddle the range (e.g., [0,10) remove [2,8) -> [0,2) and [8,10)). Must raise ValueError if l>=r.
+- get(key): return value at integer key or None if uncovered. Half-open semantics: key in [l,r) is covered, key==r is NOT.
+- get_interval(key): return (l,r,value) tuple for interval containing key, or None.
+- intervals(): return a NEW list (copy) of (l,r,value) tuples sorted by l. Mutating returned list must not affect internal state. Must return tuples, not lists.
+- total_covered(): return sum(r-l for all intervals) as integer. Empty map -> 0.
+- overlapping_intervals(l,r): given query [l,r) (raise ValueError if l>=r), return list of (cl,cr,value) tuples clipped to the query: for each stored interval [a,b) that overlaps query, emit (max(a,l), min(b,r), value) sorted by cl. No unclipped intervals.
+- __len__(): number of stored intervals.
+- __contains__(key): True iff get(key) is not None.
+
+Tests check: basic set/get, merging adjacent same-value intervals (and not merging different values), overwriting partial overlaps, splitting on remove (including middle split that yields two intervals), get boundary half-open correctness, get_interval correctness, intervals() sorted/merged/copy-immutability/tuple-type, total_covered exact length (half-open, not inclusive), overlapping_intervals clipped to query and sorted, __len__/__contains__, ValueError raising for invalid l>=r and None value, and a seeded random brute-force reference (seed 42, 200 random set/remove ops on domain 0..50) comparing every key's get(), intervals(), total_covered() and overlapping queries against a dict-based brute force model.
+
+### 043-deterministic-throttled-runner
+Title: Deterministic Throttled Runner
+Difficulty: hard
+Tags: concurrency, rate-limiting, state-machine, priority-queue
+Estimated minutes: 45
+Prompt: Fix ThrottledRunner in starter/throttler.py. Time only moves via tick(now). The runner must enforce max concurrency, token-bucket rate limiting, priority ordering, and lifecycle rules. Read the module docstring and code for the full contract — this summary is intentionally incomplete. Do not change the public API.
+
+### 044-lifecycle-registry-invariants
+Title: Lifecycle Registry Invariants
+Difficulty: hard
+Tags: class invariants and object lifecycle, class-invariants, object-lifecycle, state-machine, performance
+Estimated minutes: 60
+Prompt: Fix LifecycleRegistry to satisfy its documented invariants. The starter violates several state-machine and lifecycle rules and has a performance regression in get/put. Read starter/managed_registry.py docstring and code for the full contract. Correctness is measured by state invariants and lookup_steps must stay O(1) per operation (instrumented counter).
+
+### 048-peekable-windowed-iterator
+Title: Peekable Windowed Iterator Protocol Fix
+Difficulty: hard
+Tags: iterator and generator protocols, iterator, generator, protocol, buffering, state-machine
+Estimated minutes: 45
+Prompt: Fix BufferedIterator in starter/buffered_iterator.py to satisfy its documented iterator/generator protocol.
+
+The class wraps any iterable and provides lookahead buffering. Required invariants (see docstrings in the starter file for full contract):
+- iterator identity: iter(it) is it
+- peek(index, default) returns without consuming and fetches minimally from the source
+- has_next(), push_back(*values), take(n), window(size, step) must respect buffered data
+- close() and throw() must delegate to the underlying generator when present and maintain correct state transitions
+
+Do not over-consume the source iterator. Read the starter code carefully; the prompt is intentionally brief.
+
+### 050-canonical-binary-codec
+Title: Canonical Binary Codec Repair
+Difficulty: hard
+Tags: serialisation / deserialisation, serialization, deserialization, varint, canonical-encoding, reference-sharing
+Estimated minutes: 45
+Prompt: Fix `codec.py` so `Codec.dumps`/`loads` correctly round-trip Python values with canonical, compact encoding. The codec uses varint/ZigZag for ints, length-prefixed UTF-8 for str/bytes, little-endian IEEE-754 for floats, and back-references for shared/cyclic structures. Dumps must be deterministic and compact; loads must validate input and preserve identity/cycles. Read the starter source and its docstrings for the full contract — the prompt is intentionally brief.
+
+### 052-priority-rate-scheduler
+Title: Priority Task Scheduler with Rate Limiting and Dependencies
+Difficulty: hard
+Tags: state-machine, priority-queue, rate-limiting, concurrency, performance
+Estimated minutes: 60
+Prompt: Fix `starter/scheduler.py` so that all documented invariants hold. The scheduler must respect dependency ordering, priority with FIFO tie-break, token-bucket rate limiting with burst cap, and the state-machine rules (RUNNING is non-cancellable, FAILED propagates). It must also meet the performance requirement (heap-based ready queue, no expensive sorts). See the code for the full contract — the prompt is intentionally brief.

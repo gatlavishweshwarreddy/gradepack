@@ -1,0 +1,19 @@
+{
+  "id": "000-crypto-utils-fix",
+  "title": "Cryptographic Utilities Repair",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "Fix `crypto_utils.py` so its documented contracts hold. The module provides base64url codec, constant-time comparison, HKDF (RFC 5869), PBKDF2-like password hashing, and JWT-like token handling. Read the docstrings for exact requirements; the current implementation violates several invariants including padding handling, HKDF counter, PBKDF2 iteration count, JSON canonicalization, and signature verification. Keep the public API unchanged and do not add dependencies.",
+  "grader": "grader/test_crypto_utils.py",
+  "version": "1.0.0",
+  "tags": [
+    "cryptographic utilities (hashing, encoding)",
+    "cryptography",
+    "hashing",
+    "encoding",
+    "hkdf",
+    "jwt"
+  ],
+  "estimated_minutes": 60,
+  "license": "MIT"
+}

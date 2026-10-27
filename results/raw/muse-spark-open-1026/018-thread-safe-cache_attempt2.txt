@@ -11,13 +11,11 @@ def memoize(fn):
 
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-        # Build a hashable cache key from args and kwargs
+        # Build a hashable key from args and kwargs
         if kwargs:
-            # Use tuple of sorted items to make key deterministic and hashable
             key = (args, tuple(sorted(kwargs.items())))
         else:
             key = args
-
         with lock:
             if key in cache:
                 return cache[key]

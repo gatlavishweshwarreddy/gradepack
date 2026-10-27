@@ -5,19 +5,19 @@ def coerce_element(v):
     Convert v to an appropriate numeric type.
     Preserves fractional values instead of truncating to int.
     """
-    # bool is subclass of int, handle explicitly
+    # bool is a subclass of int, handle it explicitly
     if isinstance(v, bool):
         return int(v)
     if isinstance(v, int):
-        return v
+        return int(v)
     if isinstance(v, float):
-        if v.is_integer():
-            return int(v)
         return float(v)
+    # For strings or other types, try to detect fractional values
     try:
         f = float(v)
-        if f.is_integer():
-            return int(f)
+        i = int(f)
+        if f == i:
+            return i
         return f
     except (TypeError, ValueError):
         try:

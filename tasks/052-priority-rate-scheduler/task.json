@@ -1,5 +1,5 @@
 {
-  "id": "000-priority-rate-scheduler",
+  "id": "052-priority-rate-scheduler",
   "title": "Priority Task Scheduler with Rate Limiting and Dependencies",
   "language": "python",
   "difficulty": "hard",

@@ -1,0 +1,19 @@
+{
+  "id": "048-peekable-windowed-iterator",
+  "title": "Peekable Windowed Iterator Protocol Fix",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "Fix BufferedIterator in starter/buffered_iterator.py to satisfy its documented iterator/generator protocol.\n\nThe class wraps any iterable and provides lookahead buffering. Required invariants (see docstrings in the starter file for full contract):\n- iterator identity: iter(it) is it\n- peek(index, default) returns without consuming and fetches minimally from the source\n- has_next(), push_back(*values), take(n), window(size, step) must respect buffered data\n- close() and throw() must delegate to the underlying generator when present and maintain correct state transitions\n\nDo not over-consume the source iterator. Read the starter code carefully; the prompt is intentionally brief.",
+  "grader": "grader/test_buffered.py",
+  "version": "1.0.0",
+  "tags": [
+    "iterator and generator protocols",
+    "iterator",
+    "generator",
+    "protocol",
+    "buffering",
+    "state-machine"
+  ],
+  "estimated_minutes": 45,
+  "license": "MIT"
+}

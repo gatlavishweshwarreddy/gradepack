@@ -7,17 +7,62 @@ def duration_seconds(entries):
     """
     Return elapsed seconds between first and last entry.
     Returns 0 if fewer than 2 entries.
-    Handles logs that span midnight by adding 24h when the
-    last time is earlier than the first time.
+    Handles logs that span midnight by adding days when the clock wraps.
     """
     if len(entries) < 2:
         return 0
     base = datetime.date(2000, 1, 1)
     first = datetime.datetime.combine(base, entries[0].time)
-    last = datetime.datetime.combine(base, entries[-1].time)
-    delta = last - first
-    seconds = delta.total_seconds()
-    if seconds < 0:
-        seconds += 24 * 3600
-    return seconds
+    current_date = base
+    prev_dt = first
+    last_dt = first
+    for entry in entries[1:]:
+        cur_dt = datetime.datetime.combine(current_date, entry.time)
+        # clock went backwards -> crossed midnight
+        if cur_dt < prev_dt:
+            current_date += datetime.timedelta(days=1)
+            cur_dt = datetime.datetime.combine(current_date, entry.time)
+        prev_dt = cur_dt
+        last_dt = cur_dt
+    delta = last_dt - first
+    return delta.total_seconds()
+```
+
+parser.py
+```python
+import datetime
+
+
+class LogEntry:
+    def __init__(self, time: datetime.time, level: str, message: str):
+        self.time = time
+        self.level = level
+        self.message = message
+
+    def __repr__(self):
+        return f"LogEntry({self.time!r}, {self.level!r}, {self.message!r})"
+
+
+def parse_log(lines):
+    """Parse log lines of the form 'HH:MM:SS LEVEL message'."""
+    entries = []
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        parts = line.split(" ", 2)
+        if len(parts) < 3:
+            continue
+        time_str, level, message = parts
+        h, m, s = time_str.split(":")
+        t = datetime.time(int(h), int(m), int(s))
+        entries.append(LogEntry(t, level, message))
+    return entries
+```
+
+filter.py
+```python
+def filter_level(entries, level):
+    """Return only entries whose level matches (case-sensitive)."""
+    return [e for e in entries if e.level == level]
 ```

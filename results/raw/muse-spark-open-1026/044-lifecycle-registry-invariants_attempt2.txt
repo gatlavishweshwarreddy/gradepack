@@ -1,0 +1,12 @@
+managed_registry.py
+```python
+"""
+LifecycleRegistry manages resources with strict lifecycle invariants.
+
+Registry lifecycle:
+  CREATED -> OPEN -> CLOSED
+  - new registry starts as CREATED
+  - open() moves to OPEN
+  - close() moves to CLOSED (terminal, cannot be reopened)
+  - any operation requiring OPEN must raise RegistryClosed if not OPEN
+  - public attributes: state (str

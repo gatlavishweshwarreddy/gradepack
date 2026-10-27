@@ -6,6 +6,6 @@ from datetime import date
 def iso_week(date_str):
     """Return (iso_year, week_number) for an ISO date string."""
     d = date.fromisoformat(date_str)
-    iso_year, week_number, _ = d.isocalendar()
-    return (iso_year, week_number)
+    iso_year, week_num, _ = d.isocalendar()
+    return (iso_year, week_num)
 ```

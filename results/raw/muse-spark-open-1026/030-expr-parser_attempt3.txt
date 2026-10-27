@@ -2,8 +2,6 @@ parser.py
 ```python
 from tokenizer import tokenize
 
-_sentinel = object()
-
 
 def _parse_expr(tokens, pos, variables):
     """BUG: left-to-right evaluation, no operator precedence."""
@@ -31,12 +29,13 @@ def _parse_atom(tokens, pos, variables):
         return float(tok), pos + 1
 
 
-def _parse_expr_correct(tokens, pos, variables):
-    left, pos = _parse_term_correct(tokens, pos, variables)
+# Correct precedence implementation for new two-argument form
+def _parse_expr_prec(tokens, pos, variables):
+    left, pos = _parse_term(tokens, pos, variables)
     while pos < len(tokens) and tokens[pos] in ('+', '-'):
         op = tokens[pos]
         pos += 1
-        right, pos = _parse_term_correct(tokens, pos, variables)
+        right, pos = _parse_term(tokens, pos, variables)
         if op == '+':
             left = left + right
         elif op == '-':
@@ -44,12 +43,12 @@ def _parse_expr_correct(tokens, pos, variables):
     return left, pos
 
 
-def _parse_term_correct(tokens, pos, variables):
-    left, pos = _parse_atom_correct(tokens, pos, variables)
+def _parse_term(tokens, pos, variables):
+    left, pos = _parse_atom_prec(tokens, pos, variables)
     while pos < len(tokens) and tokens[pos] in ('*', '/'):
         op = tokens[pos]
         pos += 1
-        right, pos = _parse_atom_correct(tokens, pos, variables)
+        right, pos = _parse_atom_prec(tokens, pos, variables)
         if op == '*':
             left = left * right
         elif op == '/':
@@ -57,18 +56,11 @@ def _parse_term_correct(tokens, pos, variables):
     return left, pos
 
 
-def _parse_atom_correct(tokens, pos, variables):
+def _parse_atom_prec(tokens, pos, variables):
     tok = tokens[pos]
     if tok == '(':
-        val, pos = _parse_expr_correct(tokens, pos + 1, variables)
-        if pos < len(tokens) and tokens[pos] == ')':
-            pos += 1
-        return val, pos
-    elif tok == '-':
-        val, pos = _parse_atom_correct(tokens, pos + 1, variables)
-        return -val, pos
-    elif tok == '+':
-        val, pos = _parse_atom_correct(tokens, pos + 1, variables)
+        val, pos = _parse_expr_prec(tokens, pos + 1, variables)
+        pos += 1  # skip ')'
         return val, pos
     elif tok in variables:
         return float(variables[tok]), pos + 1
@@ -76,40 +68,22 @@ def _parse_atom_correct(tokens, pos, variables):
         return float(tok), pos + 1
 
 
-def _parse_and_eval_legacy(expr_str, variables):
+def parse_and_eval(expr_str, variables=None):
     tokens = tokenize(expr_str)
-    result, _ = _parse_expr(tokens, 0, variables)
-    return result
-
-
-def _parse_and_eval_correct(expr_str, variables):
-    tokens = tokenize(expr_str)
-    result, _ = _parse_expr_correct(tokens, 0, variables)
-    return result
-
-
-def parse_and_eval(expr_str, variables=_sentinel):
-    if variables is _sentinel:
-        variables = {}
-        return _parse_and_eval_legacy(expr_str, variables)
+    if variables is None:
+        # backward compatibility: old single-arg calls keep buggy left-to-right behavior
+        result, _ = _parse_expr(tokens, 0, {})
+        return result
     else:
-        if variables is None:
-            variables = {}
-        return _parse_and_eval_correct(expr_str, variables)
+        result, _ = _parse_expr_prec(tokens, 0, variables)
+        return result
 ```
 expr.py
 ```python
 from parser import parse_and_eval
 
-_sentinel = object()
 
-
-def evaluate(expr_str, variables=_sentinel):
+def evaluate(expr_str, variables=None):
     """Evaluate an arithmetic expression string. variables is an optional dict."""
-    if variables is _sentinel:
-        return parse_and_eval(expr_str)
-    else:
-        if variables is None:
-            variables = {}
-        return parse_and_eval(expr_str, variables)
+    return parse_and_eval(expr_str, variables)
 ```

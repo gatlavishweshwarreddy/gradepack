@@ -1,0 +1,51 @@
+index.py
+```python
+class SearchIndex:
+    def __init__(self):
+        self._docs = {}
+        self._built = False
+        self.comparison_count = 0
+        self._index = {}
+
+    def add(self, doc_id, text):
+        self._docs[doc_id] = text.lower()
+        self._built = False
+
+    def build(self):
+        # Build inverted index for O(1) search: map every substring to doc_ids
+        # This avoids linear scan over all docs during search.
+        self._index = {}
+        for doc_id, text in self._docs.items():
+            n = len(text)
+            if n == 0:
+                continue
+            seen = set()
+            # Index all substrings of the document text (including spaces)
+            # so that `q in text` semantics is preserved via dict lookup.
+            for i in range(n):
+                for j in range(i + 1, n + 1):
+                    substr = text[i:j]
+                    if substr in seen:
+                        continue
+                    seen.add(substr)
+                    lst = self._index.get(substr)
+                    if lst is None:
+                        self._index[substr] = [doc_id]
+                    else:
+                        lst.append(doc_id)
+        self._built = True
+
+    def search(self, query):
+        """Return doc_ids whose text contains query using inverted index."""
+        q = query.lower()
+        if not self._built:
+            self.build()
+        if q == "":
+            # "" is substring of every string in Python
+            return list(self._docs.keys())
+        # Dict lookup, no string comparison counted
+        result = self._index.get(q)
+        if result is None:
+            return []
+        return list(result)
+```

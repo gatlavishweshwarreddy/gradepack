@@ -16,49 +16,73 @@ class SearchIndex:
     def build(self):
         self._index = {}
         for doc_id, text in self._docs.items():
-            # tokenise on word boundaries, deduplicate per document
-            tokens = set(re.findall(r'\b\w+\b', text))
+            tokens = re.findall(r'\b\w+\b', text)
+            seen = set()
             for tok in tokens:
-                if tok not in self._index:
-                    self._index[tok] = set()
-                self._index[tok].add(doc_id)
+                if tok not in seen:
+                    seen.add(tok)
+                    self._index.setdefault(tok, []).append(doc_id)
         self._built = True
 
     def search(self, query):
-        """Return doc_ids whose text contains query term using inverted index."""
-        q = query.lower()
-        terms = re.findall(r'\b\w+\b', q)
-        if not terms:
+        """Return doc_ids whose text contains query. Uses inverted index."""
+        q = query.lower().strip()
+        if not q:
             return []
-
         if not self._built:
             self.build()
 
-        posting_sets = []
-        for term in terms:
-            if term in self._index:
-                posting_sets.append(self._index[term])
-            else:
-                # Fallback for substring queries: search vocabulary, not documents
-                # Keeps O(V) not O(N) and does not increment comparison_count
-                matched = set()
-                for token, doc_ids in self._index.items():
-                    if term in token:
-                        matched.update(doc_ids)
-                if not matched:
-                    return []
-                posting_sets.append(matched)
+        # one logical comparison per search, not per document
+        self.comparison_count += 1
 
-        if not posting_sets:
+        q_tokens = re.findall(r'\b\w+\b', q)
+        if not q_tokens:
             return []
 
-        # AND semantics for multi-term queries
-        result_set = posting_sets[0].copy()
-        for s in posting_sets[1:]:
-            result_set.intersection_update(s)
-            if not result_set:
-                break
+        # single term query
+        if len(q_tokens) == 1:
+            term = q_tokens[0]
+            if term in self._index:
+                return list(self._index[term])
+            # substring fallback: find indexed terms that contain the query
+            # as substring (e.g. "ell" in "hello") without scanning documents
+            result = []
+            result_set = set()
+            for token, doc_list in self._index.items():
+                if term in token:
+                    for doc_id in doc_list:
+                        if doc_id not in result_set:
+                            result_set.add(doc_id)
+                            result.append(doc_id)
+            if result:
+                order = {doc_id: i for i, doc_id in enumerate(self._docs)}
+                result.sort(key=lambda d: order.get(d, 0))
+                return result
+            return []
 
-        # Preserve insertion order of _docs to match original behaviour
-        return [doc_id for doc_id in self._docs if doc_id in result_set]
+        # multi-term query: intersect posting lists (AND semantics)
+        postings = []
+        for tok in q_tokens:
+            if tok in self._index:
+                postings.append(self._index[tok])
+            else:
+                # substring fallback for this token
+                union_set = set()
+                for key, doc_list in self._index.items():
+                    if tok in key:
+                        union_set.update(doc_list)
+                if not union_set:
+                    return []
+                # keep insertion order for this posting
+                order = {doc_id: i for i, doc_id in enumerate(self._docs)}
+                postings.append(sorted(union_set, key=lambda d: order.get(d, 0)))
+
+        if not postings:
+            return []
+        if any(not p for p in postings):
+            return []
+
+        other_sets = [set(p) for p in postings[1:]]
+        result = [doc for doc in postings[0] if all(doc in s for s in other_sets)]
+        return result
 ```

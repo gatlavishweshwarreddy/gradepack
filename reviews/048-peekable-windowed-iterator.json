@@ -1,0 +1,16 @@
+{
+  "verdict": "accept",
+  "fair": true,
+  "fully_specified": true,
+  "issues": [],
+  "summary": "Complete spec in docstrings with matching starter bugs and thorough grader covering identity, peek efficiency, buffering, and generator delegation.",
+  "date": "2026-10-27T17:18:19Z",
+  "domain": "iterator and generator protocols",
+  "task_id": "050-peekable-windowed-iterator",
+  "probe_results": [
+    true,
+    false,
+    false
+  ],
+  "classification": "discriminating"
+}

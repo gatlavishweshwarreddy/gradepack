@@ -1,0 +1,16 @@
+{
+  "verdict": "accept",
+  "fair": true,
+  "fully_specified": true,
+  "issues": [],
+  "summary": "Well-scoped repair task with clear contract in prompt+docstrings and comprehensive grader covering round-trip, ZigZag/varint, canonical ordering, sharing/cycles, and validation.",
+  "date": "2026-10-27T17:18:32Z",
+  "domain": "serialisation / deserialisation",
+  "task_id": "051-canonical-binary-codec",
+  "probe_results": [
+    false,
+    false,
+    false
+  ],
+  "classification": "discriminating"
+}
