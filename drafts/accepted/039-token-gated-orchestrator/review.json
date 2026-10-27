@@ -1,0 +1,15 @@
+{
+  "verdict": "accept",
+  "fair": true,
+  "fully_specified": true,
+  "issues": [],
+  "summary": "Well-specified token-gated orchestrator task: class docstring fully defines state-machine, token accounting and greedy runnable ordering; starter contains intentional bugs (missing validation, token cap, promotion, efficiency) and grader comprehensively validates correctness and performance; solution correctly fixes all issues.",
+  "date": "2026-10-27T14:37:47Z",
+  "task_id": "039-token-gated-orchestrator",
+  "probe_results": [
+    true,
+    false,
+    true
+  ],
+  "classification": "discriminating"
+}

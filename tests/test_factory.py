@@ -92,7 +92,7 @@ class TestProbeClassification:
         files = _mock_draft_files()
         # mock=True → _probe_once always returns True
         classification, results = _factory._probe_draft(
-            files, "037-example", probe_attempts=3, mock=True, mock_probe_fail=False
+            files, probe_attempts=3, mock=True, mock_probe_fail=False
         )
         assert classification == "too_easy"
         assert all(results)
@@ -102,7 +102,7 @@ class TestProbeClassification:
         """If every probe returns False, classification is discriminating."""
         files = _mock_draft_files()
         classification, results = _factory._probe_draft(
-            files, "037-example", probe_attempts=3, mock=False, mock_probe_fail=True
+            files, probe_attempts=3, mock=False, mock_probe_fail=True
         )
         assert classification == "discriminating"
         assert not any(results)
@@ -111,9 +111,8 @@ class TestProbeClassification:
     def test_single_probe_failure_means_discriminating(self):
         """Even one failure out of N makes the draft discriminating."""
         files = _mock_draft_files()
-        # mock_probe_fail=True → all False; we just test the logic directly
         classification, results = _factory._probe_draft(
-            files, "037-example", probe_attempts=1, mock=False, mock_probe_fail=True
+            files, probe_attempts=1, mock=False, mock_probe_fail=True
         )
         assert classification == "discriminating"
 
@@ -121,9 +120,7 @@ class TestProbeClassification:
         """probe_results list has exactly probe_attempts entries."""
         files = _mock_draft_files()
         for n in (1, 2, 5):
-            _, results = _factory._probe_draft(
-                files, "037-example", probe_attempts=n, mock=True
-            )
+            _, results = _factory._probe_draft(files, probe_attempts=n, mock=True)
             assert len(results) == n
 
     def test_probe_via_fake_server_always_pass(self):
@@ -135,7 +132,6 @@ class TestProbeClassification:
                 "MODEL":    "probe_always_pass",
             }):
                 with unittest.mock.patch("gradepack.api.time.sleep"):
-                    # Directly call _probe_once to test the real HTTP path
                     files = {
                         "task.json": json.dumps({
                             "id": "037-pagination-probe",
@@ -155,7 +151,7 @@ class TestProbeClassification:
                             core.task_dir(TASK_001) / "solution" / "paginate.py"
                         ).read_text(),
                     }
-                    result = _factory._probe_once(files, "037-pagination-probe", mock=False)
+                    result = _factory._probe_once(files, mock=False)
         assert result is True
 
     def test_probe_via_fake_server_always_fail(self):
@@ -186,7 +182,7 @@ class TestProbeClassification:
                             core.task_dir(TASK_001) / "solution" / "paginate.py"
                         ).read_text(),
                     }
-                    result = _factory._probe_once(files, "037-pagination-probe", mock=False)
+                    result = _factory._probe_once(files, mock=False)
         assert result is False
 
 

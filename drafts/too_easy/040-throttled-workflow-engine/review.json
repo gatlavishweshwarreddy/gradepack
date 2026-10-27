@@ -1,0 +1,15 @@
+{
+  "verdict": "accept",
+  "fair": true,
+  "fully_specified": true,
+  "issues": [],
+  "summary": "Well-defined repair task: docstrings clearly define state-machine, burst cap, priority tie-break, concurrency and failure propagation invariants, starter contains 7-8 subtle deterministic bugs, and pytest grader with FakeClock comprehensively validates fixes without hidden API changes.",
+  "date": "2026-10-27T14:37:56Z",
+  "task_id": "040-throttled-workflow-engine",
+  "probe_results": [
+    true,
+    true,
+    true
+  ],
+  "classification": "too_easy"
+}

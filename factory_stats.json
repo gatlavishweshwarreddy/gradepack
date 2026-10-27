@@ -1,0 +1,30 @@
+{
+  "drafted": 19,
+  "failed_draft_stage": 10,
+  "failed_verify": 6,
+  "judge_rejected": 1,
+  "judge_accepted": 2,
+  "probed": 2,
+  "too_easy": 1,
+  "discriminating": 1,
+  "drafts": {
+    "039-token-gated-orchestrator": {
+      "classification": "discriminating",
+      "probe_results": [
+        true,
+        false,
+        true
+      ],
+      "probe_solve_count": 2
+    },
+    "040-throttled-workflow-engine": {
+      "classification": "too_easy",
+      "probe_results": [
+        true,
+        true,
+        true
+      ],
+      "probe_solve_count": 3
+    }
+  }
+}

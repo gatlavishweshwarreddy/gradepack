@@ -232,8 +232,8 @@ gradepack factory --n 3 --mock --mock-probe-fail
 # Real run: keep drafting until 2 discriminating tasks found (cap 20 attempts)
 BASE_URL=... API_KEY=... gradepack factory --target-kept 2 --max-drafts 20
 
-# Real run: 5 parallel workers, 3 probe attempts each
-BASE_URL=... API_KEY=... gradepack factory --n 10 --parallel 5 --probe-attempts 3
+# Real run: 5 parallel workers, 3 probe attempts each, 28k token draft budget
+BASE_URL=... API_KEY=... gradepack factory --n 10 --parallel 5 --probe-attempts 3 --draft-max-tokens 28000
 ```
 
 All flags:
@@ -245,26 +245,30 @@ All flags:
 | `--max-drafts M` | same as `--n` | Hard cap on total attempts (overrides `--n` when `--target-kept` is set) |
 | `--probe-attempts K` | 3 | Times to probe each judge-accepted draft |
 | `--parallel P` | 2 | Concurrent draft workers |
+| `--draft-max-tokens N` | 24000 | `max_tokens` for the draft API call; retry doubles this (cap 32768) |
 | `--mock` | off | Use mock drafts (offline); mock probes always pass → too_easy |
 | `--mock-probe-fail` | off | Mock probes always fail → discriminating (for offline testing) |
 
 **Pipeline per draft:**
 1. Reads the last 10 lessons from `LESSONS.md` (rejections *and* too-easy lessons).
-2. Sends a drafting prompt that includes harder-task guidance (do not enumerate expected behaviour, keep prompt shorter than code, use interacting constraints, performance limits, etc.).
-3. Runs `verify` on the draft locally.
-4. Sends a **separate** review request (no shared history) → judge verdict.
-5. **Probe stage**: runs the model against the draft `--probe-attempts` times.
+2. Sends a drafting prompt with `--draft-max-tokens` tokens. If `finish_reason==length` and content is empty, retries **once** with `min(tokens×2, 32768)`. Records `draft_retried=true` per draft.
+3. Parses the response robustly: strips markdown code fences from `task.json`, finds the largest top-level JSON object, and classifies failures as `empty_content` | `truncated_json` | `invalid_json`.
+4. Runs `verify` on the draft locally (each call uses its own unique temp directory; parallel runs cannot collide).
+5. Sends a **separate** review request (no shared history) → judge verdict.
+6. **Probe stage**: runs the model against the draft `--probe-attempts` times (each probe uses its own unique temp directory).
    - All probes pass → `too_easy` → saved under `drafts/too_easy/`, lesson appended.
    - ≥ 1 probe fails → `discriminating` → saved under `drafts/accepted/`.
    - Judge rejected → saved under `drafts/rejected/`.
-6. Writes `factory_stats.json` after each draft.
-7. Prints a funnel summary at the end.
+7. Writes `factory_stats.json` after each draft.
+8. Prints a funnel summary at the end.
 
 **Drafts are never promoted automatically.** Use `gradepack promote <id>` to move a discriminating draft into `tasks/`.
 
 #### `factory_stats.json`
 
-Written after each draft run with counts: `drafted`, `failed_draft_stage`, `failed_verify`, `judge_rejected`, `judge_accepted`, `probed`, `too_easy`, `discriminating`, plus per-draft `probe_results` and `probe_solve_count`.
+Written after each draft run with counts: `drafted`, `failed_draft_stage`, `failed_verify`, `judge_rejected`, `judge_accepted`, `probed`, `too_easy`, `discriminating`, plus:
+- `draft_fail_reasons`: breakdown of draft-stage failures (`empty_content`, `truncated_json`, `invalid_json`, `other`)
+- Per-draft entry: `probe_results`, `probe_solve_count`, `draft_retried`
 
 ---
 

@@ -9,8 +9,11 @@ Usage (--help for full options):
 Pipeline per draft:
   1. Reads the last 10 lessons from LESSONS.md (including too-easy lessons).
   2. Sends a drafting prompt to the model (one call per task idea).
-  3. Parses the response into task.json, starter/<file>, grader/<file>, solution/<file>.
-  4. Runs verify on the draft.
+     - If finish_reason=="length" and content is empty/truncated, retries once
+       with max_tokens doubled (cap 32768); records retried=true in stats.
+  3. Extracts file blocks robustly: strips code fences, finds the largest
+     top-level JSON object, falls back gracefully on truncated/invalid JSON.
+  4. Runs verify on the draft (each run uses its own unique temp directory).
   5. Sends a separate review prompt to the model (fresh request, no shared history).
   6. Records verdict + reason in drafts/<category>/<id>/review.json.
   7. Probe stage: runs the model against the draft --probe-attempts times.
@@ -18,6 +21,12 @@ Pipeline per draft:
      - ≥1 probe fails   → "discriminating" → saved under drafts/accepted/
      - Judge rejected   → saved under drafts/rejected/
   8. Writes factory_stats.json after each draft.
+
+Draft-stage failure reasons tracked in stats:
+  empty_content   — finish_reason length, content empty even after retry
+  truncated_json  — task.json appears truncated (no closing brace)
+  invalid_json    — task.json present but not valid JSON
+  other           — any other draft-stage error
 
 Accepted (discriminating) drafts stay in drafts/accepted/ until promoted via:
     python -m gradepack promote <draft-id>
@@ -33,11 +42,10 @@ import re
 import shutil
 import sys
 import tempfile
+import threading as _threading
 
 from gradepack import api as _api
 from gradepack import core
-
-import threading as _threading
 
 _REPO = core._repo_root()
 _DRAFTS_DIR      = _REPO / "drafts"
@@ -47,6 +55,8 @@ _TOO_EASY_DIR    = _DRAFTS_DIR / "too_easy"
 _LESSONS_FILE    = _REPO / "LESSONS.md"
 _STATS_FILE      = _REPO / "factory_stats.json"
 _DEFAULT_MODEL   = _api._DEFAULT_MODEL
+
+_DEFAULT_DRAFT_MAX_TOKENS = 24000
 
 # Protects the final save step (assign id + copytree + stats update)
 # so parallel workers don't race on numbering or stat writes.
@@ -101,11 +111,11 @@ def _next_task_number() -> int:
     return n
 
 
-def _assign_id(files: dict[str, str]) -> dict[str, str]:
+def _assign_id(files: dict[str, str]) -> tuple[dict[str, str], str]:
     """
     Rewrite the id in task.json to use the next free numeric prefix.
     The slug part (everything after NNN-) is kept; if no slug, uses 'task'.
-    Returns a modified copy of files.
+    Returns (modified_files, new_id).
     """
     task_json_text = files.get("task.json", "{}")
     try:
@@ -114,7 +124,6 @@ def _assign_id(files: dict[str, str]) -> dict[str, str]:
         meta = {}
 
     old_id = meta.get("id", "")
-    # Extract slug part: strip any leading NNN- prefix
     slug_match = re.match(r"^\d+-(.+)$", old_id)
     slug = slug_match.group(1) if slug_match else (old_id or "task")
 
@@ -221,8 +230,85 @@ Reply with a JSON object ONLY (no markdown) with:
 """
 
 
-def _chat(system: str, user: str) -> str:
-    resp_data = _api.chat(system, user, temperature=0.7, max_tokens=16384, timeout=180)
+def _extract_json_robust(text: str) -> tuple[dict | None, str]:
+    """
+    Extract the first/largest top-level JSON object from text.
+
+    Strips:
+      - leading/trailing whitespace
+      - markdown code fences (```json ... ``` or ``` ... ```)
+      - leading prose before the first '{'
+      - trailing prose after the last '}'
+
+    Returns (parsed_dict, failure_reason).
+    failure_reason is "" on success, one of:
+      "empty_content"   — text is empty or only whitespace
+      "truncated_json"  — looks like JSON but has no closing '}'
+      "invalid_json"    — has braces but json.loads fails
+    """
+    if not text or not text.strip():
+        return None, "empty_content"
+
+    # Strip markdown code fences
+    stripped = text.strip()
+    stripped = re.sub(r"^```[a-zA-Z]*\n?", "", stripped)
+    stripped = re.sub(r"\n?```$", "", stripped.rstrip())
+    stripped = stripped.strip()
+
+    # Find the first '{' and last '}' to isolate the JSON object
+    start = stripped.find("{")
+    end   = stripped.rfind("}")
+
+    if start == -1:
+        return None, "invalid_json"
+
+    if end == -1 or end < start:
+        return None, "truncated_json"
+
+    candidate = stripped[start:end + 1]
+
+    try:
+        return json.loads(candidate), ""
+    except json.JSONDecodeError:
+        # Check if it just looks truncated (no closing brace on last line)
+        if not stripped.rstrip().endswith("}"):
+            return None, "truncated_json"
+        return None, "invalid_json"
+
+
+def _chat_draft(
+    system: str,
+    user: str,
+    max_tokens: int,
+    timeout: int = 180,
+) -> tuple[str, bool]:
+    """
+    Call the model for draft generation.
+
+    Returns (content, retried).
+
+    If finish_reason is "length" and content is empty/unusably short,
+    retries once with max_tokens doubled (cap 32768).
+    """
+    resp_data = _api.chat(system, user, temperature=0.7, max_tokens=max_tokens, timeout=timeout)
+    content      = _api.extract_content(resp_data)
+    finish_reason = _api.extract_finish_reason(resp_data)
+    retried = False
+
+    # Retry on truncation: empty or very short content on a length finish
+    if finish_reason in ("length", "max_tokens") and not content:
+        doubled = min(max_tokens * 2, 32768)
+        resp2         = _api.chat(system, user, temperature=0.7, max_tokens=doubled, timeout=timeout)
+        content       = _api.extract_content(resp2)
+        finish_reason = _api.extract_finish_reason(resp2)
+        retried = True
+
+    return content, retried
+
+
+def _chat(system: str, user: str, max_tokens: int = 16384) -> str:
+    """Simple chat call for review (no retry needed)."""
+    resp_data = _api.chat(system, user, temperature=0.7, max_tokens=max_tokens, timeout=180)
     content = _api.extract_content(resp_data)
     if not content:
         raise RuntimeError("Model returned empty content")
@@ -239,14 +325,50 @@ def _parse_file_blocks(content: str) -> dict[str, str]:
     return files
 
 
-def _model_draft(lessons: list[str]) -> dict[str, str]:
+def _extract_task_json(files: dict[str, str]) -> tuple[dict | None, str]:
+    """
+    Parse task.json from the files dict, handling code fences and truncation.
+    Returns (meta_dict, failure_reason).  failure_reason="" on success.
+    """
+    raw = files.get("task.json", "")
+    return _extract_json_robust(raw)
+
+
+def _model_draft(
+    lessons: list[str],
+    max_tokens: int = _DEFAULT_DRAFT_MAX_TOKENS,
+) -> tuple[dict[str, str], bool, str]:
+    """
+    Draft a task via the model.
+
+    Returns (files_dict, retried, failure_reason).
+    failure_reason is "" on success, otherwise one of:
+      empty_content | truncated_json | invalid_json | other
+    """
     lesson_text = "\n".join(f"- {l}" for l in lessons) if lessons else "(none yet)"
     user = (
-        f"Create a new hard Python debugging task.\n\n"
+        "Create a new hard Python debugging task.\n\n"
         f"Lessons from previous drafts (avoid these mistakes):\n{lesson_text}"
     )
-    raw = _chat(_DRAFT_SYSTEM, user)
-    return _parse_file_blocks(raw)
+    try:
+        content, retried = _chat_draft(_DRAFT_SYSTEM, user, max_tokens=max_tokens)
+    except Exception as exc:
+        return {}, False, f"other: {exc}"
+
+    if not content:
+        return {}, retried, "empty_content"
+
+    files = _parse_file_blocks(content)
+
+    # Check task.json parses
+    if "task.json" in files:
+        _, fail_reason = _extract_task_json(files)
+        if fail_reason:
+            # Try to repair: rewrite task.json key with the extracted raw text
+            files["task.json"] = files["task.json"]  # keep as-is; caller will handle
+            return files, retried, fail_reason
+
+    return files, retried, ""
 
 
 def _model_review(draft_dir: pathlib.Path) -> dict:
@@ -261,12 +383,13 @@ def _model_review(draft_dir: pathlib.Path) -> dict:
                     parts.append(f"=== {fname}/{f.name} ===\n{f.read_text()}")
     user = "\n\n".join(parts)
     raw = _chat(_REVIEW_SYSTEM, user)
+    # Try direct parse, then robust extraction
     try:
         return json.loads(raw)
     except json.JSONDecodeError:
-        m = re.search(r"\{.*\}", raw, re.DOTALL)
-        if m:
-            return json.loads(m.group())
+        parsed, _ = _extract_json_robust(raw)
+        if parsed is not None:
+            return parsed
         return {"verdict": "reject", "issues": ["Could not parse review response"], "summary": raw[:200]}
 
 
@@ -277,21 +400,24 @@ def _model_review(draft_dir: pathlib.Path) -> dict:
 def _materialise_draft(files: dict[str, str], draft_root: pathlib.Path) -> str | None:
     """
     Write files to draft_root. Returns error string on failure, None on success.
+    task.json is extracted robustly (strips code fences etc.) before writing.
     """
-    task_json_text = files.get("task.json")
-    if not task_json_text:
+    raw_task_json = files.get("task.json")
+    if not raw_task_json:
         return "No task.json in draft"
-    try:
-        meta = json.loads(task_json_text)
-    except json.JSONDecodeError as exc:
-        return f"task.json is not valid JSON: {exc}"
+
+    # Robustly parse task.json
+    meta, fail_reason = _extract_json_robust(raw_task_json)
+    if meta is None:
+        return f"task.json parse failed ({fail_reason}): {raw_task_json[:200]}"
 
     task_id = meta.get("id", "")
     if not task_id:
         return "task.json has no 'id' field"
 
     draft_root.mkdir(parents=True, exist_ok=True)
-    (draft_root / "task.json").write_text(task_json_text)
+    # Write the cleaned-up task.json
+    (draft_root / "task.json").write_text(json.dumps(meta, indent=2))
 
     for path_str, content in files.items():
         if path_str == "task.json":
@@ -307,17 +433,18 @@ def _materialise_draft(files: dict[str, str], draft_root: pathlib.Path) -> str |
 
 
 # ---------------------------------------------------------------------------
-# Verify helper (reusable)
+# Verify helper (reusable) — uses its own unique temp directory per call
 # ---------------------------------------------------------------------------
 
 def _verify_draft_files(files: dict[str, str], task_id: str) -> tuple[bool, str]:
     """
-    Materialise files to a temp dir, run verify.
+    Materialise files to a freshly-created unique temp dir, run verify.
+    Cleans up in a finally block regardless of outcome.
     Returns (ok, reason).
     """
-    with tempfile.TemporaryDirectory() as tmp:
-        tmp_path = pathlib.Path(tmp)
-        tmp_task = tmp_path / task_id
+    tmp_base = pathlib.Path(tempfile.mkdtemp())
+    try:
+        tmp_task = tmp_base / task_id
         err = _materialise_draft(files, tmp_task)
         if err:
             return False, err
@@ -348,40 +475,46 @@ def _verify_draft_files(files: dict[str, str], task_id: str) -> tuple[bool, str]
                 return False, f"solution fails: {sol_result['failures']}"
             return True, ""
         finally:
-            shutil.rmtree(tmp2, ignore_errors=True)
+            shutil.rmtree(str(tmp2), ignore_errors=True)
+    finally:
+        shutil.rmtree(str(tmp_base), ignore_errors=True)
 
 
 # ---------------------------------------------------------------------------
-# Probe stage
+# Probe stage — each call uses its own unique temp directory
 # ---------------------------------------------------------------------------
 
-def _probe_once(files: dict[str, str], task_id: str, mock: bool) -> bool:
+def _probe_once(files: dict[str, str], mock: bool) -> bool:
     """
     Run the model once against this draft task (one-shot, same logic as bench).
     Returns True if the model solves it, False otherwise.
     In mock mode, always returns True (simulate an easy task for testing).
-    mock_fail mode returns False.
+
+    Uses a freshly-created unique temp directory; cleans up in a finally block.
     """
     if mock:
-        # mock=True means simulate the probe always passing (too easy)
         return True
 
-    # Write draft to a temp location so bench can run against it
-    with tempfile.TemporaryDirectory() as tmp:
-        tmp_path = pathlib.Path(tmp)
-        tmp_task = tmp_path / task_id
+    tmp_base = pathlib.Path(tempfile.mkdtemp())
+    try:
+        # Use a fixed subdirectory name within the unique temp base
+        tmp_task = tmp_base / "probe-task"
         err = _materialise_draft(files, tmp_task)
         if err:
             return False
 
         meta_text = files.get("task.json", "{}")
-        try:
-            meta = json.loads(meta_text)
-        except Exception:
-            meta = {}
+        meta, _ = _extract_json_robust(meta_text)
+        if meta is None:
+            try:
+                meta = json.loads(meta_text)
+            except Exception:
+                meta = {}
         prompt = meta.get("prompt", "")
 
         starter_dir = tmp_task / "starter"
+        if not starter_dir.exists():
+            return False
         starter_files = {
             p.name: p.read_text()
             for p in starter_dir.iterdir()
@@ -407,11 +540,11 @@ def _probe_once(files: dict[str, str], task_id: str, mock: bool) -> bool:
         except Exception:
             return False
 
-        # Run grader in a separate temp copy
+        # Run grader in a separate unique temp copy
         tmp3 = pathlib.Path(tempfile.mkdtemp())
         try:
-            shutil.copytree(str(tmp_task), str(tmp3 / task_id))
-            task_copy = tmp3 / task_id
+            shutil.copytree(str(tmp_task), str(tmp3 / "probe-task"))
+            task_copy = tmp3 / "probe-task"
             try:
                 core.overlay_dict(candidate_files, task_copy / "starter")
             except core.CandidateError:
@@ -419,12 +552,13 @@ def _probe_once(files: dict[str, str], task_id: str, mock: bool) -> bool:
             result = core.run_pytest(task_copy / "grader")
             return result["failed"] == 0 and result["total"] > 0
         finally:
-            shutil.rmtree(tmp3, ignore_errors=True)
+            shutil.rmtree(str(tmp3), ignore_errors=True)
+    finally:
+        shutil.rmtree(str(tmp_base), ignore_errors=True)
 
 
 def _probe_draft(
     files: dict[str, str],
-    task_id: str,
     probe_attempts: int,
     mock: bool,
     mock_probe_fail: bool = False,
@@ -444,10 +578,9 @@ def _probe_draft(
         if mock_probe_fail:
             solved = False
         else:
-            solved = _probe_once(files, task_id, mock=mock)
+            solved = _probe_once(files, mock=mock)
         probe_results.append(solved)
 
-    # Discriminating = at least one probe failed
     classification = "too_easy" if all(probe_results) else "discriminating"
     return classification, probe_results
 
@@ -456,13 +589,16 @@ def _probe_draft(
 # Statistics
 # ---------------------------------------------------------------------------
 
+_DRAFT_FAIL_REASONS = ("empty_content", "truncated_json", "invalid_json", "other")
+
+
 def _load_stats() -> dict:
     if _STATS_FILE.exists():
         try:
             return json.loads(_STATS_FILE.read_text())
         except Exception:
             pass
-    return {
+    base = {
         "drafted": 0,
         "failed_draft_stage": 0,
         "failed_verify": 0,
@@ -471,8 +607,16 @@ def _load_stats() -> dict:
         "probed": 0,
         "too_easy": 0,
         "discriminating": 0,
+        "draft_fail_reasons": {r: 0 for r in _DRAFT_FAIL_REASONS},
         "drafts": {},
     }
+    return base
+
+
+def _ensure_draft_fail_reasons(stats: dict) -> None:
+    """Back-fill draft_fail_reasons key on old stats files."""
+    if "draft_fail_reasons" not in stats:
+        stats["draft_fail_reasons"] = {r: 0 for r in _DRAFT_FAIL_REASONS}
 
 
 def _save_stats(stats: dict) -> None:
@@ -480,9 +624,15 @@ def _save_stats(stats: dict) -> None:
 
 
 def _print_funnel(stats: dict) -> None:
+    dfr = stats.get("draft_fail_reasons", {})
     print("\n── Factory funnel ──────────────────────────────")
     print(f"  drafted            : {stats['drafted']}")
     print(f"  failed draft stage : {stats['failed_draft_stage']}")
+    if dfr:
+        for reason in _DRAFT_FAIL_REASONS:
+            count = dfr.get(reason, 0)
+            if count:
+                print(f"    {reason:<18s}: {count}")
     print(f"  failed verify      : {stats['failed_verify']}")
     print(f"  judge rejected     : {stats['judge_rejected']}")
     print(f"  judge accepted     : {stats['judge_accepted']}")
@@ -501,43 +651,62 @@ def _run_factory_once(
     lessons: list[str],
     probe_attempts: int,
     mock_probe_fail: bool = False,
+    draft_max_tokens: int = _DEFAULT_DRAFT_MAX_TOKENS,
 ) -> dict:
     """Draft one task, verify, review, probe. Returns a result record."""
 
     # 1. Draft ----------------------------------------------------------------
+    retried_draft = False
     if mock:
         files = _mock_draft()
+        fail_reason = ""
     else:
-        try:
-            files = _model_draft(lessons)
-        except Exception as exc:
-            with _SAVE_LOCK:
-                stats = _load_stats()
-                stats["failed_draft_stage"] += 1
-                stats["drafted"] += 1
-                _save_stats(stats)
-            return {"status": "error", "stage": "draft", "reason": str(exc)}
+        files, retried_draft, fail_reason = _model_draft(lessons, max_tokens=draft_max_tokens)
 
-    # 2. Verify (before assigning a real id — just check the structure) -------
-    # Use a temporary slug for the verify step; real id assigned under lock below.
+    if fail_reason:
+        with _SAVE_LOCK:
+            stats = _load_stats()
+            _ensure_draft_fail_reasons(stats)
+            stats["drafted"] += 1
+            stats["failed_draft_stage"] += 1
+            bucket = fail_reason.split(":")[0].strip()
+            if bucket not in _DRAFT_FAIL_REASONS:
+                bucket = "other"
+            stats["draft_fail_reasons"][bucket] += 1
+            _save_stats(stats)
+        return {"status": "error", "stage": "draft", "reason": fail_reason}
+
+    if not files:
+        # Empty files dict (no === blocks found)
+        with _SAVE_LOCK:
+            stats = _load_stats()
+            _ensure_draft_fail_reasons(stats)
+            stats["drafted"] += 1
+            stats["failed_draft_stage"] += 1
+            stats["draft_fail_reasons"]["empty_content"] += 1
+            _save_stats(stats)
+        return {"status": "error", "stage": "draft", "reason": "no file blocks in response"}
+
+    # 2. Verify — uses a unique temp dir internally; no shared name
     tmp_task_id = "000-tmp-verify"
     verify_ok, verify_reason = _verify_draft_files(files, tmp_task_id)
 
     if not verify_ok:
         with _SAVE_LOCK:
             stats = _load_stats()
+            _ensure_draft_fail_reasons(stats)
             stats["drafted"] += 1
             stats["failed_verify"] += 1
             _save_stats(stats)
         return {"status": "rejected_verify", "task_id": tmp_task_id, "reason": verify_reason}
 
-    # 4. Save to a staging temp dir for review --------------------------------
-    # 4. Staging: materialise + review + probe (all unlocked, can run in parallel)
-    with tempfile.TemporaryDirectory() as staging_tmp:
-        staging_dir = pathlib.Path(staging_tmp) / "draft"
+    # 3. Staging: materialise + review + probe (all unlocked, run in parallel)
+    staging_base = pathlib.Path(tempfile.mkdtemp())
+    try:
+        staging_dir = staging_base / "draft"
         _materialise_draft(files, staging_dir)
 
-        # 5. Review -----------------------------------------------------------
+        # 4. Review -----------------------------------------------------------
         if mock:
             review = {
                 "verdict": "accept",
@@ -553,6 +722,8 @@ def _run_factory_once(
                 review = {"verdict": "reject", "issues": [str(exc)], "summary": str(exc)}
 
         review["date"] = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+        if retried_draft:
+            review["draft_retried"] = True
 
         verdict = review.get("verdict", "reject")
 
@@ -570,6 +741,7 @@ def _run_factory_once(
                 reason = review.get("summary", "no reason given")
                 _append_lesson(reason)
                 stats = _load_stats()
+                _ensure_draft_fail_reasons(stats)
                 stats["drafted"] += 1
                 stats["judge_rejected"] += 1
                 _save_stats(stats)
@@ -580,14 +752,13 @@ def _run_factory_once(
                 "issues": review.get("issues", []),
             }
 
-        # Judge accepted — run probes outside the lock (they can be slow)
-        # Use a placeholder id for probe; real id assigned under lock when saving.
-        probe_task_id = "000-probe-tmp"
+        # Judge accepted — run probes outside the lock (they can be slow).
+        # _probe_once uses its own unique temp dirs; no shared name.
         classification, probe_results = _probe_draft(
-            files, probe_task_id, probe_attempts, mock=mock, mock_probe_fail=mock_probe_fail
+            files, probe_attempts, mock=mock, mock_probe_fail=mock_probe_fail
         )
 
-        # 6. Save result under the lock ---------------------------------------
+        # 5. Save result under the lock ---------------------------------------
         with _SAVE_LOCK:
             files, task_id = _assign_id(files)
             review["task_id"] = task_id
@@ -608,6 +779,7 @@ def _run_factory_once(
                 )
                 _append_lesson(lesson)
                 stats = _load_stats()
+                _ensure_draft_fail_reasons(stats)
                 stats["drafted"] += 1
                 stats["judge_accepted"] += 1
                 stats["probed"] += 1
@@ -616,6 +788,7 @@ def _run_factory_once(
                     "classification": "too_easy",
                     "probe_results": probe_results,
                     "probe_solve_count": sum(probe_results),
+                    "draft_retried": retried_draft,
                 }
                 _save_stats(stats)
 
@@ -628,6 +801,7 @@ def _run_factory_once(
                 review["classification"] = "discriminating"
                 (dest / "review.json").write_text(json.dumps(review, indent=2))
                 stats = _load_stats()
+                _ensure_draft_fail_reasons(stats)
                 stats["drafted"] += 1
                 stats["judge_accepted"] += 1
                 stats["probed"] += 1
@@ -636,6 +810,7 @@ def _run_factory_once(
                     "classification": "discriminating",
                     "probe_results": probe_results,
                     "probe_solve_count": sum(probe_results),
+                    "draft_retried": retried_draft,
                 }
                 _save_stats(stats)
 
@@ -652,6 +827,8 @@ def _run_factory_once(
             "probe_results": probe_results,
             "draft_dir": str(dest),
         }
+    finally:
+        shutil.rmtree(str(staging_base), ignore_errors=True)
 
 
 # ---------------------------------------------------------------------------
@@ -669,19 +846,22 @@ def build_parser() -> argparse.ArgumentParser:
             "Promote with: python -m gradepack promote <draft-id>"
         ),
     )
-    p.add_argument("--n",              type=int, default=1,
+    p.add_argument("--n",                type=int, default=1,
                    help="Number of drafts to attempt (default: 1)")
-    p.add_argument("--target-kept",    type=int, default=None,
+    p.add_argument("--target-kept",      type=int, default=None,
                    help="Stop when this many discriminating drafts are found")
-    p.add_argument("--max-drafts",     type=int, default=None,
+    p.add_argument("--max-drafts",       type=int, default=None,
                    help="Hard cap on total drafts attempted (overrides --n if set)")
-    p.add_argument("--probe-attempts", type=int, default=3,
+    p.add_argument("--probe-attempts",   type=int, default=3,
                    help="Times to probe each judge-accepted draft (default: 3)")
-    p.add_argument("--parallel",       type=int, default=2,
+    p.add_argument("--parallel",         type=int, default=2,
                    help="Concurrent draft workers (default: 2)")
-    p.add_argument("--mock",           action="store_true",
+    p.add_argument("--draft-max-tokens", type=int, default=_DEFAULT_DRAFT_MAX_TOKENS,
+                   help=f"max_tokens for draft API call (default: {_DEFAULT_DRAFT_MAX_TOKENS}); "
+                        "retry doubles this (cap 32768)")
+    p.add_argument("--mock",             action="store_true",
                    help="Use mock drafts (offline); mock probes always pass → too_easy")
-    p.add_argument("--mock-probe-fail", action="store_true",
+    p.add_argument("--mock-probe-fail",  action="store_true",
                    help="Mock probes always fail → discriminating (for testing)")
     return p
 
@@ -695,15 +875,15 @@ def cmd_factory_argv(argv: list[str]) -> None:
     target     = args.target_kept
     max_drafts = args.max_drafts if args.max_drafts is not None else n
 
-    # --target-kept overrides --n: keep drafting until target met
     if target is not None and args.max_drafts is None:
-        max_drafts = max(n, target * 5)  # reasonable upper bound
+        max_drafts = max(n, target * 5)
 
     cmd_factory(
         n=max_drafts,
         target_kept=target,
         probe_attempts=args.probe_attempts,
         parallel=args.parallel,
+        draft_max_tokens=args.draft_max_tokens,
         mock=args.mock,
         mock_probe_fail=args.mock_probe_fail,
     )
@@ -714,6 +894,7 @@ def cmd_factory(
     target_kept: int | None = None,
     probe_attempts: int = 3,
     parallel: int = 2,
+    draft_max_tokens: int = _DEFAULT_DRAFT_MAX_TOKENS,
     mock: bool = False,
     mock_probe_fail: bool = False,
 ) -> None:
@@ -726,7 +907,8 @@ def cmd_factory(
 
     print(
         f"gradepack factory: up to {n} draft(s), "
-        f"probe_attempts={probe_attempts}, parallel={parallel}  [mock={mock}]"
+        f"probe_attempts={probe_attempts}, parallel={parallel}, "
+        f"draft_max_tokens={draft_max_tokens}  [mock={mock}]"
     )
     if target_kept is not None:
         print(f"  Stopping when {target_kept} discriminating draft(s) found")
@@ -736,12 +918,12 @@ def cmd_factory(
     def _one_draft(_: int) -> dict:
         return _run_factory_once(
             mock=mock,
-            lessons=_load_last_lessons(10),  # re-read so parallel workers see updates
+            lessons=_load_last_lessons(10),
             probe_attempts=probe_attempts,
             mock_probe_fail=mock_probe_fail,
+            draft_max_tokens=draft_max_tokens,
         )
 
-    # Submit drafts in batches of `parallel`; stop early if target_kept met
     remaining = n
     while remaining > 0:
         batch = min(remaining, parallel)
@@ -786,7 +968,6 @@ def cmd_factory(
                     print(f"  ERROR  stage={result.get('stage','?')}: {result.get('reason','?')}")
 
                 if target_kept is not None and kept >= target_kept:
-                    # Cancel remaining futures in this batch
                     for f in futures:
                         f.cancel()
                     remaining = 0

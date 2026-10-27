@@ -5,17 +5,20 @@ The server reads the ``model`` field from the JSON request body to select behavi
 Set BASE_URL to the server's base URL and MODEL to one of the mode names.
 
 Modes (set as MODEL env var):
-  normal              — content = corrected file in a fenced block
-  reasoning           — content is null, text only in reasoning_content
-  starter_path        — uses "starter/paginate.py" and "./paginate.py" as filename labels
-  length_empty        — finish_reason "length", content is empty string
-  length_retry        — first call: finish_reason "length" empty; second call: normal
-  rate_limit          — HTTP 429 on first call, then normal on retry
-  always_500          — always HTTP 500
-  slow                — hangs for 60s (simulates timeout)
-  probe_always_pass   — always returns correct solution (probe always passes → too_easy)
-  probe_fail_once     — first call fails (wrong answer), subsequent calls pass (discriminating)
-  probe_always_fail   — always returns wrong answer (all probes fail → discriminating)
+  normal                — content = corrected file in a fenced block
+  reasoning             — content is null, text only in reasoning_content
+  starter_path          — uses "starter/paginate.py" and "./paginate.py" as filename labels
+  length_empty          — finish_reason "length", content is empty string
+  length_retry          — first call: finish_reason "length" empty; second call: normal
+  rate_limit            — HTTP 429 on first call, then normal on retry
+  always_500            — always HTTP 500
+  slow                  — hangs for 60s (simulates timeout)
+  probe_always_pass     — always returns correct solution (probe always passes → too_easy)
+  probe_fail_once       — first call fails (wrong answer), subsequent calls pass (discriminating)
+  probe_always_fail     — always returns wrong answer (all probes fail → discriminating)
+  draft_length_retry    — factory draft mode: call 1 length+empty, call 2 returns full draft
+  draft_json_fenced     — factory draft mode: task.json wrapped in ```json ... ``` fences
+  draft_truncated_json  — factory draft mode: task.json is truncated (no closing brace)
 """
 import http.server
 import json
@@ -34,6 +37,68 @@ def paginate(items, page, per_page):
     start = (page - 1) * per_page
     return items[start:start + per_page]
 '''
+
+# ---------------------------------------------------------------------------
+# Factory-draft response fixtures
+# ---------------------------------------------------------------------------
+
+_VALID_DRAFT_META = json.dumps({
+    "id": "000-adder-draft",
+    "title": "Fix the broken adder",
+    "language": "python",
+    "difficulty": "hard",
+    "prompt": (
+        "The function add(a, b) in starter/adder.py returns the wrong result. "
+        "Fix it so all grader tests pass. The function should perform basic "
+        "integer addition. Do not change the function signature."
+    ),
+    "grader": "pytest",
+    "version": "1.0",
+    "tags": ["arithmetic"],
+    "estimated_minutes": 5,
+    "license": "MIT",
+}, indent=2)
+
+_ADDER_STARTER = "def add(a, b):\n    return a - b  # BUG\n"
+_ADDER_GRADER = (
+    "import os, sys, pytest\n"
+    "sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'starter'))\n"
+    "from adder import add\n\n"
+    "@pytest.mark.parametrize('a,b,expected', [\n"
+    "    (1, 2, 3), (0, 0, 0), (-1, 5, 4),\n"
+    "])\n"
+    "def test_add(a, b, expected):\n"
+    "    assert add(a, b) == expected\n"
+)
+_ADDER_SOLUTION = "def add(a, b):\n    return a + b\n"
+
+# A complete well-formed draft response (used by draft_length_retry call 2)
+_VALID_DRAFT_RESPONSE = (
+    f"=== task.json ===\n{_VALID_DRAFT_META}\n\n"
+    f"=== starter/adder.py ===\n{_ADDER_STARTER}\n\n"
+    f"=== grader/test_adder.py ===\n{_ADDER_GRADER}\n\n"
+    f"=== solution/adder.py ===\n{_ADDER_SOLUTION}"
+)
+
+# task.json wrapped in ```json ... ``` fences
+_DRAFT_JSON_FENCED_RESPONSE = (
+    "=== task.json ===\n"
+    "```json\n"
+    f"{_VALID_DRAFT_META}\n"
+    "```\n\n"
+    f"=== starter/adder.py ===\n{_ADDER_STARTER}\n\n"
+    f"=== grader/test_adder.py ===\n{_ADDER_GRADER}\n\n"
+    f"=== solution/adder.py ===\n{_ADDER_SOLUTION}"
+)
+
+# task.json is truncated — no closing brace
+_VALID_DRAFT_META_TRUNCATED = _VALID_DRAFT_META[:_VALID_DRAFT_META.rfind("}")]
+_DRAFT_TRUNCATED_JSON_RESPONSE = (
+    f"=== task.json ===\n{_VALID_DRAFT_META_TRUNCATED}\n\n"
+    f"=== starter/adder.py ===\n{_ADDER_STARTER}\n\n"
+    f"=== grader/test_adder.py ===\n{_ADDER_GRADER}\n\n"
+    f"=== solution/adder.py ===\n{_ADDER_SOLUTION}"
+)
 
 
 def _make_response(content, finish_reason="stop", reasoning_content=None):
@@ -206,6 +271,32 @@ class _Handler(http.server.BaseHTTPRequestHandler):
                 "    return items[start:start + per_page]\n"
                 "```"
             )
+            self._respond_json(resp)
+            return
+
+        # ── Factory draft-stage modes ─────────────────────────────────────────
+
+        if mode == "draft_length_retry":
+            # Call 1: finish_reason length + empty content (simulates truncation)
+            # Call 2: returns a full valid draft response
+            count = server_state.setdefault("draft_len_count", 0)
+            server_state["draft_len_count"] = count + 1
+            if count == 0:
+                resp = _make_response(content="", finish_reason="length")
+            else:
+                resp = _make_response(_VALID_DRAFT_RESPONSE)
+            self._respond_json(resp)
+            return
+
+        if mode == "draft_json_fenced":
+            # Returns a draft where task.json is wrapped in ```json ... ``` fences
+            resp = _make_response(_DRAFT_JSON_FENCED_RESPONSE)
+            self._respond_json(resp)
+            return
+
+        if mode == "draft_truncated_json":
+            # Returns a draft where task.json is truncated (no closing brace)
+            resp = _make_response(_DRAFT_TRUNCATED_JSON_RESPONSE)
             self._respond_json(resp)
             return
 

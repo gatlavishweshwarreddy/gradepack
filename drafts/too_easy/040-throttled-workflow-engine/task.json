@@ -1,0 +1,18 @@
+{
+  "id": "throttled-workflow-engine",
+  "title": "Throttled Workflow Engine with Priority and Rate Limits",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "Fix the throttled workflow engine in workflow.py.\n\nThe engine executes tasks with dependencies, priorities, concurrency limits and token-bucket rate limiting. Tasks have states PENDING -> QUEUED -> RUNNING -> SUCCEEDED/FAILED/CANCELLED with strict transition rules.\n\nThe current implementation violates several scheduling invariants. Read the code and docstrings to infer the intended contract — this prompt does not exhaustively list edge cases. Fix the bugs so that all invariants hold without changing the public API (Scheduler, TokenBucket, FakeClock).\n\nKey properties to preserve (non-exhaustive): state-machine validity, rate-limit burst cap, priority ordering, and failure propagation.",
+  "grader": "pytest grader/test_workflow.py -v",
+  "version": "1.0.0",
+  "tags": [
+    "state-machine",
+    "concurrency",
+    "rate-limiting",
+    "scheduling",
+    "priority-queue"
+  ],
+  "estimated_minutes": 60,
+  "license": "MIT"
+}

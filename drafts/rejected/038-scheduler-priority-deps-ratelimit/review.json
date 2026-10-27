@@ -1,0 +1,16 @@
+{
+  "verdict": "reject",
+  "fair": true,
+  "fully_specified": false,
+  "issues": [
+    "starter/scheduler.py contains explicit 'BUG:' comments that reveal exact bug locations and nature (transitive cancel, any vs all, heap key, token refill cap, burst check), trivializing the debugging task",
+    "spec mentions FAILED state but never defines how it is entered, leaving state-machine underspecified",
+    "grader does not verify that RUNNING/COMPLETED/CANCELLED are terminal for cancellation - reference solution cancels RUNNING yet passes all tests",
+    "grader does not test token-bucket capacity capping after idle period or elapsed-time refill, only basic burst cases",
+    "dependency_checks O(V+E) requirement only tested on a linear completion chain, not on cancellation propagation, allowing inefficient implementations to pass",
+    "prompt is not self-contained and delegates full contract to starter docstring, making task ambiguous in isolation"
+  ],
+  "summary": "Starter leaks bug locations and grader misses key invariants (RUNNING non-cancellable, token cap, FAILED) allowing spec-violating solution to pass.",
+  "date": "2026-10-27T14:36:34Z",
+  "task_id": "038-scheduler-priority-deps-ratelimit"
+}
