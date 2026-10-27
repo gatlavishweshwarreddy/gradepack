@@ -1,0 +1,22 @@
+{
+  "id": "021-config-merger",
+  "title": "Config merger mutates the base config when merging nested keys",
+  "difficulty": "hard",
+  "language": "python",
+  "tags": [
+    "dict",
+    "deep-copy",
+    "merge"
+  ],
+  "estimated_minutes": 20,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/021-config-merger.json",
+  "prompt": "The package in starter/ implements a configuration merger. merger.py provides merge(base, override) which performs a deep merge: keys present only in base are kept, keys present only in override are added, and keys present in both are merged recursively if both values are dicts, otherwise the override value wins. loader.py provides load_config(path) which reads a JSON file and returns a dict. The bug: after merge(base, override) is called, the base dict (or its nested dicts) may be modified in place, so calling merge a second time with a different override produces wrong results. The grader calls merge twice with the same base and two different overrides and checks that both results are correct and that base is unchanged. Do not edit the tests.",
+  "starter_files": {
+    "loader.py": "import json\n\n\ndef load_config(path):\n    \"\"\"Load a JSON config file and return a dict.\"\"\"\n    with open(path) as f:\n        return json.load(f)\n",
+    "merger.py": "def merge(base, override):\n    \"\"\"\n    Deep-merge override into base. Keys only in base are kept.\n    Keys only in override are added. When both values are dicts,\n    merge recursively; otherwise override wins.\n\n    BUG: for nested dict keys, updates base[k] directly in place\n    before assigning to result, which mutates the original base dict.\n    \"\"\"\n    result = dict(base)\n    for k, v in override.items():\n        if k in result and isinstance(result[k], dict) and isinstance(v, dict):\n            # BUG: updates result[k] (which IS base[k]) in place\n            result[k].update(v)\n        else:\n            result[k] = v\n    return result\n"
+  },
+  "grader_files": {
+    "test_merger.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom merger import merge\nimport pytest\n\n\ndef test_simple_override():\n    base = {\"a\": 1, \"b\": 2}\n    result = merge(base, {\"b\": 99})\n    assert result == {\"a\": 1, \"b\": 99}\n\n\ndef test_adds_new_key():\n    base = {\"a\": 1}\n    result = merge(base, {\"z\": 9})\n    assert result == {\"a\": 1, \"z\": 9}\n\n\ndef test_deep_merge():\n    base = {\"db\": {\"host\": \"localhost\", \"port\": 5432}}\n    result = merge(base, {\"db\": {\"port\": 5433}})\n    assert result == {\"db\": {\"host\": \"localhost\", \"port\": 5433}}\n\n\ndef test_base_unchanged_after_merge():\n    base = {\"db\": {\"host\": \"localhost\", \"port\": 5432}, \"debug\": False}\n    _ = merge(base, {\"db\": {\"port\": 5433}})\n    assert base == {\"db\": {\"host\": \"localhost\", \"port\": 5432}, \"debug\": False}\n\n\ndef test_two_merges_same_base():\n    base = {\"x\": {\"a\": 1, \"b\": 2}, \"y\": 0}\n    r1 = merge(base, {\"x\": {\"b\": 99}})\n    r2 = merge(base, {\"x\": {\"a\": 55}})\n    assert r1 == {\"x\": {\"a\": 1, \"b\": 99}, \"y\": 0}\n    assert r2 == {\"x\": {\"a\": 55, \"b\": 2}, \"y\": 0}\n\n\ndef test_nested_three_levels():\n    base = {\"a\": {\"b\": {\"c\": 1}}}\n    r1 = merge(base, {\"a\": {\"b\": {\"c\": 2}}})\n    assert r1 == {\"a\": {\"b\": {\"c\": 2}}}\n    assert base == {\"a\": {\"b\": {\"c\": 1}}}\n\n\ndef test_override_wins_non_dict():\n    base = {\"k\": {\"nested\": True}}\n    result = merge(base, {\"k\": \"flat\"})\n    assert result[\"k\"] == \"flat\"\n\n\ndef test_empty_override():\n    base = {\"a\": 1}\n    result = merge(base, {})\n    assert result == {\"a\": 1}\n    assert base == {\"a\": 1}\n"
+  }
+}

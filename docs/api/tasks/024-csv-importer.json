@@ -1,0 +1,23 @@
+{
+  "id": "024-csv-importer",
+  "title": "CSV importer rejects valid numeric values in certain formats",
+  "difficulty": "hard",
+  "language": "python",
+  "tags": [
+    "csv",
+    "coercion",
+    "parsing"
+  ],
+  "estimated_minutes": 20,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/024-csv-importer.json",
+  "prompt": "The package in starter/ implements a CSV importer with schema validation. importer.py provides import_csv(rows, schema) where rows is a list of dicts (as from csv.DictReader) and schema is a dict mapping column names to type names ('int', 'float', 'str'). coerce.py provides coerce(value, type_name) which converts a string value to the target Python type. schema.py provides validate_schema(schema) which checks that all type names are valid. The bug: coerce() raises ValueError for integer columns when the CSV contains values like '1.0' or '2.0' \u2014 whole numbers formatted as floats \u2014 even though those values represent valid integers. The grader checks that import_csv correctly coerces '1.0', '42.0', and similar float-formatted integers to int, and raises ValueError only for genuinely non-numeric values. Do not edit the tests.",
+  "starter_files": {
+    "coerce.py": "def coerce(value, type_name):\n    \"\"\"\n    Convert string value to type_name ('int', 'float', 'str').\n    Raises ValueError for non-numeric values when type is int or float.\n\n    BUG: coerces int directly via int(value), so '1.0' raises ValueError\n    instead of succeeding (should convert via float first then truncate).\n    \"\"\"\n    if type_name == \"int\":\n        return int(value)\n    elif type_name == \"float\":\n        return float(value)\n    else:\n        return str(value)\n",
+    "importer.py": "from schema import validate_schema\nfrom coerce import coerce\n\n\ndef import_csv(rows, schema):\n    \"\"\"\n    Convert list-of-dicts rows using schema (col -> type name).\n    Returns list of dicts with values coerced to the schema types.\n    Raises ValueError for invalid values.\n    \"\"\"\n    validate_schema(schema)\n    result = []\n    for row in rows:\n        converted = {}\n        for col, type_name in schema.items():\n            raw = row.get(col, \"\")\n            converted[col] = coerce(raw, type_name)\n        result.append(converted)\n    return result\n",
+    "schema.py": "VALID_TYPES = {\"int\", \"float\", \"str\"}\n\n\ndef validate_schema(schema):\n    \"\"\"Raise ValueError if any type name is not valid.\"\"\"\n    for col, type_name in schema.items():\n        if type_name not in VALID_TYPES:\n            raise ValueError(f\"Unknown type {type_name!r} for column {col!r}\")\n"
+  },
+  "grader_files": {
+    "test_csv_importer.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom importer import import_csv\nfrom coerce import coerce\nimport pytest\n\n\ndef test_integer_column_plain():\n    rows = [{\"qty\": \"5\"}]\n    result = import_csv(rows, {\"qty\": \"int\"})\n    assert result[0][\"qty\"] == 5\n\n\ndef test_integer_column_float_string():\n    rows = [{\"qty\": \"1.0\"}]\n    result = import_csv(rows, {\"qty\": \"int\"})\n    assert result[0][\"qty\"] == 1\n\n\ndef test_integer_column_float_string_42():\n    rows = [{\"qty\": \"42.0\"}]\n    result = import_csv(rows, {\"qty\": \"int\"})\n    assert result[0][\"qty\"] == 42\n\n\ndef test_float_column():\n    rows = [{\"price\": \"9.99\"}]\n    result = import_csv(rows, {\"price\": \"float\"})\n    assert result[0][\"price\"] == pytest.approx(9.99)\n\n\ndef test_str_column():\n    rows = [{\"name\": \"Alice\"}]\n    result = import_csv(rows, {\"name\": \"str\"})\n    assert result[0][\"name\"] == \"Alice\"\n\n\ndef test_mixed_schema():\n    rows = [{\"name\": \"Bob\", \"qty\": \"3.0\", \"price\": \"12.50\"}]\n    result = import_csv(rows, {\"name\": \"str\", \"qty\": \"int\", \"price\": \"float\"})\n    assert result[0][\"name\"] == \"Bob\"\n    assert result[0][\"qty\"] == 3\n    assert result[0][\"price\"] == pytest.approx(12.50)\n\n\ndef test_invalid_int_raises():\n    rows = [{\"qty\": \"abc\"}]\n    with pytest.raises(ValueError):\n        import_csv(rows, {\"qty\": \"int\"})\n\n\ndef test_invalid_schema_type():\n    from schema import validate_schema\n    with pytest.raises(ValueError):\n        validate_schema({\"col\": \"boolean\"})\n\n\ndef test_multiple_rows():\n    rows = [{\"x\": \"1.0\"}, {\"x\": \"2.0\"}, {\"x\": \"3.0\"}]\n    result = import_csv(rows, {\"x\": \"int\"})\n    assert [r[\"x\"] for r in result] == [1, 2, 3]\n"
+  }
+}

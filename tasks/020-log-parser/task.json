@@ -1,0 +1,12 @@
+{
+  "id": "020-log-parser",
+  "title": "Log parser reports wrong duration for entries spanning midnight",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The package in starter/ implements a log file parser. parser.py provides parse_log(lines) which parses lines of the form 'HH:MM:SS LEVEL message' and returns a list of LogEntry objects with fields: time (datetime.time), level (str), message (str). stats.py provides duration_seconds(entries) which returns the elapsed time in seconds between the first and last log entry. filter.py provides filter_level(entries, level) returning only entries at the given level. When a log spans midnight — the first entry is before 00:00:00 and the last is after — duration_seconds returns a negative or very small value instead of the correct positive elapsed time. The grader checks duration_seconds for log sequences that do and do not span midnight, and checks filter_level for correctness. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": ["datetime", "parsing", "edge-cases"],
+  "estimated_minutes": 25,
+  "license": "MIT"
+}

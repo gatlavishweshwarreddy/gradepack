@@ -10,6 +10,9 @@ Covers:
   - invalid output scoring 0.0
   - failure_reason categories
   - bench --publish skips mock files by default
+  - agentic mode (mock-agentic: fail turn 1, pass turn 2)
+  - raw_output_path is relative
+  - validate on new tasks 019-026
 """
 import json
 import pathlib
@@ -251,3 +254,115 @@ def test_publish_real_model_always_published(tmp_path):
         assert (tmp_path / "docs" / "results" / "gpt-4o.json").exists()
     finally:
         _b.core._repo_root = orig
+
+
+# ---------------------------------------------------------------------------
+# Agentic mode — mock-agentic: fail turn 1, pass turn 2
+# ---------------------------------------------------------------------------
+
+def test_mock_agentic_solves_on_turn2():
+    """mock-agentic should fail turn 1 and succeed on turn 2."""
+    record = _bench._bench_task_agentic(
+        TASK_001, 1,
+        mock=False, mock_agentic=True, mock_pass=True,
+        raw_output_dir=pathlib.Path(tempfile.gettempdir()) / "gradepack_agentic_test",
+        provider="test", model_name="test",
+        max_tokens=8192, temperature=0.7,
+        max_turns=3,
+    )
+    assert record["agentic"] is True
+    assert record["solved_at_turn"] == 2
+    assert record["turns_used"] == 2
+    assert record["score"] == 1.0
+
+
+def test_mock_agentic_fails_all_turns_when_max1():
+    """With max_turns=1 and mock-agentic, should fail (only 1 turn, which fails)."""
+    record = _bench._bench_task_agentic(
+        TASK_001, 1,
+        mock=False, mock_agentic=True, mock_pass=True,
+        raw_output_dir=pathlib.Path(tempfile.gettempdir()) / "gradepack_agentic_test",
+        provider="test", model_name="test",
+        max_tokens=8192, temperature=0.7,
+        max_turns=1,
+    )
+    assert record["agentic"] is True
+    assert record["solved_at_turn"] is None
+    assert record["score"] < 1.0
+
+
+def test_mock_regular_passes_turn1():
+    """Regular mock (not agentic) with --mock should pass on first and only turn."""
+    record = _bench._bench_task_agentic(
+        TASK_001, 1,
+        mock=True, mock_agentic=False, mock_pass=True,
+        raw_output_dir=pathlib.Path(tempfile.gettempdir()) / "gradepack_agentic_test",
+        provider="test", model_name="test",
+        max_tokens=8192, temperature=0.7,
+        max_turns=3,
+    )
+    assert record["solved_at_turn"] == 1
+    assert record["score"] == 1.0
+
+
+# ---------------------------------------------------------------------------
+# raw_output_path is relative
+# ---------------------------------------------------------------------------
+
+def test_bench_task_raw_path_is_relative():
+    """raw_output_path in a bench record must be relative (no leading '/')."""
+    # Use a raw_dir inside the repo root so relative_to() succeeds.
+    raw_dir = core._repo_root() / "results" / "raw" / "_test_relative"
+    try:
+        record = _bench._bench_task(
+            TASK_001, 1,
+            mock=True, mock_pass=True,
+            raw_output_dir=raw_dir,
+            provider="test", model_name="test",
+            max_tokens=8192, temperature=0.7,
+        )
+        rp = record.get("raw_output_path")
+        assert rp is not None, "raw_output_path should be set"
+        assert not rp.startswith("/"), f"raw_output_path should be relative, got: {rp}"
+    finally:
+        shutil.rmtree(raw_dir, ignore_errors=True)
+
+
+def test_agentic_task_raw_path_is_relative():
+    """raw_output_path in an agentic record must be relative."""
+    raw_dir = core._repo_root() / "results" / "raw" / "_test_agentic_relative"
+    try:
+        record = _bench._bench_task_agentic(
+            TASK_001, 1,
+            mock=True, mock_agentic=False, mock_pass=True,
+            raw_output_dir=raw_dir,
+            provider="test", model_name="test",
+            max_tokens=8192, temperature=0.7,
+            max_turns=2,
+        )
+        rp = record.get("raw_output_path")
+        assert rp is not None
+        assert not rp.startswith("/"), f"raw_output_path should be relative, got: {rp}"
+    finally:
+        shutil.rmtree(raw_dir, ignore_errors=True)
+
+
+# ---------------------------------------------------------------------------
+# validate on new tasks 019–026
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize("task_id", [
+    "019-invoice-total",
+    "020-log-parser",
+    "021-config-merger",
+    "022-permissions",
+    "023-inventory",
+    "024-csv-importer",
+    "025-rate-limiter",
+    "026-retry-client",
+])
+def test_validate_new_tasks(task_id):
+    """Each new task must pass validate with zero errors."""
+    from gradepack.validate import validate_task
+    errors = validate_task(task_id)
+    assert errors == [], f"Validation errors for {task_id}: {errors}"

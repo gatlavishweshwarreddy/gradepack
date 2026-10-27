@@ -1,0 +1,42 @@
+[
+  {
+    "task_id": "001-pagination-off-by-one",
+    "attempt": 1,
+    "provider": "mock",
+    "model": "smoke-agentic",
+    "date": "2026-10-27T10:50:37Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 0.41,
+    "raw_output_path": "results/raw/smoke-agentic/001-pagination-off-by-one_attempt1_turn2.txt",
+    "agentic": true,
+    "turns_used": 2,
+    "solved_at_turn": 2,
+    "max_turns": 3
+  },
+  {
+    "task_id": "021-config-merger",
+    "attempt": 1,
+    "provider": "mock",
+    "model": "smoke-agentic",
+    "date": "2026-10-27T10:50:38Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 0.41,
+    "raw_output_path": "results/raw/smoke-agentic/021-config-merger_attempt1_turn2.txt",
+    "agentic": true,
+    "turns_used": 2,
+    "solved_at_turn": 2,
+    "max_turns": 3
+  }
+]

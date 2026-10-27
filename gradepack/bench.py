@@ -95,6 +95,32 @@ def _mock_broken_files(task_id: str) -> dict[str, str]:
 
 
 # ---------------------------------------------------------------------------
+# Agentic follow-up prompt builder
+# ---------------------------------------------------------------------------
+
+_AGENTIC_FEEDBACK_TEMPLATE = """\
+Your previous submission failed. Here are the failing test names and the last \
+40 lines of pytest output. Do NOT ask for the grader source — it will not be \
+provided. Fix the files and reply in the same format as before.
+
+Failing tests:
+{failing_tests}
+
+Pytest output (last 40 lines):
+{pytest_tail}
+"""
+
+
+def _build_feedback_prompt(result: dict, pytest_output: str) -> str:
+    failures = result.get("failures", [])
+    lines = pytest_output.splitlines()[-40:]
+    return _AGENTIC_FEEDBACK_TEMPLATE.format(
+        failing_tests="\n".join(f"  - {f}" for f in failures) or "  (none listed)",
+        pytest_tail="\n".join(lines),
+    )
+
+
+# ---------------------------------------------------------------------------
 # Single-task bench run
 # ---------------------------------------------------------------------------
 
@@ -152,14 +178,17 @@ def _bench_task(
 
     elapsed = round(time.monotonic() - t0, 2)
 
-    # Save raw model output
+    # Save raw model output (path stored relative to repo root)
     raw_path: str | None = None
     if raw_response:
         raw_output_dir.mkdir(parents=True, exist_ok=True)
         safe_id = task_id.replace("/", "_")
         raw_file = raw_output_dir / f"{safe_id}_attempt{attempt}.txt"
         raw_file.write_text(raw_response)
-        raw_path = str(raw_file)
+        try:
+            raw_path = str(raw_file.resolve().relative_to(core._repo_root()))
+        except ValueError:
+            raw_path = str(raw_file)
 
     # Run grader
     had_candidate = bool(candidate_files)
@@ -204,6 +233,180 @@ def _bench_task(
         "finish_reason":   finish_reason,
         "elapsed_s":       elapsed,
         "raw_output_path": raw_path,
+    }
+    if token_usage:
+        record["token_usage"] = token_usage
+    if error_msg:
+        record["error"] = error_msg
+    return record
+
+
+# ---------------------------------------------------------------------------
+# Agentic multi-turn task runner
+# ---------------------------------------------------------------------------
+
+def _bench_task_agentic(
+    task_id: str,
+    attempt: int,
+    *,
+    mock: bool,
+    mock_agentic: bool,
+    mock_pass: bool,
+    raw_output_dir: pathlib.Path,
+    provider: str,
+    model_name: str,
+    max_tokens: int,
+    temperature: float,
+    max_turns: int,
+) -> dict:
+    """
+    Run a task agentically: up to max_turns turns, feeding back failing test
+    names + last 40 lines of pytest output after each failed turn.
+
+    --mock-agentic: turn 1 returns starter (fails), turn 2 returns solution (passes).
+    """
+    meta = core.load_task_json(task_id)
+    prompt = meta.get("prompt", "")
+
+    starter_dir = core.task_dir(task_id) / "starter"
+    starter_files = {
+        p.name: p.read_text()
+        for p in starter_dir.iterdir()
+        if p.is_file() and p.suffix == ".py"
+    }
+    allowed = set(starter_files)
+
+    t0 = time.monotonic()
+
+    # Current candidate files start as None (no submission yet)
+    candidate_files: dict[str, str] = {}
+    conversation: list[dict] = []  # [{"role": ..., "content": ...}]
+    solved_at_turn: int | None = None
+    turns_used = 0
+    error_msg: str | None = None
+    finish_reason: str = ""
+    token_usage: dict | None = None
+    raw_response: str = ""
+    result: dict = {"passed": 0, "failed": 0, "total": 0, "failures": [], "error": None, "_raw_output": ""}
+
+    # Build initial user message
+    initial_msg = _api.build_coding_prompt(prompt, starter_files)
+    conversation.append({"role": "user", "content": initial_msg})
+
+    for turn in range(1, max_turns + 1):
+        turns_used = turn
+
+        # --- Get model response ---
+        if mock or mock_agentic:
+            if mock_agentic:
+                # turn 1 fails (starter), turn 2+ succeeds (solution)
+                candidate_files = _mock_broken_files(task_id) if turn == 1 else _mock_fixed_files(task_id)
+            else:
+                candidate_files = _mock_fixed_files(task_id) if mock_pass else _mock_broken_files(task_id)
+            raw_response = f"[mock turn={turn}]"
+            finish_reason = "stop"
+        else:
+            try:
+                resp_data = _api.chat(
+                    _api._SYSTEM_CODING,
+                    conversation[-1]["content"],
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    timeout=180,
+                )
+                raw_response  = _api.extract_content(resp_data)
+                finish_reason = _api.extract_finish_reason(resp_data)
+                if turn == 1:
+                    token_usage = _api.extract_usage(resp_data)
+                if raw_response:
+                    candidate_files = _api.parse_coding_response(raw_response, allowed)
+                conversation.append({"role": "assistant", "content": raw_response})
+            except Exception as exc:
+                error_msg = str(exc)
+                break
+
+        # --- Save raw output ---
+        if raw_response:
+            raw_output_dir.mkdir(parents=True, exist_ok=True)
+            safe_id = task_id.replace("/", "_")
+            raw_file = raw_output_dir / f"{safe_id}_attempt{attempt}_turn{turn}.txt"
+            raw_file.write_text(raw_response)
+
+        # --- Run grader ---
+        had_candidate = bool(candidate_files)
+        tmp_task = core.make_temp_copy(task_id)
+        tmp_parent = tmp_task.parent
+        try:
+            if had_candidate:
+                try:
+                    core.overlay_dict(candidate_files, tmp_task / "starter")
+                except core.CandidateError as exc:
+                    error_msg = str(exc)
+                    had_candidate = False
+            result = core.run_pytest(tmp_task / "grader")
+        finally:
+            shutil.rmtree(tmp_parent, ignore_errors=True)
+
+        if not had_candidate:
+            break
+
+        total  = result["total"]
+        passed = result["passed"]
+        if total > 0 and passed == total:
+            solved_at_turn = turn
+            break
+
+        # Failed — build feedback for next turn (if turns remain)
+        if turn < max_turns:
+            feedback = _build_feedback_prompt(result, result.get("_raw_output", ""))
+            conversation.append({"role": "user", "content": feedback})
+
+    elapsed = round(time.monotonic() - t0, 2)
+
+    # Final scoring
+    had_candidate = bool(candidate_files) and not error_msg
+    if not had_candidate or error_msg:
+        score = 0.0
+        passed = 0
+        failed = result.get("total", 0)
+    else:
+        total  = result["total"]
+        passed = result["passed"]
+        failed = result["failed"]
+        score  = round(passed / total, 4) if total else 0.0
+
+    reason = _categorise(result, error_msg, finish_reason, had_candidate)
+
+    # Save raw path relative to repo root
+    raw_path: str | None = None
+    if raw_response:
+        raw_output_dir.mkdir(parents=True, exist_ok=True)
+        safe_id = task_id.replace("/", "_")
+        last_file = raw_output_dir / f"{safe_id}_attempt{attempt}_turn{turns_used}.txt"
+        try:
+            raw_path = str(last_file.resolve().relative_to(core._repo_root()))
+        except ValueError:
+            raw_path = str(last_file)
+
+    record: dict = {
+        "task_id":          task_id,
+        "attempt":          attempt,
+        "provider":         provider,
+        "model":            model_name,
+        "date":             datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "passed":           passed,
+        "failed":           failed,
+        "total":            result.get("total", 0),
+        "score":            score,
+        "failing_tests":    result.get("failures", []),
+        "failure_reason":   reason,
+        "finish_reason":    finish_reason,
+        "elapsed_s":        elapsed,
+        "raw_output_path":  raw_path,
+        "agentic":          True,
+        "turns_used":       turns_used,
+        "solved_at_turn":   solved_at_turn,
+        "max_turns":        max_turns,
     }
     if token_usage:
         record["token_usage"] = token_usage
@@ -260,6 +463,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--parallel",       type=int, default=1, help="Thread concurrency (default: 1)")
     p.add_argument("--mock",           action="store_true", help="Use solution files (no API call)")
     p.add_argument("--mock-fail",      action="store_true", help="Use starter files unchanged (simulates broken model)")
+    p.add_argument("--mock-agentic",   action="store_true", help="Agentic mock: fail turn 1, pass turn 2")
+    p.add_argument("--agentic",        action="store_true", help="Enable agentic multi-turn mode")
+    p.add_argument("--max-turns",      type=int, default=3, help="Max turns in agentic mode (default: 3)")
     p.add_argument("--task",           action="append", dest="tasks", metavar="TASK_ID",
                    help="Restrict to this task (repeatable)")
     p.add_argument("--max-tokens",     type=int, default=8192, help="max_tokens for API requests (default: 8192)")
@@ -280,6 +486,9 @@ def cmd_bench_argv(argv: list[str]) -> None:
         parallel=args.parallel,
         mock=args.mock,
         mock_pass=not args.mock_fail,
+        mock_agentic=args.mock_agentic,
+        agentic=args.agentic or args.mock_agentic,
+        max_turns=args.max_turns,
         task_filter=args.tasks,
         max_tokens=args.max_tokens,
         temperature=args.temperature,
@@ -295,6 +504,9 @@ def cmd_bench(
     parallel: int = 1,
     mock: bool = False,
     mock_pass: bool = True,
+    mock_agentic: bool = False,
+    agentic: bool = False,
+    max_turns: int = 3,
     task_filter: list[str] | None = None,
     max_tokens: int = 8192,
     temperature: float = 0.7,
@@ -305,7 +517,7 @@ def cmd_bench(
     results_dir = core._repo_root() / "results"
     results_dir.mkdir(exist_ok=True)
 
-    if mock:
+    if mock or mock_agentic:
         provider = provider_label or "mock"
         model_name = model
     else:
@@ -325,16 +537,29 @@ def cmd_bench(
     task_ids = task_filter if task_filter else core.all_task_ids()
     jobs = [(tid, attempt) for tid in task_ids for attempt in range(1, attempts + 1)]
 
+    # Choose runner function
+    if agentic or mock_agentic:
+        _runner = lambda tid, attempt: _bench_task_agentic(
+            tid, attempt,
+            mock=mock, mock_agentic=mock_agentic, mock_pass=mock_pass,
+            raw_output_dir=raw_output_dir,
+            provider=provider, model_name=model_name,
+            max_tokens=max_tokens, temperature=temperature,
+            max_turns=max_turns,
+        )
+    else:
+        _runner = lambda tid, attempt: _bench_task(
+            tid, attempt,
+            mock=mock, mock_pass=mock_pass,
+            raw_output_dir=raw_output_dir,
+            provider=provider, model_name=model_name,
+            max_tokens=max_tokens, temperature=temperature,
+        )
+
     new_records: list[dict] = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, parallel)) as pool:
         futures = {
-            pool.submit(
-                _bench_task, tid, attempt,
-                mock=mock, mock_pass=mock_pass,
-                raw_output_dir=raw_output_dir,
-                provider=provider, model_name=model_name,
-                max_tokens=max_tokens, temperature=temperature,
-            ): (tid, attempt)
+            pool.submit(_runner, tid, attempt): (tid, attempt)
             for tid, attempt in jobs
         }
         for future in concurrent.futures.as_completed(futures):
@@ -350,10 +575,13 @@ def cmd_bench(
                     "score": 0.0, "passed": 0, "failed": 0, "total": 0,
                 }
             new_records.append(record)
+            turn_info = ""
+            if record.get("agentic"):
+                turn_info = f"  turns={record.get('turns_used','?')} solved_at={record.get('solved_at_turn','—')}"
             print(
                 f"  {record['task_id']} attempt={record['attempt']}  "
                 f"score={record.get('score', '?')}  "
-                f"reason={record.get('failure_reason', '?')}"
+                f"reason={record.get('failure_reason', '?')}{turn_info}"
             )
 
     all_records = existing + new_records
@@ -366,6 +594,15 @@ def cmd_bench(
     avg_pk = round(sum(pk.values()) / len(pk), 4) if pk else 0.0
     print(f"\nResults written to {results_file}")
     print(f"pass@1 (avg): {avg_p1:.1%}   pass@{k} (avg): {avg_pk:.1%}")
+
+    # Agentic summary stats
+    if agentic or mock_agentic:
+        agentic_recs = [r for r in new_records if r.get("agentic")]
+        if agentic_recs:
+            solved_within_n = sum(1 for r in agentic_recs if r.get("solved_at_turn") is not None)
+            avg_turns = sum(r.get("turns_used", 0) for r in agentic_recs) / len(agentic_recs)
+            print(f"solved-within-{max_turns}-turns: {solved_within_n}/{len(agentic_recs)}  "
+                  f"avg_turns: {avg_turns:.2f}")
 
     if publish:
         print("\nPublishing…")

@@ -1,0 +1,12 @@
+{
+  "id": "024-csv-importer",
+  "title": "CSV importer rejects valid numeric values in certain formats",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The package in starter/ implements a CSV importer with schema validation. importer.py provides import_csv(rows, schema) where rows is a list of dicts (as from csv.DictReader) and schema is a dict mapping column names to type names ('int', 'float', 'str'). coerce.py provides coerce(value, type_name) which converts a string value to the target Python type. schema.py provides validate_schema(schema) which checks that all type names are valid. The bug: coerce() raises ValueError for integer columns when the CSV contains values like '1.0' or '2.0' — whole numbers formatted as floats — even though those values represent valid integers. The grader checks that import_csv correctly coerces '1.0', '42.0', and similar float-formatted integers to int, and raises ValueError only for genuinely non-numeric values. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": ["csv", "coercion", "parsing"],
+  "estimated_minutes": 20,
+  "license": "MIT"
+}

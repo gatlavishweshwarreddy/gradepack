@@ -1,16 +1,12 @@
 {
   "id": "015-sliding-window-max",
-  "title": "Fix off-by-one in sliding window maximum",
+  "title": "Sliding window maximum produces incorrect results",
   "language": "python",
-  "difficulty": "hard",
-  "prompt": "The function sliding_max(nums, k) in starter/window.py returns a list of the maximum value in each sliding window of size k over nums. The bug is an off-by-one: the deque holds indices, and the left-trim condition uses `>= i - k` instead of the correct `< i - k + 1`, so stale indices are not evicted and the wrong maximum is returned for windows that have moved past a previously large element. Fix the condition so that sliding_max([3,1,2,5,4], 3) == [3,5,5], sliding_max([1], 1) == [1], and sliding_max([], 3) == []. The grader uses parametrized cases and a seeded brute-force reference to validate random inputs. Do not edit the tests.",
+  "difficulty": "medium",
+  "prompt": "The function sliding_max(nums, k) in starter/window.py returns a list of the maximum value in each contiguous window of size k over nums. For an input of length n the result must have n-k+1 elements. The function gives incorrect maximums for certain inputs — in particular when the true maximum is in the right half of a window rather than the left. For example sliding_max([1,3,1,2], 3) should be [3,3] but returns a wrong value. The grader checks correctness against several reference cases including varied window sizes, duplicate values, and single-element windows. Do not edit the tests.",
   "grader": "pytest",
   "version": "1.0",
-  "tags": [
-    "algorithms",
-    "deque",
-    "off-by-one"
-  ],
-  "estimated_minutes": 30,
+  "tags": ["algorithms", "deque", "sliding-window"],
+  "estimated_minutes": 20,
   "license": "MIT"
 }

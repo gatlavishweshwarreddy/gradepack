@@ -1,0 +1,22 @@
+{
+  "id": "022-permissions",
+  "title": "Permission checker grants access when it should deny",
+  "difficulty": "hard",
+  "language": "python",
+  "tags": [
+    "rbac",
+    "identity",
+    "bugs"
+  ],
+  "estimated_minutes": 20,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/022-permissions.json",
+  "prompt": "The package in starter/ implements a role-based access control checker. roles.py defines a Role dataclass with name (str) and permissions (frozenset of str). permissions.py provides has_permission(user_roles, permission) which returns True if any role in user_roles grants the given permission. A user may have multiple roles; the check should return True only when at least one role's permissions set contains the exact permission string. For certain permission strings the function incorrectly returns True when it should return False, or False when it should return True. The grader checks has_permission for users with zero, one, and multiple roles, with permissions present in some roles but not others, using several permission string values. Do not edit the tests.",
+  "starter_files": {
+    "permissions.py": "def has_permission(user_roles, permission):\n    \"\"\"\n    Return True if any role in user_roles grants the given permission.\n\n    BUG: uses 'in' to check membership in the frozenset, but compares\n    with 'is' identity for the frozenset itself \u2014 actually the real bug\n    is that the substring check is used: any(permission in role.permissions ...)\n    which treats 'read' as matching 'read_write' because 'read' is a substring.\n    \"\"\"\n    for role in user_roles:\n        for perm in role.permissions:\n            if permission in perm:\n                return True\n    return False\n",
+    "roles.py": "from dataclasses import dataclass, field\n\n\n@dataclass\nclass Role:\n    name: str\n    permissions: frozenset = field(default_factory=frozenset)\n\n    def __post_init__(self):\n        if not isinstance(self.permissions, frozenset):\n            self.permissions = frozenset(self.permissions)\n"
+  },
+  "grader_files": {
+    "test_permissions.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom roles import Role\nfrom permissions import has_permission\nimport pytest\n\n\nVIEWER = Role(\"viewer\", frozenset([\"read\"]))\nEDITOR = Role(\"editor\", frozenset([\"read\", \"write\"]))\nADMIN  = Role(\"admin\",  frozenset([\"read\", \"write\", \"delete\"]))\nREAD_WRITE = Role(\"read_write_role\", frozenset([\"read_write\"]))\n\n\ndef test_user_with_permission():\n    assert has_permission([VIEWER], \"read\") is True\n\n\ndef test_user_without_permission():\n    assert has_permission([VIEWER], \"write\") is False\n\n\ndef test_multi_role_has_permission():\n    assert has_permission([VIEWER, EDITOR], \"write\") is True\n\n\ndef test_empty_roles():\n    assert has_permission([], \"read\") is False\n\n\ndef test_exact_match_required():\n    assert has_permission([READ_WRITE_ROLE], \"read\") is False\n\n\ndef test_exact_match_required_write():\n    assert has_permission([READ_WRITE_ROLE], \"write\") is False\n\n\ndef test_exact_full_permission_matches():\n    assert has_permission([READ_WRITE_ROLE], \"read_write\") is True\n\n\ndef test_delete_not_in_editor():\n    assert has_permission([EDITOR], \"delete\") is False\n\n\ndef test_admin_has_delete():\n    assert has_permission([ADMIN], \"delete\") is True\n\n\nREAD_WRITE_ROLE = Role(\"rw\", frozenset([\"read_write\"]))\n"
+  }
+}

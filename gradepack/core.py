@@ -175,7 +175,9 @@ def run_pytest(grader_dir: pathlib.Path, timeout: int = 30) -> dict:
     if len(raw) > _OUTPUT_CAP:
         raw = raw[:_OUTPUT_CAP] + "\n[output truncated]\n"
 
-    return _parse_verbose_output(raw)
+    result = _parse_verbose_output(raw)
+    result["_raw_output"] = raw
+    return result
 
 
 def _parse_verbose_output(text: str) -> dict:

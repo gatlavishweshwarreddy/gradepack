@@ -1,0 +1,12 @@
+{
+  "id": "026-retry-client",
+  "title": "HTTP client does not retry all transient errors and backoff is wrong",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The package in starter/ implements an HTTP client with retry logic. client.py provides HttpClient(transport, max_retries, backoff_base) with get(url) which calls transport.request(url) and retries on transient failures. transport.py provides FakeTransport, a controllable test double that returns pre-configured responses. backoff.py provides wait_seconds(attempt, base) returning the backoff delay for a given attempt number. The client retries on some error status codes but not others that should also be retried, and the backoff delay for the second and subsequent retries is wrong — it does not grow exponentially from the base. The grader checks that the client retries on all required 5xx status codes, that the number of calls to transport matches expectations, and that wait_seconds returns the correct exponential series. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": ["http", "retry", "backoff"],
+  "estimated_minutes": 25,
+  "license": "MIT"
+}

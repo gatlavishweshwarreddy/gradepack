@@ -113,6 +113,12 @@ API_KEY=sk-... \
 MODEL=gpt-4o-mini \
 gradepack bench --model gpt-4o-mini --attempts 3 --parallel 2
 
+# Agentic mode: up to 3 turns; failed turns send back test names + pytest output
+gradepack bench --model gpt-4o --agentic --max-turns 3 --attempts 1
+
+# Agentic offline smoke test (fail turn 1, pass turn 2):
+gradepack bench --model mock-agentic --mock-agentic --task 001-pagination-off-by-one
+
 # Publish results to docs/results/ (for GitHub Pages leaderboard)
 gradepack bench --model gpt-4o-mini ... --publish
 # Mock files are skipped unless --include-mock is added
@@ -130,6 +136,9 @@ All flags:
 | `--parallel M` | 1 | Thread concurrency |
 | `--mock` | off | Use solution files, no API call |
 | `--mock-fail` | off | Use starter files (simulates broken model) |
+| `--agentic` | off | Enable multi-turn agentic mode |
+| `--max-turns N` | 3 | Max turns per task in agentic mode |
+| `--mock-agentic` | off | Agentic mock: fail turn 1, pass turn 2 (offline test) |
 | `--task <id>` | all | Restrict to one task (repeatable) |
 | `--max-tokens N` | 8192 | API max_tokens |
 | `--temperature F` | 0.7 | Sampling temperature |
@@ -147,7 +156,32 @@ Required env vars for real runs (`BASE_URL` and `API_KEY` have no defaults):
 
 Records per attempt: `provider`, `model`, `date`, `elapsed_s`, `finish_reason`, `failure_reason`, `token_usage`, `raw_output_path`. Computes `pass@1` and `pass@k`. Retries HTTP 429/5xx with exponential backoff (max 4 tries). File names from model responses are normalised (leading `starter/` stripped) before the integrity check.
 
+`raw_output_path` is stored relative to the repo root in all result files.
+
+**Agentic mode** records additionally include: `agentic: true`, `turns_used`, `solved_at_turn` (null if not solved), `max_turns`. The summary printed after a run shows `pass@1` (turn 1 only), `solved-within-N-turns`, and average turns.
+
 `failure_reason` values: `none` · `wrong_answer` · `test_failure_parametrized` · `invalid_output` · `no_answer` · `timeout` · `runner_error` · `api_error`
+
+---
+
+### Comparing several models
+
+To compare models, run each with a different `--model` label and then view the leaderboard:
+
+```bash
+# Run three models
+BASE_URL=... API_KEY=... MODEL=gpt-4o       gradepack bench --model gpt-4o       --attempts 3 --parallel 4 --publish
+BASE_URL=... API_KEY=... MODEL=gpt-4o-mini  gradepack bench --model gpt-4o-mini  --attempts 3 --parallel 4 --publish
+BASE_URL=... API_KEY=... MODEL=claude-3-5   gradepack bench --model claude-3-5   --attempts 3 --parallel 4 --publish
+
+# Summarise all models
+gradepack report
+
+# Open the leaderboard
+open docs/index.html
+```
+
+Each `results/<model>.json` is independent; `report` reads all JSON files and prints one section per model. The leaderboard at `docs/index.html` reads from `docs/results/index.json` and renders a sortable table.
 
 ---
 

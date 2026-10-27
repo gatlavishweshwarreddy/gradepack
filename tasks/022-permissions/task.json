@@ -1,0 +1,12 @@
+{
+  "id": "022-permissions",
+  "title": "Permission checker grants access when it should deny",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The package in starter/ implements a role-based access control checker. roles.py defines a Role dataclass with name (str) and permissions (frozenset of str). permissions.py provides has_permission(user_roles, permission) which returns True if any role in user_roles grants the given permission. A user may have multiple roles; the check should return True only when at least one role's permissions set contains the exact permission string. For certain permission strings the function incorrectly returns True when it should return False, or False when it should return True. The grader checks has_permission for users with zero, one, and multiple roles, with permissions present in some roles but not others, using several permission string values. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": ["rbac", "identity", "bugs"],
+  "estimated_minutes": 20,
+  "license": "MIT"
+}

@@ -1,0 +1,42 @@
+=== starter/memo.py ===
+import threading
+
+
+def memoize(fn):
+    """Cache results of fn. Thread-safe."""
+    cache = {}
+    lock = threading.Lock()
+
+    def wrapper(*args):
+        with lock:
+            if args in cache:
+                return cache[args]
+        result = fn(*args)
+        with lock:
+            if args in cache:
+                return cache[args]
+            cache[args] = result
+            return result
+
+    return wrapper
+=== memo.py ===
+import threading
+
+
+def memoize(fn):
+    """Cache results of fn. Thread-safe."""
+    cache = {}
+    lock = threading.Lock()
+
+    def wrapper(*args):
+        with lock:
+            if args in cache:
+                return cache[args]
+        result = fn(*args)
+        with lock:
+            if args in cache:
+                return cache[args]
+            cache[args] = result
+            return result
+
+    return wrapper

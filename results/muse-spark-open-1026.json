@@ -13,7 +13,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 11.27,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/001-pagination-off-by-one_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/001-pagination-off-by-one_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 404,
       "completion_tokens": 3357,
@@ -44,7 +44,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 3.67,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/001-pagination-off-by-one_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/001-pagination-off-by-one_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 404,
       "completion_tokens": 703,
@@ -75,7 +75,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 6.82,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/001-pagination-off-by-one_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/001-pagination-off-by-one_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 404,
       "completion_tokens": 1560,
@@ -106,7 +106,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 4.37,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/002-csv-parse-strip_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/002-csv-parse-strip_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 451,
       "completion_tokens": 1026,
@@ -137,7 +137,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 6.42,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/002-csv-parse-strip_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/002-csv-parse-strip_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 451,
       "completion_tokens": 1521,
@@ -168,7 +168,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 5.29,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/002-csv-parse-strip_attempt3.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/002-csv-parse-strip_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 451,
       "completion_tokens": 1222,
@@ -199,7 +199,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 4.13,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/003-date-diff_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/003-date-diff_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 474,
       "completion_tokens": 863,
@@ -230,7 +230,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 17.83,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/001-pagination-off-by-one_attempt3.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/001-pagination-off-by-one_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 404,
       "completion_tokens": 4117,
@@ -261,7 +261,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 5.22,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/003-date-diff_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/003-date-diff_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 474,
       "completion_tokens": 1250,
@@ -292,7 +292,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 2.17,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/003-date-diff_attempt3.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/003-date-diff_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 474,
       "completion_tokens": 492,
@@ -323,7 +323,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 10.59,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/004-word-frequency_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/004-word-frequency_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 413,
       "completion_tokens": 3077,
@@ -354,7 +354,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 1.46,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/005-lru-cache_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/005-lru-cache_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 510,
       "completion_tokens": 313,
@@ -385,7 +385,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 11.56,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/004-word-frequency_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/004-word-frequency_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 413,
       "completion_tokens": 3308,
@@ -416,7 +416,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 11.84,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/004-word-frequency_attempt3.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/004-word-frequency_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 413,
       "completion_tokens": 3490,
@@ -447,7 +447,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 2.83,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/005-lru-cache_attempt3.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/005-lru-cache_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 510,
       "completion_tokens": 647,
@@ -478,7 +478,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 2.12,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/006-stack-with-min_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/006-stack-with-min_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 453,
       "completion_tokens": 437,
@@ -509,7 +509,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 4.1,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/005-lru-cache_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/005-lru-cache_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 510,
       "completion_tokens": 944,
@@ -540,7 +540,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 2.53,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/006-stack-with-min_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/006-stack-with-min_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 453,
       "completion_tokens": 545,
@@ -571,7 +571,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 3.09,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/007-slug-generator_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/007-slug-generator_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 467,
       "completion_tokens": 812,
@@ -602,7 +602,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 3.42,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/006-stack-with-min_attempt3.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/006-stack-with-min_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 453,
       "completion_tokens": 849,
@@ -633,7 +633,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 1.49,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/008-run-length-encoding_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/008-run-length-encoding_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 465,
       "completion_tokens": 328,
@@ -664,7 +664,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 4.38,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/007-slug-generator_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/007-slug-generator_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 467,
       "completion_tokens": 1203,
@@ -695,7 +695,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 1.6,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/008-run-length-encoding_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/008-run-length-encoding_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 465,
       "completion_tokens": 419,
@@ -726,7 +726,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 3.87,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/007-slug-generator_attempt3.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/007-slug-generator_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 467,
       "completion_tokens": 976,
@@ -757,7 +757,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 2.7,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/008-run-length-encoding_attempt3.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/008-run-length-encoding_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 465,
       "completion_tokens": 801,
@@ -788,7 +788,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 12.29,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/009-token-bucket_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/009-token-bucket_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 538,
       "completion_tokens": 3069,
@@ -819,7 +819,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 2.66,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/010-json-flattener_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/010-json-flattener_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 481,
       "completion_tokens": 733,
@@ -850,7 +850,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 13.19,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/009-token-bucket_attempt3.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/009-token-bucket_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 538,
       "completion_tokens": 3018,
@@ -881,7 +881,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 1.81,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/010-json-flattener_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/010-json-flattener_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 481,
       "completion_tokens": 419,
@@ -912,7 +912,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 2.59,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/010-json-flattener_attempt3.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/010-json-flattener_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 481,
       "completion_tokens": 714,
@@ -943,7 +943,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 20.04,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/009-token-bucket_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/009-token-bucket_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 538,
       "completion_tokens": 5250,
@@ -974,7 +974,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 3.62,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/011-iso-week_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/011-iso-week_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 484,
       "completion_tokens": 924,
@@ -1005,7 +1005,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 2.85,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/011-iso-week_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/011-iso-week_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 484,
       "completion_tokens": 513,
@@ -1036,7 +1036,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 2.05,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/011-iso-week_attempt3.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/011-iso-week_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 484,
       "completion_tokens": 458,
@@ -1067,7 +1067,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 5.46,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/012-retry-decorator_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/012-retry-decorator_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 506,
       "completion_tokens": 1246,
@@ -1098,7 +1098,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 5.41,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/012-retry-decorator_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/012-retry-decorator_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 506,
       "completion_tokens": 1268,
@@ -1129,7 +1129,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 5.38,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/012-retry-decorator_attempt3.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/012-retry-decorator_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 506,
       "completion_tokens": 1362,
@@ -1160,7 +1160,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 7.91,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/013-timezone-scheduler_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/013-timezone-scheduler_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 821,
       "completion_tokens": 2579,
@@ -1191,7 +1191,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 8.45,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/013-timezone-scheduler_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/013-timezone-scheduler_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 821,
       "completion_tokens": 2745,
@@ -1222,7 +1222,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 7.87,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/013-timezone-scheduler_attempt3.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/013-timezone-scheduler_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 821,
       "completion_tokens": 2684,
@@ -1253,7 +1253,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 2.29,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/014-mutable-default_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/014-mutable-default_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 457,
       "completion_tokens": 348,
@@ -1284,7 +1284,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 2.27,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/014-mutable-default_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/014-mutable-default_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 457,
       "completion_tokens": 380,
@@ -1315,7 +1315,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 2.18,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/014-mutable-default_attempt3.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/014-mutable-default_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 457,
       "completion_tokens": 491,
@@ -1346,7 +1346,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 3.45,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/015-sliding-window-max_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/015-sliding-window-max_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 585,
       "completion_tokens": 973,
@@ -1377,7 +1377,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 2.84,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/015-sliding-window-max_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/015-sliding-window-max_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 585,
       "completion_tokens": 777,
@@ -1408,7 +1408,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 4.91,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/015-sliding-window-max_attempt3.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/015-sliding-window-max_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 585,
       "completion_tokens": 1677,
@@ -1441,7 +1441,7 @@
     "failure_reason": "test_failure_parametrized",
     "finish_reason": "stop",
     "elapsed_s": 13.64,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/016-decimal-money_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/016-decimal-money_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 524,
       "completion_tokens": 3402,
@@ -1474,7 +1474,7 @@
     "failure_reason": "test_failure_parametrized",
     "finish_reason": "stop",
     "elapsed_s": 13.2,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/016-decimal-money_attempt3.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/016-decimal-money_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 524,
       "completion_tokens": 3087,
@@ -1505,7 +1505,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 1.57,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/017-unicode-dedup_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/017-unicode-dedup_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 480,
       "completion_tokens": 350,
@@ -1538,7 +1538,7 @@
     "failure_reason": "test_failure_parametrized",
     "finish_reason": "stop",
     "elapsed_s": 17.11,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/016-decimal-money_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/016-decimal-money_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 524,
       "completion_tokens": 4113,
@@ -1569,7 +1569,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 2.1,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/017-unicode-dedup_attempt3.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/017-unicode-dedup_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 480,
       "completion_tokens": 389,
@@ -1600,7 +1600,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 4.2,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/017-unicode-dedup_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/017-unicode-dedup_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 480,
       "completion_tokens": 1040,
@@ -1631,7 +1631,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 8.4,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/018-thread-safe-cache_attempt1.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/018-thread-safe-cache_attempt1.txt",
     "token_usage": {
       "prompt_tokens": 592,
       "completion_tokens": 2042,
@@ -1662,7 +1662,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 5.65,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/018-thread-safe-cache_attempt3.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/018-thread-safe-cache_attempt3.txt",
     "token_usage": {
       "prompt_tokens": 592,
       "completion_tokens": 1645,
@@ -1693,7 +1693,7 @@
     "failure_reason": "none",
     "finish_reason": "stop",
     "elapsed_s": 18.97,
-    "raw_output_path": "/Users/vishweshwarreddygatla/gradepack/results/raw/muse-spark-open-1026/018-thread-safe-cache_attempt2.txt",
+    "raw_output_path": "results/raw/muse-spark-open-1026/018-thread-safe-cache_attempt2.txt",
     "token_usage": {
       "prompt_tokens": 592,
       "completion_tokens": 5410,

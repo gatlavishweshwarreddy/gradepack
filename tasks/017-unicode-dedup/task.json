@@ -1,16 +1,12 @@
 {
   "id": "017-unicode-dedup",
-  "title": "Fix unicode deduplicator to normalise before comparing",
+  "title": "String deduplicator keeps visually identical duplicates",
   "language": "python",
-  "difficulty": "hard",
-  "prompt": "The function dedup(strings) in starter/dedup.py removes duplicate strings from a list, preserving the first occurrence and the original ordering. The bug: it uses plain equality (==) for comparison, so strings that look identical visually but differ in Unicode normalisation form (e.g. NFC 'caf\\u00e9' vs NFD 'cafe\\u0301') are treated as different and both kept. Fix it by normalising each string to NFC (unicodedata.normalize('NFC', s)) before the seen-set lookup, while still returning the original (un-normalised) strings. The function must also handle an empty list. The grader uses parametrized cases including NFC/NFD pairs and seeded random sequences of mixed-form strings validated against a reference implementation. Do not edit the tests.",
+  "difficulty": "medium",
+  "prompt": "The function dedup(strings) in starter/dedup.py removes duplicate strings from a list, preserving first occurrence and original ordering, and returns the deduplicated list. When the input contains strings that look identical on screen but are encoded differently — for example a character written as a single precomposed code point versus the same character written as a base letter plus a combining mark — dedup treats them as distinct and keeps both. The grader checks that dedup collapses such visually identical pairs into a single entry, while still preserving order and removing exact byte-level duplicates. Do not edit the tests.",
   "grader": "pytest",
   "version": "1.0",
-  "tags": [
-    "unicode",
-    "normalization",
-    "strings"
-  ],
-  "estimated_minutes": 25,
+  "tags": ["unicode", "normalization", "strings"],
+  "estimated_minutes": 15,
   "license": "MIT"
 }

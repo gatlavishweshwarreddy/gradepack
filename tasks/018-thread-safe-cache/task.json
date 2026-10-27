@@ -1,16 +1,12 @@
 {
   "id": "018-thread-safe-cache",
-  "title": "Fix thread-safe memoize cache: wrong key and missing lock on write",
+  "title": "Memoize decorator returns stale or incorrect cached values",
   "language": "python",
   "difficulty": "hard",
-  "prompt": "The module starter/memo.py provides memoize(fn), a decorator that caches function results in a shared dict protected by a threading.Lock. It has two bugs: (1) it stores results under id(args) (the object identity of the tuple) instead of args (its value), so the cache never hits on a subsequent call because each call creates a new tuple with a different id; (2) the lock is released before writing, creating a race window. Fix both: (1) use args as the cache key, (2) hold the lock across the entire read-check-compute-write sequence (check under lock; release to compute; re-acquire; if another thread wrote it first return that value; otherwise store and return). The grader tests that the wrapped function is called exactly once per unique argument set (using a call counter and seeded random sequences), that the return value is always correct, and uses threading.Barrier to test concurrent access. Do not edit the tests.",
+  "prompt": "The module starter/memo.py exports memoize(fn), a decorator that caches the return value of fn keyed on its arguments. Calling a memoized function twice with the same arguments should return the same value both times without calling fn again. The grader checks: (1) that calling the decorated function twice with equal argument tuples returns the same value and does not invoke the underlying function a second time; (2) that different argument tuples produce independently cached results; (3) that the cache is safe to use from multiple threads without corrupting results. The current implementation fails at least one of these checks. Do not edit the tests.",
   "grader": "pytest",
   "version": "1.0",
-  "tags": [
-    "concurrency",
-    "threading",
-    "caching"
-  ],
-  "estimated_minutes": 35,
+  "tags": ["caching", "threading", "decorators"],
+  "estimated_minutes": 25,
   "license": "MIT"
 }

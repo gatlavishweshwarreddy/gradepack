@@ -156,80 +156,184 @@
   },
   {
     "id": "013-timezone-scheduler",
-    "title": "Fix timezone-aware event scheduler",
-    "difficulty": "hard",
+    "title": "Event scheduler returns wrong times in non-UTC zones",
+    "difficulty": "medium",
     "language": "python",
     "tags": [
       "datetime",
       "timezone",
-      "state"
-    ],
-    "estimated_minutes": 30,
-    "version": "1.0"
-  },
-  {
-    "id": "014-mutable-default",
-    "title": "Fix mutable default argument leaking shared state",
-    "difficulty": "hard",
-    "language": "python",
-    "tags": [
-      "gotchas",
-      "state",
-      "oop"
+      "scheduler"
     ],
     "estimated_minutes": 20,
     "version": "1.0"
   },
   {
+    "id": "014-mutable-default",
+    "title": "Accumulator instances share state unexpectedly",
+    "difficulty": "easy",
+    "language": "python",
+    "tags": [
+      "classes",
+      "state",
+      "python-gotcha"
+    ],
+    "estimated_minutes": 10,
+    "version": "1.0"
+  },
+  {
     "id": "015-sliding-window-max",
-    "title": "Fix off-by-one in sliding window maximum",
-    "difficulty": "hard",
+    "title": "Sliding window maximum produces incorrect results",
+    "difficulty": "medium",
     "language": "python",
     "tags": [
       "algorithms",
       "deque",
-      "off-by-one"
+      "sliding-window"
     ],
-    "estimated_minutes": 30,
+    "estimated_minutes": 20,
     "version": "1.0"
   },
   {
     "id": "016-decimal-money",
-    "title": "Fix float rounding errors in monetary calculations",
-    "difficulty": "hard",
+    "title": "Ledger balance is inaccurate for certain decimal amounts",
+    "difficulty": "easy",
     "language": "python",
     "tags": [
-      "arithmetic",
       "decimal",
-      "rounding"
+      "arithmetic",
+      "money"
     ],
-    "estimated_minutes": 25,
+    "estimated_minutes": 10,
     "version": "1.0"
   },
   {
     "id": "017-unicode-dedup",
-    "title": "Fix unicode deduplicator to normalise before comparing",
-    "difficulty": "hard",
+    "title": "String deduplicator keeps visually identical duplicates",
+    "difficulty": "medium",
     "language": "python",
     "tags": [
       "unicode",
       "normalization",
       "strings"
     ],
-    "estimated_minutes": 25,
+    "estimated_minutes": 15,
     "version": "1.0"
   },
   {
     "id": "018-thread-safe-cache",
-    "title": "Fix thread-safe memoize cache: wrong key and missing lock on write",
+    "title": "Memoize decorator returns stale or incorrect cached values",
     "difficulty": "hard",
     "language": "python",
     "tags": [
-      "concurrency",
+      "caching",
       "threading",
-      "caching"
+      "decorators"
     ],
-    "estimated_minutes": 35,
+    "estimated_minutes": 25,
+    "version": "1.0"
+  },
+  {
+    "id": "019-invoice-total",
+    "title": "Invoice total is wrong when both discount and tax apply",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "arithmetic",
+      "ordering",
+      "money"
+    ],
+    "estimated_minutes": 20,
+    "version": "1.0"
+  },
+  {
+    "id": "020-log-parser",
+    "title": "Log parser reports wrong duration for entries spanning midnight",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "datetime",
+      "parsing",
+      "edge-cases"
+    ],
+    "estimated_minutes": 25,
+    "version": "1.0"
+  },
+  {
+    "id": "021-config-merger",
+    "title": "Config merger mutates the base config when merging nested keys",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "dict",
+      "deep-copy",
+      "merge"
+    ],
+    "estimated_minutes": 20,
+    "version": "1.0"
+  },
+  {
+    "id": "022-permissions",
+    "title": "Permission checker grants access when it should deny",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "rbac",
+      "identity",
+      "bugs"
+    ],
+    "estimated_minutes": 20,
+    "version": "1.0"
+  },
+  {
+    "id": "023-inventory",
+    "title": "Inventory reservation allows overbooking under concurrent requests",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "inventory",
+      "concurrency",
+      "state"
+    ],
+    "estimated_minutes": 25,
+    "version": "1.0"
+  },
+  {
+    "id": "024-csv-importer",
+    "title": "CSV importer rejects valid numeric values in certain formats",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "csv",
+      "coercion",
+      "parsing"
+    ],
+    "estimated_minutes": 20,
+    "version": "1.0"
+  },
+  {
+    "id": "025-rate-limiter",
+    "title": "Rate limiter allows one extra request per window",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "rate-limiting",
+      "sliding-window",
+      "off-by-one"
+    ],
+    "estimated_minutes": 20,
+    "version": "1.0"
+  },
+  {
+    "id": "026-retry-client",
+    "title": "HTTP client does not retry all transient errors and backoff is wrong",
+    "difficulty": "hard",
+    "language": "python",
+    "tags": [
+      "http",
+      "retry",
+      "backoff"
+    ],
+    "estimated_minutes": 25,
     "version": "1.0"
   }
 ]

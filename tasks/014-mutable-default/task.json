@@ -1,16 +1,12 @@
 {
   "id": "014-mutable-default",
-  "title": "Fix mutable default argument leaking shared state",
+  "title": "Accumulator instances share state unexpectedly",
   "language": "python",
-  "difficulty": "hard",
-  "prompt": "The module starter/accumulator.py defines Accumulator(initial=[]). Each instance should have its own independent list of items. The bug is a classic mutable default argument: the default list is shared across all instances that do not pass an explicit initial value, so items added to one instance bleed into the next. Fix it by using None as the default and creating a new list inside __init__ when initial is None. The grader tests that two independently created Accumulator() instances do not share state, that adding to one does not affect the other, that the initial list is copied (not referenced), and checks correct behavior with seeded random sequences of add operations across multiple instances. Do not edit the tests.",
+  "difficulty": "easy",
+  "prompt": "The module starter/accumulator.py defines an Accumulator class. Each Accumulator should maintain its own independent list of items, and the list should start empty for every new instance unless an initial list is explicitly provided to the constructor. When a second Accumulator is created and items are appended to it, the first Accumulator must not see those items and vice versa. The grader checks that two independently-constructed Accumulator instances have separate item lists and that appending to one does not affect the other. Do not edit the tests.",
   "grader": "pytest",
   "version": "1.0",
-  "tags": [
-    "gotchas",
-    "state",
-    "oop"
-  ],
-  "estimated_minutes": 20,
+  "tags": ["classes", "state", "python-gotcha"],
+  "estimated_minutes": 10,
   "license": "MIT"
 }

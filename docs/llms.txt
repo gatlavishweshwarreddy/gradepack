@@ -92,43 +92,99 @@ Estimated minutes: 20
 Prompt: The function retry(max_attempts, exceptions) in starter/retry.py is a decorator factory. It wraps a function so that if it raises one of the listed exception types it is retried up to max_attempts times total (not max_attempts extra times). After exhausting all attempts, the last exception is re-raised. The starter has two bugs: (1) it catches all BaseException instead of only the specified exception types, so unrelated exceptions are silently retried; and (2) the attempt counter starts at 0 but the loop condition is wrong, allowing max_attempts+1 total calls instead of max_attempts. Fix both. Do not edit the tests.
 
 ### 013-timezone-scheduler
-Title: Fix timezone-aware event scheduler
-Difficulty: hard
-Tags: datetime, timezone, state
-Estimated minutes: 30
-Prompt: The module starter/scheduler.py contains a class EventScheduler. add_event(name, utc_dt) stores an event with its UTC datetime. next_event_in(tz_name) returns a (name, timedelta) tuple for the next upcoming event converted into the named timezone (e.g. 'US/Eastern'), using the 'now' supplied by a clock() callable passed to the constructor. The module starter/clock.py provides UtcClock with a now() method returning the current UTC time as a timezone-aware datetime. The bug: add_event silently strips tzinfo when the caller passes a naive datetime (it should raise ValueError), AND next_event_in uses a naive 'now' for comparison instead of the aware datetime from clock.now(), so events in non-UTC timezones are compared incorrectly. Fix both bugs: (1) raise ValueError in add_event if utc_dt.tzinfo is None, (2) use clock.now() (which is already UTC-aware) directly for the comparison. Do not edit the tests.
+Title: Event scheduler returns wrong times in non-UTC zones
+Difficulty: medium
+Tags: datetime, timezone, scheduler
+Estimated minutes: 20
+Prompt: The module starter/scheduler.py provides EventScheduler. add_event(name, utc_dt) stores an event by name with its UTC time. next_event_in(tz_name) should return a (name, timedelta) tuple for the nearest upcoming event, where the timedelta is computed relative to the current time in the given timezone. The method relies on a clock helper in starter/clock.py that returns the current time. When tested against a non-UTC zone such as 'America/New_York' or 'Asia/Tokyo', next_event_in returns a timedelta whose magnitude is wrong — it differs from the correct value by several hours. All other tests (empty scheduler, past events, exact ties) must also pass. Do not edit the tests.
 
 ### 014-mutable-default
-Title: Fix mutable default argument leaking shared state
-Difficulty: hard
-Tags: gotchas, state, oop
-Estimated minutes: 20
-Prompt: The module starter/accumulator.py defines Accumulator(initial=[]). Each instance should have its own independent list of items. The bug is a classic mutable default argument: the default list is shared across all instances that do not pass an explicit initial value, so items added to one instance bleed into the next. Fix it by using None as the default and creating a new list inside __init__ when initial is None. The grader tests that two independently created Accumulator() instances do not share state, that adding to one does not affect the other, that the initial list is copied (not referenced), and checks correct behavior with seeded random sequences of add operations across multiple instances. Do not edit the tests.
+Title: Accumulator instances share state unexpectedly
+Difficulty: easy
+Tags: classes, state, python-gotcha
+Estimated minutes: 10
+Prompt: The module starter/accumulator.py defines an Accumulator class. Each Accumulator should maintain its own independent list of items, and the list should start empty for every new instance unless an initial list is explicitly provided to the constructor. When a second Accumulator is created and items are appended to it, the first Accumulator must not see those items and vice versa. The grader checks that two independently-constructed Accumulator instances have separate item lists and that appending to one does not affect the other. Do not edit the tests.
 
 ### 015-sliding-window-max
-Title: Fix off-by-one in sliding window maximum
-Difficulty: hard
-Tags: algorithms, deque, off-by-one
-Estimated minutes: 30
-Prompt: The function sliding_max(nums, k) in starter/window.py returns a list of the maximum value in each sliding window of size k over nums. The bug is an off-by-one: the deque holds indices, and the left-trim condition uses `>= i - k` instead of the correct `< i - k + 1`, so stale indices are not evicted and the wrong maximum is returned for windows that have moved past a previously large element. Fix the condition so that sliding_max([3,1,2,5,4], 3) == [3,5,5], sliding_max([1], 1) == [1], and sliding_max([], 3) == []. The grader uses parametrized cases and a seeded brute-force reference to validate random inputs. Do not edit the tests.
+Title: Sliding window maximum produces incorrect results
+Difficulty: medium
+Tags: algorithms, deque, sliding-window
+Estimated minutes: 20
+Prompt: The function sliding_max(nums, k) in starter/window.py returns a list of the maximum value in each contiguous window of size k over nums. For an input of length n the result must have n-k+1 elements. The function gives incorrect maximums for certain inputs — in particular when the true maximum is in the right half of a window rather than the left. For example sliding_max([1,3,1,2], 3) should be [3,3] but returns a wrong value. The grader checks correctness against several reference cases including varied window sizes, duplicate values, and single-element windows. Do not edit the tests.
 
 ### 016-decimal-money
-Title: Fix float rounding errors in monetary calculations
-Difficulty: hard
-Tags: arithmetic, decimal, rounding
-Estimated minutes: 25
-Prompt: The module starter/ledger.py defines a Ledger class for tracking monetary transactions. add(amount_str) records an amount (passed as a string like '0.10'), and balance() returns the running total as a string rounded to 2 decimal places. The bug: amounts are converted to float internally, causing accumulated floating-point error (e.g. 0.1 + 0.2 != 0.3 in float). Fix it by using Python's decimal.Decimal for all arithmetic. The constructor must accept an optional initial_balance string (default '0'). balance() must return a string with exactly 2 decimal places (e.g. '0.30', not '0.3'). add() must raise ValueError for non-numeric input. The grader tests exact cent-level accuracy with parametrized cases and seeded random cent sequences compared against a Decimal reference. Do not edit the tests.
+Title: Ledger balance is inaccurate for certain decimal amounts
+Difficulty: easy
+Tags: decimal, arithmetic, money
+Estimated minutes: 10
+Prompt: The module starter/ledger.py provides a Ledger class. add(amount_str) records a monetary amount supplied as a string such as '0.10' or '19.99'. balance() returns the running total rounded to two decimal places. For amounts that cannot be represented exactly in binary, balance() returns a value that differs from the arithmetically correct sum — for example three additions of '0.10' yield 0.30 but the ledger may return a slightly different value. The grader checks exact equality of the balance against the expected decimal sum for several sequences of additions including common problem values. Do not edit the tests.
 
 ### 017-unicode-dedup
-Title: Fix unicode deduplicator to normalise before comparing
-Difficulty: hard
+Title: String deduplicator keeps visually identical duplicates
+Difficulty: medium
 Tags: unicode, normalization, strings
-Estimated minutes: 25
-Prompt: The function dedup(strings) in starter/dedup.py removes duplicate strings from a list, preserving the first occurrence and the original ordering. The bug: it uses plain equality (==) for comparison, so strings that look identical visually but differ in Unicode normalisation form (e.g. NFC 'caf\u00e9' vs NFD 'cafe\u0301') are treated as different and both kept. Fix it by normalising each string to NFC (unicodedata.normalize('NFC', s)) before the seen-set lookup, while still returning the original (un-normalised) strings. The function must also handle an empty list. The grader uses parametrized cases including NFC/NFD pairs and seeded random sequences of mixed-form strings validated against a reference implementation. Do not edit the tests.
+Estimated minutes: 15
+Prompt: The function dedup(strings) in starter/dedup.py removes duplicate strings from a list, preserving first occurrence and original ordering, and returns the deduplicated list. When the input contains strings that look identical on screen but are encoded differently — for example a character written as a single precomposed code point versus the same character written as a base letter plus a combining mark — dedup treats them as distinct and keeps both. The grader checks that dedup collapses such visually identical pairs into a single entry, while still preserving order and removing exact byte-level duplicates. Do not edit the tests.
 
 ### 018-thread-safe-cache
-Title: Fix thread-safe memoize cache: wrong key and missing lock on write
+Title: Memoize decorator returns stale or incorrect cached values
 Difficulty: hard
-Tags: concurrency, threading, caching
-Estimated minutes: 35
-Prompt: The module starter/memo.py provides memoize(fn), a decorator that caches function results in a shared dict protected by a threading.Lock. It has two bugs: (1) it stores results under id(args) (the object identity of the tuple) instead of args (its value), so the cache never hits on a subsequent call because each call creates a new tuple with a different id; (2) the lock is released before writing, creating a race window. Fix both: (1) use args as the cache key, (2) hold the lock across the entire read-check-compute-write sequence (check under lock; release to compute; re-acquire; if another thread wrote it first return that value; otherwise store and return). The grader tests that the wrapped function is called exactly once per unique argument set (using a call counter and seeded random sequences), that the return value is always correct, and uses threading.Barrier to test concurrent access. Do not edit the tests.
+Tags: caching, threading, decorators
+Estimated minutes: 25
+Prompt: The module starter/memo.py exports memoize(fn), a decorator that caches the return value of fn keyed on its arguments. Calling a memoized function twice with the same arguments should return the same value both times without calling fn again. The grader checks: (1) that calling the decorated function twice with equal argument tuples returns the same value and does not invoke the underlying function a second time; (2) that different argument tuples produce independently cached results; (3) that the cache is safe to use from multiple threads without corrupting results. The current implementation fails at least one of these checks. Do not edit the tests.
+
+### 019-invoice-total
+Title: Invoice total is wrong when both discount and tax apply
+Difficulty: hard
+Tags: arithmetic, ordering, money
+Estimated minutes: 20
+Prompt: The package in starter/ implements a simple invoicing module. invoice.py provides Invoice with add_line(description, unit_price, quantity), discount(rate) to set a percentage discount (0.0–1.0), and total(tax_rate) which returns the final amount after applying the discount and then tax. tax.py provides apply_tax(amount, rate). discount.py provides apply_discount(amount, rate). When both a discount and a tax are applied the returned total is wrong — it does not match the value computed by discounting the subtotal first and then applying tax to the discounted amount. The grader compares total() against a reference calculation for several combinations of line items, discount rates, and tax rates. Results must be rounded to two decimal places. Do not edit the tests.
+
+### 020-log-parser
+Title: Log parser reports wrong duration for entries spanning midnight
+Difficulty: hard
+Tags: datetime, parsing, edge-cases
+Estimated minutes: 25
+Prompt: The package in starter/ implements a log file parser. parser.py provides parse_log(lines) which parses lines of the form 'HH:MM:SS LEVEL message' and returns a list of LogEntry objects with fields: time (datetime.time), level (str), message (str). stats.py provides duration_seconds(entries) which returns the elapsed time in seconds between the first and last log entry. filter.py provides filter_level(entries, level) returning only entries at the given level. When a log spans midnight — the first entry is before 00:00:00 and the last is after — duration_seconds returns a negative or very small value instead of the correct positive elapsed time. The grader checks duration_seconds for log sequences that do and do not span midnight, and checks filter_level for correctness. Do not edit the tests.
+
+### 021-config-merger
+Title: Config merger mutates the base config when merging nested keys
+Difficulty: hard
+Tags: dict, deep-copy, merge
+Estimated minutes: 20
+Prompt: The package in starter/ implements a configuration merger. merger.py provides merge(base, override) which performs a deep merge: keys present only in base are kept, keys present only in override are added, and keys present in both are merged recursively if both values are dicts, otherwise the override value wins. loader.py provides load_config(path) which reads a JSON file and returns a dict. The bug: after merge(base, override) is called, the base dict (or its nested dicts) may be modified in place, so calling merge a second time with a different override produces wrong results. The grader calls merge twice with the same base and two different overrides and checks that both results are correct and that base is unchanged. Do not edit the tests.
+
+### 022-permissions
+Title: Permission checker grants access when it should deny
+Difficulty: hard
+Tags: rbac, identity, bugs
+Estimated minutes: 20
+Prompt: The package in starter/ implements a role-based access control checker. roles.py defines a Role dataclass with name (str) and permissions (frozenset of str). permissions.py provides has_permission(user_roles, permission) which returns True if any role in user_roles grants the given permission. A user may have multiple roles; the check should return True only when at least one role's permissions set contains the exact permission string. For certain permission strings the function incorrectly returns True when it should return False, or False when it should return True. The grader checks has_permission for users with zero, one, and multiple roles, with permissions present in some roles but not others, using several permission string values. Do not edit the tests.
+
+### 023-inventory
+Title: Inventory reservation allows overbooking under concurrent requests
+Difficulty: hard
+Tags: inventory, concurrency, state
+Estimated minutes: 25
+Prompt: The package in starter/ implements an inventory reservation service. inventory.py provides Inventory with add_stock(item, qty), available(item) returning current uncommitted quantity, and reserve(item, qty) which should atomically decrement the available stock and return True, or return False without changing stock if qty exceeds what is available. reservation.py provides ReservationLog that records committed reservations. The bug: reserve() reads available() and then writes, but the available() calculation does not account for reservations that are already committed, so multiple callers can each observe sufficient stock and all succeed, resulting in total reserved quantity exceeding actual stock. The grader checks that the sum of successful reservations never exceeds initial stock, using seeded sequences of concurrent-style reservation attempts. Do not edit the tests.
+
+### 024-csv-importer
+Title: CSV importer rejects valid numeric values in certain formats
+Difficulty: hard
+Tags: csv, coercion, parsing
+Estimated minutes: 20
+Prompt: The package in starter/ implements a CSV importer with schema validation. importer.py provides import_csv(rows, schema) where rows is a list of dicts (as from csv.DictReader) and schema is a dict mapping column names to type names ('int', 'float', 'str'). coerce.py provides coerce(value, type_name) which converts a string value to the target Python type. schema.py provides validate_schema(schema) which checks that all type names are valid. The bug: coerce() raises ValueError for integer columns when the CSV contains values like '1.0' or '2.0' — whole numbers formatted as floats — even though those values represent valid integers. The grader checks that import_csv correctly coerces '1.0', '42.0', and similar float-formatted integers to int, and raises ValueError only for genuinely non-numeric values. Do not edit the tests.
+
+### 025-rate-limiter
+Title: Rate limiter allows one extra request per window
+Difficulty: hard
+Tags: rate-limiting, sliding-window, off-by-one
+Estimated minutes: 20
+Prompt: The package in starter/ implements a sliding-window rate limiter. limiter.py provides RateLimiter(max_requests, window_seconds) with allow(key, now) which returns True if the given key has made fewer than max_requests requests in the window ending at now, and records the request if allowed. store.py provides RequestStore which manages per-key timestamps. The bug: when exactly max_requests have been made within the window, allow() returns True (permits one extra) instead of False. The grader checks that after exactly max_requests calls allow() returns False for the same key, that different keys have independent limits, and that requests older than window_seconds are correctly expired. Do not edit the tests.
+
+### 026-retry-client
+Title: HTTP client does not retry all transient errors and backoff is wrong
+Difficulty: hard
+Tags: http, retry, backoff
+Estimated minutes: 25
+Prompt: The package in starter/ implements an HTTP client with retry logic. client.py provides HttpClient(transport, max_retries, backoff_base) with get(url) which calls transport.request(url) and retries on transient failures. transport.py provides FakeTransport, a controllable test double that returns pre-configured responses. backoff.py provides wait_seconds(attempt, base) returning the backoff delay for a given attempt number. The client retries on some error status codes but not others that should also be retried, and the backoff delay for the second and subsequent retries is wrong — it does not grow exponentially from the base. The grader checks that the client retries on all required 5xx status codes, that the number of calls to transport matches expectations, and that wait_seconds returns the correct exponential series. Do not edit the tests.

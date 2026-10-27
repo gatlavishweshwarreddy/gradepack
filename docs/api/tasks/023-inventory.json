@@ -1,0 +1,22 @@
+{
+  "id": "023-inventory",
+  "title": "Inventory reservation allows overbooking under concurrent requests",
+  "difficulty": "hard",
+  "language": "python",
+  "tags": [
+    "inventory",
+    "concurrency",
+    "state"
+  ],
+  "estimated_minutes": 25,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/023-inventory.json",
+  "prompt": "The package in starter/ implements an inventory reservation service. inventory.py provides Inventory with add_stock(item, qty), available(item) returning current uncommitted quantity, and reserve(item, qty) which should atomically decrement the available stock and return True, or return False without changing stock if qty exceeds what is available. reservation.py provides ReservationLog that records committed reservations. The bug: reserve() reads available() and then writes, but the available() calculation does not account for reservations that are already committed, so multiple callers can each observe sufficient stock and all succeed, resulting in total reserved quantity exceeding actual stock. The grader checks that the sum of successful reservations never exceeds initial stock, using seeded sequences of concurrent-style reservation attempts. Do not edit the tests.",
+  "starter_files": {
+    "inventory.py": "from reservation import ReservationLog\n\n\nclass Inventory:\n    def __init__(self):\n        self._stock = {}\n        self._log = ReservationLog()\n\n    def add_stock(self, item, qty):\n        self._stock[item] = self._stock.get(item, 0) + qty\n\n    def available(self, item):\n        # BUG: returns raw stock without subtracting already-reserved qty\n        return self._stock.get(item, 0)\n\n    def reserve(self, item, qty):\n        if self.available(item) >= qty:\n            self._log.record(item, qty)\n            return True\n        return False\n\n    def reservations(self):\n        return self._log\n",
+    "reservation.py": "class ReservationLog:\n    def __init__(self):\n        self._log = []\n\n    def record(self, item, qty):\n        self._log.append((item, qty))\n\n    def total_reserved(self, item):\n        return sum(q for i, q in self._log if i == item)\n\n    def all_reservations(self):\n        return list(self._log)\n"
+  },
+  "grader_files": {
+    "test_inventory.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom inventory import Inventory\nimport pytest\nimport random\n\n\ndef test_single_reserve_success():\n    inv = Inventory()\n    inv.add_stock(\"apple\", 5)\n    assert inv.reserve(\"apple\", 3) is True\n\n\ndef test_single_reserve_failure_over_stock():\n    inv = Inventory()\n    inv.add_stock(\"apple\", 2)\n    assert inv.reserve(\"apple\", 5) is False\n\n\ndef test_sequential_reservations_do_not_overbook():\n    inv = Inventory()\n    inv.add_stock(\"apple\", 5)\n    assert inv.reserve(\"apple\", 3) is True\n    assert inv.reserve(\"apple\", 3) is False\n\n\ndef test_exact_stock_reserve():\n    inv = Inventory()\n    inv.add_stock(\"apple\", 4)\n    assert inv.reserve(\"apple\", 4) is True\n    assert inv.reserve(\"apple\", 1) is False\n\n\ndef test_different_items_independent():\n    inv = Inventory()\n    inv.add_stock(\"apple\", 3)\n    inv.add_stock(\"banana\", 3)\n    assert inv.reserve(\"apple\", 3) is True\n    assert inv.reserve(\"banana\", 3) is True\n\n\ndef test_total_reserved_never_exceeds_stock():\n    rng = random.Random(42)\n    inv = Inventory()\n    stock = 10\n    inv.add_stock(\"widget\", stock)\n    for _ in range(20):\n        qty = rng.randint(1, 4)\n        inv.reserve(\"widget\", qty)\n    total = inv.reservations().total_reserved(\"widget\")\n    assert total <= stock, f\"Overbooked: {total} > {stock}\"\n\n\ndef test_available_decreases_after_reserve():\n    inv = Inventory()\n    inv.add_stock(\"thing\", 10)\n    inv.reserve(\"thing\", 4)\n    assert inv.available(\"thing\") == 6\n"
+  }
+}

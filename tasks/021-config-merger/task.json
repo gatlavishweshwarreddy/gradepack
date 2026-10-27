@@ -1,0 +1,12 @@
+{
+  "id": "021-config-merger",
+  "title": "Config merger mutates the base config when merging nested keys",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The package in starter/ implements a configuration merger. merger.py provides merge(base, override) which performs a deep merge: keys present only in base are kept, keys present only in override are added, and keys present in both are merged recursively if both values are dicts, otherwise the override value wins. loader.py provides load_config(path) which reads a JSON file and returns a dict. The bug: after merge(base, override) is called, the base dict (or its nested dicts) may be modified in place, so calling merge a second time with a different override produces wrong results. The grader calls merge twice with the same base and two different overrides and checks that both results are correct and that base is unchanged. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": ["dict", "deep-copy", "merge"],
+  "estimated_minutes": 20,
+  "license": "MIT"
+}

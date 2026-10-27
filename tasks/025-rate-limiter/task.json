@@ -1,0 +1,12 @@
+{
+  "id": "025-rate-limiter",
+  "title": "Rate limiter allows one extra request per window",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The package in starter/ implements a sliding-window rate limiter. limiter.py provides RateLimiter(max_requests, window_seconds) with allow(key, now) which returns True if the given key has made fewer than max_requests requests in the window ending at now, and records the request if allowed. store.py provides RequestStore which manages per-key timestamps. The bug: when exactly max_requests have been made within the window, allow() returns True (permits one extra) instead of False. The grader checks that after exactly max_requests calls allow() returns False for the same key, that different keys have independent limits, and that requests older than window_seconds are correctly expired. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": ["rate-limiting", "sliding-window", "off-by-one"],
+  "estimated_minutes": 20,
+  "license": "MIT"
+}

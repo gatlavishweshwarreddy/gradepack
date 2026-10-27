@@ -1,0 +1,22 @@
+{
+  "id": "025-rate-limiter",
+  "title": "Rate limiter allows one extra request per window",
+  "difficulty": "hard",
+  "language": "python",
+  "tags": [
+    "rate-limiting",
+    "sliding-window",
+    "off-by-one"
+  ],
+  "estimated_minutes": 20,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/025-rate-limiter.json",
+  "prompt": "The package in starter/ implements a sliding-window rate limiter. limiter.py provides RateLimiter(max_requests, window_seconds) with allow(key, now) which returns True if the given key has made fewer than max_requests requests in the window ending at now, and records the request if allowed. store.py provides RequestStore which manages per-key timestamps. The bug: when exactly max_requests have been made within the window, allow() returns True (permits one extra) instead of False. The grader checks that after exactly max_requests calls allow() returns False for the same key, that different keys have independent limits, and that requests older than window_seconds are correctly expired. Do not edit the tests.",
+  "starter_files": {
+    "limiter.py": "from store import RequestStore\n\n\nclass RateLimiter:\n    def __init__(self, max_requests, window_seconds):\n        self._max = max_requests\n        self._window = window_seconds\n        self._store = RequestStore()\n\n    def allow(self, key, now):\n        \"\"\"\n        Return True and record the request if the key has made fewer than\n        max_requests in the last window_seconds. Return False otherwise.\n\n        BUG: uses <= self._max instead of < self._max, so max_requests+1\n        requests are allowed within the window instead of max_requests.\n        \"\"\"\n        since = now - self._window\n        recent = self._store.get_since(key, since)\n        if len(recent) <= self._max:\n            self._store.add(key, now)\n            return True\n        return False\n",
+    "store.py": "class RequestStore:\n    \"\"\"Stores per-key request timestamps.\"\"\"\n\n    def __init__(self):\n        self._data = {}\n\n    def add(self, key, timestamp):\n        self._data.setdefault(key, []).append(timestamp)\n\n    def get_since(self, key, since):\n        \"\"\"Return timestamps for key that are >= since.\"\"\"\n        return [t for t in self._data.get(key, []) if t >= since]\n\n    def prune(self, key, since):\n        \"\"\"Remove timestamps older than since.\"\"\"\n        self._data[key] = self.get_since(key, since)\n"
+  },
+  "grader_files": {
+    "test_rate_limiter.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom limiter import RateLimiter\nimport pytest\n\n\ndef test_allows_up_to_limit():\n    rl = RateLimiter(max_requests=3, window_seconds=60)\n    t = 0\n    assert rl.allow(\"user1\", t + 1) is True\n    assert rl.allow(\"user1\", t + 2) is True\n    assert rl.allow(\"user1\", t + 3) is True\n\n\ndef test_blocks_at_limit():\n    rl = RateLimiter(max_requests=3, window_seconds=60)\n    t = 0\n    rl.allow(\"user1\", t + 1)\n    rl.allow(\"user1\", t + 2)\n    rl.allow(\"user1\", t + 3)\n    result = rl.allow(\"user1\", t + 4)\n    assert result is False, \"Should be blocked after max_requests\"\n\n\ndef test_independent_keys():\n    rl = RateLimiter(max_requests=2, window_seconds=60)\n    rl.allow(\"alice\", 1)\n    rl.allow(\"alice\", 2)\n    assert rl.allow(\"alice\", 3) is False\n    assert rl.allow(\"bob\", 3) is True\n\n\ndef test_expired_requests_not_counted():\n    rl = RateLimiter(max_requests=2, window_seconds=10)\n    rl.allow(\"user1\", 1)\n    rl.allow(\"user1\", 2)\n    assert rl.allow(\"user1\", 5) is False\n    assert rl.allow(\"user1\", 15) is True\n\n\ndef test_limit_of_one():\n    rl = RateLimiter(max_requests=1, window_seconds=60)\n    assert rl.allow(\"x\", 1) is True\n    assert rl.allow(\"x\", 2) is False\n\n\ndef test_window_boundary():\n    rl = RateLimiter(max_requests=2, window_seconds=10)\n    rl.allow(\"u\", 1)\n    rl.allow(\"u\", 10)\n    assert rl.allow(\"u\", 11) is False\n    assert rl.allow(\"u\", 12) is True\n"
+  }
+}

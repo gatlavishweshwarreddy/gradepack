@@ -1,0 +1,12 @@
+{
+  "id": "023-inventory",
+  "title": "Inventory reservation allows overbooking under concurrent requests",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The package in starter/ implements an inventory reservation service. inventory.py provides Inventory with add_stock(item, qty), available(item) returning current uncommitted quantity, and reserve(item, qty) which should atomically decrement the available stock and return True, or return False without changing stock if qty exceeds what is available. reservation.py provides ReservationLog that records committed reservations. The bug: reserve() reads available() and then writes, but the available() calculation does not account for reservations that are already committed, so multiple callers can each observe sufficient stock and all succeed, resulting in total reserved quantity exceeding actual stock. The grader checks that the sum of successful reservations never exceeds initial stock, using seeded sequences of concurrent-style reservation attempts. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": ["inventory", "concurrency", "state"],
+  "estimated_minutes": 25,
+  "license": "MIT"
+}

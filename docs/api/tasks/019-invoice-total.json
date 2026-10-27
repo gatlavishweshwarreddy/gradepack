@@ -1,0 +1,23 @@
+{
+  "id": "019-invoice-total",
+  "title": "Invoice total is wrong when both discount and tax apply",
+  "difficulty": "hard",
+  "language": "python",
+  "tags": [
+    "arithmetic",
+    "ordering",
+    "money"
+  ],
+  "estimated_minutes": 20,
+  "version": "1.0",
+  "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/019-invoice-total.json",
+  "prompt": "The package in starter/ implements a simple invoicing module. invoice.py provides Invoice with add_line(description, unit_price, quantity), discount(rate) to set a percentage discount (0.0\u20131.0), and total(tax_rate) which returns the final amount after applying the discount and then tax. tax.py provides apply_tax(amount, rate). discount.py provides apply_discount(amount, rate). When both a discount and a tax are applied the returned total is wrong \u2014 it does not match the value computed by discounting the subtotal first and then applying tax to the discounted amount. The grader compares total() against a reference calculation for several combinations of line items, discount rates, and tax rates. Results must be rounded to two decimal places. Do not edit the tests.",
+  "starter_files": {
+    "discount.py": "def apply_discount(amount, rate):\n    \"\"\"Return amount * (1 - rate), not rounded.\"\"\"\n    return amount * (1.0 - rate)\n",
+    "invoice.py": "from tax import apply_tax\nfrom discount import apply_discount\n\n\nclass Invoice:\n    def __init__(self):\n        self._lines = []\n        self._discount_rate = 0.0\n\n    def add_line(self, description, unit_price, quantity):\n        self._lines.append((description, unit_price, quantity))\n\n    def discount(self, rate):\n        self._discount_rate = rate\n\n    def subtotal(self):\n        return sum(p * q for _, p, q in self._lines)\n\n    def total(self, tax_rate=0.0):\n        sub = self.subtotal()\n        # BUG: applies discount savings as a subtraction and tax as an addition\n        # on the original subtotal, rather than taxing the post-discount amount.\n        # discount_amount = sub * discount_rate, tax_amount = sub * tax_rate\n        discount_amount = sub * self._discount_rate\n        tax_amount = sub * tax_rate\n        return round(sub - discount_amount + tax_amount, 2)\n",
+    "tax.py": "def apply_tax(amount, rate):\n    \"\"\"Return amount * (1 + rate), not rounded.\"\"\"\n    return amount * (1.0 + rate)\n"
+  },
+  "grader_files": {
+    "test_invoice.py": "import os\nimport sys\n\nsys.path.insert(0, os.path.join(os.path.dirname(__file__), \"..\", \"starter\"))\n\nfrom invoice import Invoice\nimport pytest\n\n\ndef _ref_total(lines, discount_rate, tax_rate):\n    sub = sum(p * q for _, p, q in lines)\n    discounted = sub * (1.0 - discount_rate)\n    return round(discounted * (1.0 + tax_rate), 2)\n\n\ndef test_no_discount_no_tax():\n    inv = Invoice()\n    inv.add_line(\"Widget\", 10.0, 3)\n    assert inv.total(0.0) == 30.0\n\n\ndef test_tax_only():\n    inv = Invoice()\n    inv.add_line(\"Widget\", 100.0, 1)\n    assert inv.total(0.10) == 110.0\n\n\ndef test_discount_only():\n    inv = Invoice()\n    inv.add_line(\"Widget\", 100.0, 1)\n    inv.discount(0.20)\n    assert inv.total(0.0) == 80.0\n\n\ndef test_discount_then_tax():\n    inv = Invoice()\n    inv.add_line(\"Widget\", 100.0, 1)\n    inv.discount(0.10)\n    result = inv.total(0.10)\n    expected = _ref_total([(\"Widget\", 100.0, 1)], 0.10, 0.10)\n    assert result == expected\n\n\ndef test_multiple_lines_with_discount_and_tax():\n    inv = Invoice()\n    inv.add_line(\"A\", 50.0, 2)\n    inv.add_line(\"B\", 25.0, 4)\n    inv.discount(0.15)\n    result = inv.total(0.08)\n    lines = [(\"A\", 50.0, 2), (\"B\", 25.0, 4)]\n    expected = _ref_total(lines, 0.15, 0.08)\n    assert result == expected\n\n\n@pytest.mark.parametrize(\"unit,qty,disc,tax\", [\n    (10.0, 5, 0.0, 0.0),\n    (10.0, 5, 0.10, 0.0),\n    (10.0, 5, 0.0, 0.10),\n    (10.0, 5, 0.25, 0.20),\n    (99.99, 1, 0.05, 0.07),\n    (1.0, 100, 0.50, 0.15),\n])\ndef test_parametrized_combinations(unit, qty, disc, tax):\n    inv = Invoice()\n    inv.add_line(\"Item\", unit, qty)\n    inv.discount(disc)\n    result = inv.total(tax)\n    expected = _ref_total([(\"Item\", unit, qty)], disc, tax)\n    assert result == expected\n"
+  }
+}

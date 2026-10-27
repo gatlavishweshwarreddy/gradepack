@@ -1,0 +1,13 @@
+=== dedup.py ===
+import unicodedata
+
+def dedup(strings: list[str]) -> list[str]:
+    """Return strings with duplicates removed, preserving first occurrence."""
+    seen = set()
+    result = []
+    for s in strings:
+        norm = unicodedata.normalize('NFC', s)
+        if norm not in seen:
+            seen.add(norm)
+            result.append(s)
+    return result

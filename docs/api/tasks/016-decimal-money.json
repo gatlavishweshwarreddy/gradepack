@@ -1,17 +1,17 @@
 {
   "id": "016-decimal-money",
-  "title": "Fix float rounding errors in monetary calculations",
-  "difficulty": "hard",
+  "title": "Ledger balance is inaccurate for certain decimal amounts",
+  "difficulty": "easy",
   "language": "python",
   "tags": [
-    "arithmetic",
     "decimal",
-    "rounding"
+    "arithmetic",
+    "money"
   ],
-  "estimated_minutes": 25,
+  "estimated_minutes": 10,
   "version": "1.0",
   "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/016-decimal-money.json",
-  "prompt": "The module starter/ledger.py defines a Ledger class for tracking monetary transactions. add(amount_str) records an amount (passed as a string like '0.10'), and balance() returns the running total as a string rounded to 2 decimal places. The bug: amounts are converted to float internally, causing accumulated floating-point error (e.g. 0.1 + 0.2 != 0.3 in float). Fix it by using Python's decimal.Decimal for all arithmetic. The constructor must accept an optional initial_balance string (default '0'). balance() must return a string with exactly 2 decimal places (e.g. '0.30', not '0.3'). add() must raise ValueError for non-numeric input. The grader tests exact cent-level accuracy with parametrized cases and seeded random cent sequences compared against a Decimal reference. Do not edit the tests.",
+  "prompt": "The module starter/ledger.py provides a Ledger class. add(amount_str) records a monetary amount supplied as a string such as '0.10' or '19.99'. balance() returns the running total rounded to two decimal places. For amounts that cannot be represented exactly in binary, balance() returns a value that differs from the arithmetically correct sum \u2014 for example three additions of '0.10' yield 0.30 but the ledger may return a slightly different value. The grader checks exact equality of the balance against the expected decimal sum for several sequences of additions including common problem values. Do not edit the tests.",
   "starter_files": {
     "ledger.py": "class Ledger:\n    def __init__(self, initial_balance=\"0\"):\n        # BUG: stores as float, accumulates rounding error\n        self._balance = float(initial_balance)\n\n    def add(self, amount_str: str) -> None:\n        try:\n            self._balance += float(amount_str)\n        except ValueError:\n            raise ValueError(f\"Invalid amount: {amount_str!r}\")\n\n    def balance(self) -> str:\n        return f\"{self._balance:.2f}\"\n"
   },

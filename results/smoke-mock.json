@@ -1,0 +1,34 @@
+[
+  {
+    "task_id": "001-pagination-off-by-one",
+    "attempt": 1,
+    "provider": "mock",
+    "model": "smoke-mock",
+    "date": "2026-10-27T10:50:37Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 0.0,
+    "raw_output_path": "results/raw/smoke-mock/001-pagination-off-by-one_attempt1.txt"
+  },
+  {
+    "task_id": "026-retry-client",
+    "attempt": 1,
+    "provider": "mock",
+    "model": "smoke-mock",
+    "date": "2026-10-27T10:50:37Z",
+    "passed": 10,
+    "failed": 0,
+    "total": 10,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 0.0,
+    "raw_output_path": "results/raw/smoke-mock/026-retry-client_attempt1.txt"
+  }
+]

@@ -1,17 +1,17 @@
 {
   "id": "014-mutable-default",
-  "title": "Fix mutable default argument leaking shared state",
-  "difficulty": "hard",
+  "title": "Accumulator instances share state unexpectedly",
+  "difficulty": "easy",
   "language": "python",
   "tags": [
-    "gotchas",
+    "classes",
     "state",
-    "oop"
+    "python-gotcha"
   ],
-  "estimated_minutes": 20,
+  "estimated_minutes": 10,
   "version": "1.0",
   "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/014-mutable-default.json",
-  "prompt": "The module starter/accumulator.py defines Accumulator(initial=[]). Each instance should have its own independent list of items. The bug is a classic mutable default argument: the default list is shared across all instances that do not pass an explicit initial value, so items added to one instance bleed into the next. Fix it by using None as the default and creating a new list inside __init__ when initial is None. The grader tests that two independently created Accumulator() instances do not share state, that adding to one does not affect the other, that the initial list is copied (not referenced), and checks correct behavior with seeded random sequences of add operations across multiple instances. Do not edit the tests.",
+  "prompt": "The module starter/accumulator.py defines an Accumulator class. Each Accumulator should maintain its own independent list of items, and the list should start empty for every new instance unless an initial list is explicitly provided to the constructor. When a second Accumulator is created and items are appended to it, the first Accumulator must not see those items and vice versa. The grader checks that two independently-constructed Accumulator instances have separate item lists and that appending to one does not affect the other. Do not edit the tests.",
   "starter_files": {
     "accumulator.py": "class Accumulator:\n    # BUG: mutable default argument \u2014 shared across all instances\n    def __init__(self, initial=[]):\n        self.items = initial\n\n    def add(self, value):\n        self.items.append(value)\n        return self\n\n    def total(self):\n        return sum(self.items)\n\n    def values(self):\n        return list(self.items)\n"
   },

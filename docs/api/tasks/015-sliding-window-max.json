@@ -1,17 +1,17 @@
 {
   "id": "015-sliding-window-max",
-  "title": "Fix off-by-one in sliding window maximum",
-  "difficulty": "hard",
+  "title": "Sliding window maximum produces incorrect results",
+  "difficulty": "medium",
   "language": "python",
   "tags": [
     "algorithms",
     "deque",
-    "off-by-one"
+    "sliding-window"
   ],
-  "estimated_minutes": 30,
+  "estimated_minutes": 20,
   "version": "1.0",
   "url": "https://gatlavishweshwarreddy.github.io/gradepack/api/tasks/015-sliding-window-max.json",
-  "prompt": "The function sliding_max(nums, k) in starter/window.py returns a list of the maximum value in each sliding window of size k over nums. The bug is an off-by-one: the deque holds indices, and the left-trim condition uses `>= i - k` instead of the correct `< i - k + 1`, so stale indices are not evicted and the wrong maximum is returned for windows that have moved past a previously large element. Fix the condition so that sliding_max([3,1,2,5,4], 3) == [3,5,5], sliding_max([1], 1) == [1], and sliding_max([], 3) == []. The grader uses parametrized cases and a seeded brute-force reference to validate random inputs. Do not edit the tests.",
+  "prompt": "The function sliding_max(nums, k) in starter/window.py returns a list of the maximum value in each contiguous window of size k over nums. For an input of length n the result must have n-k+1 elements. The function gives incorrect maximums for certain inputs \u2014 in particular when the true maximum is in the right half of a window rather than the left. For example sliding_max([1,3,1,2], 3) should be [3,3] but returns a wrong value. The grader checks correctness against several reference cases including varied window sizes, duplicate values, and single-element windows. Do not edit the tests.",
   "starter_files": {
     "window.py": "from collections import deque\n\n\ndef sliding_max(nums: list, k: int) -> list:\n    \"\"\"Return the maximum of each sliding window of size k.\"\"\"\n    if not nums or k <= 0:\n        return []\n    dq: deque[int] = deque()  # stores indices\n    result = []\n    for i, val in enumerate(nums):\n        # Remove indices outside the window\n        # BUG: should be `dq and dq[0] < i - k + 1` but uses wrong condition\n        while dq and dq[0] >= i - k:\n            dq.popleft()\n        # Remove smaller elements from back\n        while dq and nums[dq[-1]] <= val:\n            dq.pop()\n        dq.append(i)\n        if i >= k - 1:\n            result.append(nums[dq[0]])\n    return result\n"
   },

@@ -1,0 +1,12 @@
+{
+  "id": "019-invoice-total",
+  "title": "Invoice total is wrong when both discount and tax apply",
+  "language": "python",
+  "difficulty": "hard",
+  "prompt": "The package in starter/ implements a simple invoicing module. invoice.py provides Invoice with add_line(description, unit_price, quantity), discount(rate) to set a percentage discount (0.0–1.0), and total(tax_rate) which returns the final amount after applying the discount and then tax. tax.py provides apply_tax(amount, rate). discount.py provides apply_discount(amount, rate). When both a discount and a tax are applied the returned total is wrong — it does not match the value computed by discounting the subtotal first and then applying tax to the discounted amount. The grader compares total() against a reference calculation for several combinations of line items, discount rates, and tax rates. Results must be rounded to two decimal places. Do not edit the tests.",
+  "grader": "pytest",
+  "version": "1.0",
+  "tags": ["arithmetic", "ordering", "money"],
+  "estimated_minutes": 20,
+  "license": "MIT"
+}

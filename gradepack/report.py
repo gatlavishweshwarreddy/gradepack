@@ -50,6 +50,9 @@ def _print_model_report(model_name: str, records: list[dict]) -> None:
         key=lambda x: x[1]
     )[:5]
 
+    # Agentic stats
+    agentic_recs = [r for r in records if r.get("agentic")]
+
     width = 60
     print()
     print("=" * width)
@@ -57,6 +60,15 @@ def _print_model_report(model_name: str, records: list[dict]) -> None:
     print("=" * width)
     print(f"  pass@1 (avg): {avg_p1:.1%}   pass@{attempts} (avg): {avg_pk:.1%}")
     print(f"  Tasks: {len(p1)}   Attempts per task: {attempts}")
+
+    if agentic_recs:
+        max_turns = max((r.get("max_turns", 1) for r in agentic_recs), default=1)
+        solved_within_n = sum(1 for r in agentic_recs if r.get("solved_at_turn") is not None)
+        avg_turns = sum(r.get("turns_used", 0) for r in agentic_recs) / len(agentic_recs)
+        p1_turn1 = sum(1 for r in agentic_recs if r.get("solved_at_turn") == 1)
+        print(f"  [agentic]  pass@1-turn1: {p1_turn1}/{len(agentic_recs)}  "
+              f"solved-within-{max_turns}: {solved_within_n}/{len(agentic_recs)}  "
+              f"avg_turns: {avg_turns:.2f}")
 
     print()
     print("  By difficulty:")
