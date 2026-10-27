@@ -6,12 +6,6 @@ Built during the Meta Global AI Developer Hackathon (Oct 26 to Nov 4, 2026).
 
 ---
 
-## Built with
-
-IBM Bob wrote the majority of the code in this repository — runner, tasks, CLI, bench, factory, server, MCP server, leaderboard, and CI. Task design, difficulty calibration, and review decisions are mine.
-
----
-
 ## Install
 
 ```bash
