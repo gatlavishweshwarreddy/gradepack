@@ -26,7 +26,6 @@ def _encode_varint(n):
 
 
 def _decode_varint(buf, pos):
-    start = pos
     result = 0
     shift = 0
     while True:
@@ -38,64 +37,50 @@ def _decode_varint(buf, pos):
         if (b & 0x80) == 0:
             break
         shift += 7
-        # allow arbitrary large ints but prevent infinite loop / DoS
-        if shift >= 1_000_000:
+        if shift >= 64:
             raise ValueError("varint too long")
-    # validate canonical minimal encoding
-    canonical = _encode_varint(result)
-    if len(canonical) != (pos - start) or canonical != bytes(buf[start:pos]):
-        raise ValueError("non-canonical varint")
     return result, pos
 
 
 def _encode_zigzag(n):
-    # canonical zigzag for arbitrary Python ints: (n<<1) ^ -(n<0)
-    return (n << 1) ^ (-(n < 0))
+    if n >= 0:
+        return n << 1
+    else:
+        return (-n << 1) - 1
 
 
 def _decode_zigzag(n):
-    return (n >> 1) ^ (-(n & 1))
+    return (n >> 1) ^ -(n & 1)
 
 
 def _sort_key(obj):
-    # total ordering for canonical sorting
+    # canonical order: None < bool < int < float < str < bytes < list < dict < set
     if obj is None:
-        return (0,)
+        return (0, 0)
     elif isinstance(obj, bool):
-        return (1, obj)
+        return (1, int(obj))
     elif isinstance(obj, int):
         return (2, obj)
     elif isinstance(obj, float):
         if math.isnan(obj):
-            # NaN sorts after all numbers but deterministically
             return (3, float('inf'), 1)
-        # distinguish -0.0 vs 0.0 via copysign for determinism
+        if math.isinf(obj):
+            return (3, obj, 0)
         if obj == 0.0:
+            # distinguish -0.0 and 0.0
             return (3, 0.0, math.copysign(1.0, obj))
-        return (3, obj)
+        return (3, obj, 0)
     elif isinstance(obj, str):
         return (4, obj)
     elif isinstance(obj, bytes):
         return (5, obj)
     elif isinstance(obj, list):
-        return (6, tuple(_sort_key(e) for e in obj))
+        return (6, tuple(_sort_key(x) for x in obj))
     elif isinstance(obj, dict):
-        # dict keys are hashable, but handle generically
-        # sort items by key's sort key for determinism
-        try:
-            items = tuple(sorted((( _sort_key(k), _sort_key(v)) for k, v in obj.items())))
-        except TypeError:
-            # fallback to repr if needed
-            items = tuple(sorted((( _sort_key(k), _sort_key(v)) for k, v in obj.items()), key=lambda x: repr(x)))
-        return (7, items)
+        return (7, tuple(sorted((_sort_key(k), _sort_key(v)) for k, v in obj.items())))
     elif isinstance(obj, set):
-        try:
-            elems = tuple(sorted(_sort_key(e) for e in obj))
-        except TypeError:
-            elems = tuple(sorted((_sort_key(e) for e in obj), key=lambda x: repr(x)))
-        return (8, elems)
+        return (8, tuple(sorted(_sort_key(x) for x in obj)))
     else:
-        # unsupported types should not be sorted, but provide fallback
         return (9, repr(obj))
 
 
@@ -161,26 +146,25 @@ class Codec:
             buf.extend(_encode_varint(len(obj)))
             buf.extend(obj)
         elif isinstance(obj, list):
-            memo[obj_id] = next_id[0]
-            next_id[0] += 1
             buf.append(TAG_LIST)
             buf.extend(_encode_varint(len(obj)))
+            memo[obj_id] = next_id[0]
+            next_id[0] += 1
             for item in obj:
                 self._encode(item, buf, memo, next_id)
         elif isinstance(obj, dict):
-            memo[obj_id] = next_id[0]
-            next_id[0] += 1
             buf.append(TAG_DICT)
             buf.extend(_encode_varint(len(obj)))
-            # canonical sorted order
-            for k, v in sorted(obj.items(), key=lambda kv: _sort_key(kv[0])):
-                self._encode(k, buf, memo, next_id)
-                self._encode(v, buf, memo, next_id)
-        elif isinstance(obj, set):
             memo[obj_id] = next_id[0]
             next_id[0] += 1
+            for k in sorted(obj, key=_sort_key):
+                self._encode(k, buf, memo, next_id)
+                self._encode(obj[k], buf, memo, next_id)
+        elif isinstance(obj, set):
             buf.append(TAG_SET)
             buf.extend(_encode_varint(len(obj)))
+            memo[obj_id] = next_id[0]
+            next_id[0] += 1
             for item in sorted(obj, key=_sort_key):
                 self._encode(item, buf, memo, next_id)
         else:

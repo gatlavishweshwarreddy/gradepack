@@ -1,6 +1,7 @@
 codec.py
 ```python
 import struct
+import math
 
 TAG_NULL = 0x00
 TAG_TRUE = 0x01
@@ -27,6 +28,7 @@ def _encode_varint(n):
 def _decode_varint(buf, pos):
     result = 0
     shift = 0
+    start = pos
     while True:
         if pos >= len(buf):
             raise ValueError("truncated varint")
@@ -38,10 +40,15 @@ def _decode_varint(buf, pos):
         shift += 7
         if shift >= 64:
             raise ValueError("varint too long")
+    # canonical check: minimal encoding
+    encoded = _encode_varint(result)
+    if len(encoded) != (pos - start) or encoded != buf[start:pos]:
+        raise ValueError("non-canonical varint")
     return result, pos
 
 
 def _encode_zigzag(n):
+    # canonical zigzag for arbitrary Python ints
     if n >= 0:
         return n << 1
     else:
@@ -52,57 +59,9 @@ def _decode_zigzag(n):
     return (n >> 1) ^ -(n & 1)
 
 
-def _sort_key(obj):
-    # Canonical total order for dict keys / set elements.
-    # Order by type tag order, then by value. Handles heterogeneous types.
-    if obj is None:
+def _sort_key(x):
+    # canonical deterministic order for dict keys / set elements
+    # order by type tag then natural value
+    if x is None:
         return (0, 0)
-    elif isinstance(obj, bool):
-        return (1, int(obj))
-    elif isinstance(obj, int):
-        return (2, obj)
-    elif isinstance(obj, float):
-        # use IEEE-754 bit pattern for deterministic ordering (NaN, -0.0)
-        return (3, struct.unpack('<Q', struct.pack('<d', obj))[0])
-    elif isinstance(obj, str):
-        return (4, obj)
-    elif isinstance(obj, bytes):
-        return (5, obj)
-    elif isinstance(obj, list):
-        return (6, len(obj))
-    elif isinstance(obj, dict):
-        return (7, len(obj))
-    elif isinstance(obj, set):
-        return (8, len(obj))
-    else:
-        return (9, repr(obj))
-
-
-class Codec:
-    """
-    Binary codec for Python values.
-
-    Public API:
-      dumps(obj) -> bytes
-      loads(data) -> obj
-
-    Supported types: None, bool, int, float, str, bytes, list, dict, set.
-    Shared references and cyclic structures are preserved via back-references.
-    Dict keys and set elements are serialized in canonical sorted order.
-    Internal helpers _encode, _decode, _encode_varint, _decode_varint,
-    _encode_zigzag, _decode_zigzag may be instrumented for performance checks.
-    Floats are little-endian IEEE-754. Strings are UTF-8 with byte-length prefix.
-    The decoder validates input and rejects trailing/unknown/truncated data.
-    """
-
-    def dumps(self, obj):
-        buf = bytearray()
-        memo = {}
-        next_id = [0]
-        self._encode(obj, buf, memo, next_id)
-        return bytes(buf)
-
-    def loads(self, data):
-        if not isinstance(data, (bytes, bytearray)):
-            raise TypeError("data must be bytes")
-        if len(data) ==
+    if isinstance(x,

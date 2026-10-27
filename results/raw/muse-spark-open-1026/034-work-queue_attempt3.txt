@@ -28,12 +28,13 @@ class WorkQueue:
         with self._lock:
             return self._done and not self._items
 ```
-
 worker.py
 ```python
 import threading
 
+
 class Worker:
+    # shared lock to protect concurrent appends to the shared results list
     _results_lock = threading.Lock()
 
     def __init__(self, queue, results):

@@ -10,8 +10,6 @@ def parse_csv(text):
     headers = [h.strip() for h in lines[0].split(",")]
     result = []
     for line in lines[1:]:
-        if not line.strip():
-            continue
         values = [v.strip() for v in line.split(",")]
         result.append(dict(zip(headers, values)))
     return result

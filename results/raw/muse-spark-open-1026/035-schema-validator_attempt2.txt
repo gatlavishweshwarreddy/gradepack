@@ -9,34 +9,30 @@ class Schema:
 
     def load(self, definition):
         """Store a schema definition dict."""
-        self._definition = copy.deepcopy(definition)
+        self._definition = definition
 
     def define(self, name, sub_schema):
         """Register a named sub-schema for $ref resolution."""
-        self._definitions[name] = copy.deepcopy(sub_schema)
+        self._definitions[name] = sub_schema
 
     def expand(self):
         """
         Resolve $ref references.
-        Returns a deep-copied expanded schema without mutating the original.
         """
         expanded = copy.deepcopy(self._definition)
         self._resolve(expanded)
         return expanded
 
     def _resolve(self, node):
-        if isinstance(node, dict):
-            if "$ref" in node:
-                ref_name = node["$ref"]
-                if ref_name in self._definitions:
-                    ref_copy = copy.deepcopy(self._definitions[ref_name])
-                    del node["$ref"]
-                    node.update(ref_copy)
-            for v in list(node.values()):
-                self._resolve(v)
-        elif isinstance(node, list):
-            for item in node:
-                self._resolve(item)
+        if not isinstance(node, dict):
+            return
+        if "$ref" in node:
+            ref_name = node["$ref"]
+            if ref_name in self._definitions:
+                node.update(self._definitions[ref_name])
+                del node["$ref"]
+        for v in list(node.values()):
+            self._resolve(v)
 ```
 
 validator.py

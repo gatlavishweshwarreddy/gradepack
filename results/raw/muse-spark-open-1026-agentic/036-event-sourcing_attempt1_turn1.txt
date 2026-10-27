@@ -11,11 +11,9 @@ class EventStore:
         """
         Return events with sequence >= from_seq in sequence order.
         """
-        return sorted(
-            [e for e in self._events if e.sequence >= from_seq],
-            key=lambda e: e.sequence
-        )
+        return sorted([e for e in self._events if e.sequence >= from_seq], key=lambda e: e.sequence)
 ```
+
 projector.py
 ```python
 class Projector:

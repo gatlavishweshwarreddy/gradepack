@@ -148,18 +148,15 @@ class Scheduler:
         completed_tasks.sort(key=lambda t: (t.priority, t.seq))
         completed = [t.task_id for t in completed_tasks]
 
-        # Promote PENDING tasks and propagate failures.
-        # Dependencies are always on earlier seq (submit checks unknown dep),
-        # so a single pass in insertion order (seq order) is sufficient,
-        # but we loop until stable to handle transitive propagation safely
-        # without any expensive sorts.
+        # Promote PENDING tasks: check dependency propagation every tick
+        # Need iterative handling for transitive FAILED propagation
         changed = True
         while changed:
             changed = False
             for task in self.tasks.values():
                 if task.state != TaskState.PENDING:
                     continue
-                # propagation: if any dep is FAILED or CANCELLED, fail immediately
+                # check if any dep is FAILED or CANCELLED -> propagate FAILED
                 failed_dep = False
                 for d in task.deps:
                     dep_state = self.tasks[d].state
@@ -170,7 +167,7 @@ class Scheduler:
                     task.state = TaskState.FAILED
                     changed = True
                     continue
-                # promotion: all deps COMPLETED -> READY
+                # check if all deps are COMPLETED -> READY
                 if task.deps and all(self.tasks[d].state == TaskState.COMPLETED for d in task.deps):
                     task.state = TaskState.READY
                     heapq.heappush(self.ready_heap, (task.priority, task.seq, task.task_id))

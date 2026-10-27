@@ -11,7 +11,7 @@ def memoize(fn):
 
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-        # Build a hashable key from args and kwargs
+        # Build a hashable cache key from args and kwargs
         if kwargs:
             key = (args, tuple(sorted(kwargs.items())))
         else:

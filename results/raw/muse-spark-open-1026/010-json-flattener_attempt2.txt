@@ -6,10 +6,7 @@ def flatten(obj, sep="."):
 
     def _recurse(current, prefix):
         for key, value in current.items():
-            if prefix:
-                new_key = prefix + sep + key
-            else:
-                new_key = key
+            new_key = f"{prefix}{sep}{key}" if prefix else key
             if isinstance(value, dict):
                 _recurse(value, new_key)
             else:

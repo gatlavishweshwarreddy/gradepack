@@ -20,11 +20,10 @@ class Graph:
 
         dist = {source: 0.0}
         pq = [(0.0, source)]
-
         while pq:
             d, u = heapq.heappop(pq)
             # Skip stale entries
-            if d != dist.get(u):
+            if d != dist.get(u, None):
                 continue
             if u == target:
                 return d

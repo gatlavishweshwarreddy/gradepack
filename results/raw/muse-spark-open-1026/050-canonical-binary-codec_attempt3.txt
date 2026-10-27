@@ -42,8 +42,7 @@ def _decode_varint(buf, pos):
 
 
 def _encode_zigzag(n):
-    # canonical zigzag for arbitrary Python int
-    # 0 -> 0, -1 -> 1, 1 -> 2, -2 -> 3, ...
+    # canonical ZigZag for arbitrary Python ints
     if n >= 0:
         return n << 1
     else:
@@ -54,42 +53,29 @@ def _decode_zigzag(n):
     return (n >> 1) ^ -(n & 1)
 
 
-def _type_rank(o):
-    if o is None:
-        return 0
-    if isinstance(o, bool):
-        return 1
-    if isinstance(o, int):
-        return 2
-    if isinstance(o, float):
-        return 3
-    if isinstance(o, str):
-        return 4
-    if isinstance(o, bytes):
-        return 5
-    if isinstance(o, list):
-        return 6
-    if isinstance(o, dict):
-        return 7
-    if isinstance(o, set):
-        return 8
-    return 9
-
-
-def _sort_key(o):
-    r = _type_rank(o)
-    if o is None:
-        return (r, 0)
-    if isinstance(o, bool):
-        return (r, int(o))
-    # for int, float, str, bytes use natural ordering
-    # list/dict/set are not expected as dict keys / set elements (unhashable)
-    # but handle them for completeness
-    try:
-        return (r, o)
-    except TypeError:
-        # fallback to repr for unorderable types
-        return (r, repr(o))
+def _sort_key(obj):
+    # canonical total order for dict keys / set elements
+    if obj is None:
+        return (0, 0)
+    if isinstance(obj, bool):
+        return (1, obj)
+    if isinstance(obj, int):
+        return (2, obj)
+    if isinstance(obj, float):
+        if obj != obj:  # NaN
+            return (3, float('inf'))
+        return (3, obj)
+    if isinstance(obj, str):
+        return (4, obj)
+    if isinstance(obj, bytes):
+        return (5, obj)
+    if isinstance(obj, list):
+        return (6, repr(obj))
+    if isinstance(obj, dict):
+        return (7, repr(obj))
+    if isinstance(obj, set):
+        return (8, repr(obj))
+    return (9, repr(obj))
 
 
 class Codec:
@@ -154,7 +140,6 @@ class Codec:
             buf.extend(_encode_varint(len(obj)))
             buf.extend(obj)
         elif isinstance(obj, list):
-            # memoize before encoding contents to support cycles/shared refs
             memo[obj_id] = next_id[0]
             next_id[0] += 1
             buf.append(TAG_LIST)
@@ -166,7 +151,6 @@ class Codec:
             next_id[0] += 1
             buf.append(TAG_DICT)
             buf.extend(_encode_varint(len(obj)))
-            # canonical sorted order
             for k, v in sorted(obj.items(), key=lambda kv: _sort_key(kv[0])):
                 self._encode(k, buf, memo, next_id)
                 self._encode(v, buf, memo, next_id)
@@ -204,10 +188,7 @@ class Codec:
             length, pos = _decode_varint(buf, pos)
             if pos + length > len(buf):
                 raise ValueError("truncated str")
-            try:
-                s = buf[pos:pos+length].decode('utf-8')
-            except UnicodeDecodeError as e:
-                raise ValueError("invalid utf-8") from e
+            s = buf[pos:pos+length].decode('utf-8')
             pos += length
             return s, pos
         elif tag == TAG_BYTES:
@@ -230,23 +211,4 @@ class Codec:
             d = {}
             memo.append(d)
             for _ in range(length):
-                k, pos = self._decode(buf, pos, memo)
-                v, pos = self._decode(buf, pos, memo)
-                d[k] = v
-            return d, pos
-        elif tag == TAG_SET:
-            length, pos = _decode_varint(buf, pos)
-            s = set()
-            memo.append(s)
-            for _ in range(length):
-                val, pos = self._decode(buf, pos, memo)
-                s.add(val)
-            return s, pos
-        elif tag == TAG_REF:
-            ref_id, pos = _decode_varint(buf, pos)
-            if ref_id >= len(memo):
-                raise ValueError("invalid ref")
-            return memo[ref_id], pos
-        else:
-            raise ValueError(f"unknown tag: {tag}")
-```
+                k,

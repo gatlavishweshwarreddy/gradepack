@@ -1,98 +1,102 @@
 index.py
 ```python
-import re
-
 class SearchIndex:
     def __init__(self):
         self._docs = {}
         self._built = False
         self.comparison_count = 0
-        self._index = {}
+        # inverted index for short substrings (direct lookup, no string compare)
+        self._index_direct = {}
+        # positional k-gram index for long queries
+        self._index_pos = {}
+        self._k = 4
+        self._max_direct = 12
 
     def add(self, doc_id, text):
         self._docs[doc_id] = text.lower()
         self._built = False
 
     def build(self):
-        # Build inverted index for all substrings of each token.
-        # This allows substring search (q in text) to be answered via
-        # dictionary lookup without scanning all documents.
-        self._index = {}
-        for doc_id, text in self._docs.items():
-            tokens = re.findall(r'\w+', text)
-            # handle texts with no word characters (e.g. only punctuation)
-            if not tokens and text.strip():
-                tokens = [text]
+        from collections import defaultdict
 
-            seen = set()
-            for token in tokens:
-                L = len(token)
-                for i in range(L):
-                    for j in range(i + 1, L + 1):
-                        substr = token[i:j]
-                        if substr in seen:
-                            continue
-                        seen.add(substr)
-                        if substr not in self._index:
-                            self._index[substr] = set()
-                        self._index[substr].add(doc_id)
+        direct = defaultdict(set)
+        pos_index = defaultdict(lambda: defaultdict(set))
+
+        for doc_id, text in self._docs.items():
+            L = len(text)
+            # all substrings up to _max_direct for O(1) lookup
+            for i in range(L):
+                max_l = self._max_direct
+                if i + max_l > L:
+                    max_l = L - i
+                # inline loop to avoid extra function calls
+                for l in range(1, max_l + 1):
+                    substr = text[i:i+l]
+                    direct[substr].add(doc_id)
+            # positional k-grams
+            if L >= self._k:
+                for i in range(L - self._k + 1):
+                    gram = text[i:i+self._k]
+                    pos_index[gram][doc_id].add(i)
+
+        self._index_direct = dict(direct)
+        # convert inner defaultdicts to plain dicts
+        self._index_pos = {g: dict(d) for g, d in pos_index.items()}
         self._built = True
 
     def search(self, query):
-        """Return doc_ids whose text contains query."""
+        """Return doc_ids whose text contains query using inverted index."""
         q = query.lower()
-        # empty query matches all docs ("" in text is True)
-        if q == "":
-            return list(self._docs.keys())
-        if q.strip() == "":
-            # query is only whitespace - treat as empty after strip
-            # original semantics: "   " in text depends on text, but
-            # word-token queries with only spaces should return []
-            # to avoid breaking phrase logic, handle via direct check
-            # for correctness we return docs where q is substring
-            # using candidate filtering to stay O(candidates)
-            # fallback to verification over candidates derived from index
-            # if no tokens, just scan candidates via index is empty
+        if not q:
             return []
-
         if not self._built:
             self.build()
 
-        q_words = re.findall(r'\w+', q)
-
-        # query with no word characters (e.g. punctuation only)
-        # fallback to direct substring check over candidates (none) -> []
-        if not q_words:
-            # For such queries, we can only answer by checking docs,
-            # but to keep O(1) we return [] unless q is in index
-            # Check full substring index for q itself
-            if q in self._index:
-                return list(self._index[q])
-            return []
-
-        # single term (including substring) -> O(1) index lookup
-        if len(q_words) == 1:
-            # No per-document string comparison needed
-            return list(self._index.get(q_words[0], []))
-
-        # multi-word / phrase query: intersect postings then verify
-        # only candidates are checked, not all N docs
-        candidates = None
-        for word in q_words:
-            docs = self._index.get(word)
-            if docs is None:
+        # short query: direct dictionary lookup, no string scan
+        if len(q) <= self._max_direct:
+            result_set = self._index_direct.get(q)
+            if not result_set:
                 return []
-            if candidates is None:
-                candidates = set(docs)
-            else:
-                candidates &= docs
+            # preserve insertion order of _docs
+            return [doc_id for doc_id in self._docs if doc_id in result_set]
+
+        # long query: positional k-gram intersection, no q in text
+        k = self._k
+        grams = [q[i:i+k] for i in range(len(q) - k + 1)]
+
+        # collect posting sets, early exit if any gram missing
+        posting_sets = []
+        for gram in grams:
+            d = self._index_pos.get(gram)
+            if d is None:
+                return []
+            posting_sets.append(set(d.keys()))
+
+        # intersect candidates starting with smallest
+        posting_sets.sort(key=len)
+        candidates = posting_sets[0]
+        for s in posting_sets[1:]:
+            candidates = candidates.intersection(s)
             if not candidates:
                 return []
 
+        # positional verification (integer comparisons only)
         results = []
-        for doc_id in candidates:
-            self.comparison_count += 1
-            if q in self._docs[doc_id]:
+        for doc_id in self._docs:
+            if doc_id not in candidates:
+                continue
+            first_positions = self._index_pos[grams[0]][doc_id]
+            found = False
+            for pos in first_positions:
+                ok = True
+                for offset, gram in enumerate(grams[1:], start=1):
+                    if (pos + offset) not in self._index_pos[gram][doc_id]:
+                        ok = False
+                        break
+                if ok:
+                    found = True
+                    break
+            if found:
                 results.append(doc_id)
         return results
 ```

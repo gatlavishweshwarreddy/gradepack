@@ -1,11 +1,7 @@
 inventory.py
 ```python
 import threading
-
-try:
-    from reservation import ReservationLog
-except ImportError:
-    from .reservation import ReservationLog
+from reservation import ReservationLog
 
 
 class Inventory:
@@ -23,8 +19,8 @@ class Inventory:
             return self._stock.get(item, 0) - self._log.total_reserved(item)
 
     def reserve(self, item, qty):
+        # atomically check and commit
         with self._lock:
-            # atomically check and record; available must account for already-committed reservations
             available = self._stock.get(item, 0) - self._log.total_reserved(item)
             if available >= qty:
                 self._log.record(item, qty)
@@ -34,7 +30,6 @@ class Inventory:
     def reservations(self):
         return self._log
 ```
-
 reservation.py
 ```python
 import threading

@@ -52,13 +52,11 @@ class BufferedIterator:
     def peek(self, index=0, default=_sentinel):
         if index < 0:
             raise ValueError("index must be non-negative")
-        if len(self._buffer) > index:
-            return self._buffer[index]
-        if self._exhausted:
-            if default is not _sentinel:
-                return default
-            raise StopIteration
         while len(self._buffer) <= index:
+            if self._exhausted:
+                if default is not _sentinel:
+                    return default
+                raise StopIteration
             try:
                 self._buffer.append(next(self._source_iter))
             except StopIteration:
@@ -78,7 +76,8 @@ class BufferedIterator:
     def push_back(self, *values):
         if not values:
             return
-        self._buffer.extendleft(reversed(values))
+        for val in reversed(values):
+            self._buffer.appendleft(val)
         self._exhausted = False
 
     def take(self, n):
@@ -95,28 +94,31 @@ class BufferedIterator:
     def window(self, size, step=1):
         if size <= 0 or step <= 0:
             raise ValueError("size and step must be positive")
-        buf = []
-        for _ in range(size):
-            try:
+        buf = deque()
+        try:
+            for _ in range(size):
                 buf.append(next(self))
-            except StopIteration:
-                return
+        except StopIteration:
+            return
         yield tuple(buf)
         while True:
+            new_items = []
             for _ in range(step):
                 try:
-                    buf.append(next(self))
+                    new_items.append(next(self))
                 except StopIteration:
                     return
-            buf = buf[step:]
+            for item in new_items:
+                buf.append(item)
+                buf.popleft()
             yield tuple(buf)
 
     def close(self):
         if hasattr(self._source_iter, 'close'):
             try:
                 self._source_iter.close()
-            except Exception:
-                pass
+            except BaseException:
+                raise
         self._buffer.clear()
         self._exhausted = True
 
@@ -134,8 +136,20 @@ class BufferedIterator:
                 self._exhausted = False
                 return result
         if isinstance(exc_type, BaseException):
-            raise exc_type.with_traceback(tb)
+            if tb is not None:
+                raise exc_type.with_traceback(tb)
+            raise exc_type
         if exc_val is not None:
-            raise exc_type(exc_val).with_traceback(tb)
-        raise exc_type().with_traceback(tb)
+            if isinstance(exc_val, BaseException):
+                exc = exc_val
+            else:
+                try:
+                    exc = exc_type(exc_val)
+                except Exception:
+                    exc = exc_type()
+        else:
+            exc = exc_type()
+        if tb is not None:
+            exc = exc.with_traceback(tb)
+        raise exc
 ```

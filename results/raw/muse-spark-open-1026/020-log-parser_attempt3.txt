@@ -7,63 +7,23 @@ def duration_seconds(entries):
     """
     Return elapsed seconds between first and last entry.
     Returns 0 if fewer than 2 entries.
-    Handles logs that span midnight (and multiple midnights) by
-    detecting when the clock goes backwards and adding day offsets.
+    Correctly handles logs that span midnight by tracking day rollover.
     """
     if len(entries) < 2:
         return 0
     base = datetime.date(2000, 1, 1)
     first = datetime.datetime.combine(base, entries[0].time)
-
-    # Track day offset for the last entry by counting midnight crossings
-    day_offset = 0
-    prev_time = entries[0].time
-    for e in entries[1:]:
-        if e.time < prev_time:
-            day_offset += 1
-        prev_time = e.time
-
-    last_date = base + datetime.timedelta(days=day_offset)
-    last = datetime.datetime.combine(last_date, entries[-1].time)
+    prev = first
+    for entry in entries[1:]:
+        cur = datetime.datetime.combine(prev.date(), entry.time)
+        # if time went backwards, we have crossed midnight -> next day
+        if cur < prev:
+            cur += datetime.timedelta(days=1)
+            # handle unlikely case of multiple day gap in one step
+            while cur < prev:
+                cur += datetime.timedelta(days=1)
+        prev = cur
+    last = prev
     delta = last - first
     return delta.total_seconds()
-```
-
-parser.py
-```python
-import datetime
-
-
-class LogEntry:
-    def __init__(self, time: datetime.time, level: str, message: str):
-        self.time = time
-        self.level = level
-        self.message = message
-
-    def __repr__(self):
-        return f"LogEntry({self.time!r}, {self.level!r}, {self.message!r})"
-
-
-def parse_log(lines):
-    """Parse log lines of the form 'HH:MM:SS LEVEL message'."""
-    entries = []
-    for line in lines:
-        line = line.strip()
-        if not line:
-            continue
-        parts = line.split(" ", 2)
-        if len(parts) < 3:
-            continue
-        time_str, level, message = parts
-        h, m, s = time_str.split(":")
-        t = datetime.time(int(h), int(m), int(s))
-        entries.append(LogEntry(t, level, message))
-    return entries
-```
-
-filter.py
-```python
-def filter_level(entries, level):
-    """Return only entries whose level matches (case-sensitive)."""
-    return [e for e in entries if e.level == level]
 ```

@@ -3,101 +3,60 @@ parser.py
 from tokenizer import tokenize
 
 
+def _parse_expr(tokens, pos, variables):
+    """Parse addition and subtraction (lowest precedence)."""
+    left, pos = _parse_term(tokens, pos, variables)
+    while pos < len(tokens) and tokens[pos] in ('+', '-'):
+        op = tokens[pos]
+        pos += 1
+        right, pos = _parse_term(tokens, pos, variables)
+        if op == '+':
+            left = left + right
+        elif op == '-':
+            left = left - right
+    return left, pos
+
+
+def _parse_term(tokens, pos, variables):
+    """Parse multiplication and division (higher precedence)."""
+    left, pos = _parse_atom(tokens, pos, variables)
+    while pos < len(tokens) and tokens[pos] in ('*', '/'):
+        op = tokens[pos]
+        pos += 1
+        right, pos = _parse_atom(tokens, pos, variables)
+        if op == '*':
+            left = left * right
+        elif op == '/':
+            left = left / right
+    return left, pos
+
+
 def _parse_atom(tokens, pos, variables):
     tok = tokens[pos]
     if tok == '(':
         val, pos = _parse_expr(tokens, pos + 1, variables)
-        pos += 1  # skip ')'
+        # skip ')'
+        if pos < len(tokens) and tokens[pos] == ')':
+            pos += 1
+        else:
+            # fallback to original behaviour if malformed
+            pos += 1
         return val, pos
+    elif tok in ('+', '-'):
+        # unary plus/minus
+        op = tok
+        val, pos = _parse_atom(tokens, pos + 1, variables)
+        return (-val if op == '-' else val), pos
     elif tok in variables:
         return float(variables[tok]), pos + 1
     else:
         return float(tok), pos + 1
-
-
-def _parse_expr(tokens, pos, variables):
-    """BUG: left-to-right evaluation, no operator precedence. Kept for backward compatibility."""
-    left, pos = _parse_atom(tokens, pos, variables)
-    while pos < len(tokens) and tokens[pos] in ('+', '-', '*', '/'):
-        op = tokens[pos]
-        pos += 1
-        right, pos = _parse_atom(tokens, pos, variables)
-        if op == '+': left = left + right
-        elif op == '-': left = left - right
-        elif op == '*': left = left * right
-        elif op == '/': left = left / right
-    return left, pos
-
-
-# --- Correct precedence implementation for new two-argument form ---
-
-def _parse_atom_correct(tokens, pos, variables):
-    tok = tokens[pos]
-    if tok == '(':
-        val, pos = _parse_expr_correct(tokens, pos + 1, variables)
-        pos += 1  # skip ')'
-        return val, pos
-    elif tok in variables:
-        return float(variables[tok]), pos + 1
-    else:
-        return float(tok), pos + 1
-
-
-def _parse_term_correct(tokens, pos, variables):
-    left, pos = _parse_atom_correct(tokens, pos, variables)
-    while pos < len(tokens) and tokens[pos] in ('*', '/'):
-        op = tokens[pos]
-        pos += 1
-        right, pos = _parse_atom_correct(tokens, pos, variables)
-        if op == '*': left = left * right
-        elif op == '/': left = left / right
-    return left, pos
-
-
-def _parse_expr_correct(tokens, pos, variables):
-    left, pos = _parse_term_correct(tokens, pos, variables)
-    while pos < len(tokens) and tokens[pos] in ('+', '-'):
-        op = tokens[pos]
-        pos += 1
-        right, pos = _parse_term_correct(tokens, pos, variables)
-        if op == '+': left = left + right
-        elif op == '-': left = left - right
-    return left, pos
 
 
 def parse_and_eval(expr_str, variables=None):
     if variables is None:
-        # Legacy single-argument path: preserve buggy left-to-right behavior for backward compatibility
         variables = {}
-        tokens = tokenize(expr_str)
-        result, _ = _parse_expr(tokens, 0, variables)
-        return result
-    else:
-        tokens = tokenize(expr_str)
-        result, _ = _parse_expr_correct(tokens, 0, variables)
-        return result
-```
-
-expr.py
-```python
-from parser import parse_and_eval
-
-
-def evaluate(expr_str, variables=None):
-    """Evaluate an arithmetic expression string. variables is an optional dict."""
-    if variables is None:
-        # Backward compatibility: single-argument calls must keep old buggy behavior
-        return parse_and_eval(expr_str)
-    return parse_and_eval(expr_str, variables)
-```
-
-tokenizer.py
-```python
-def tokenize(expr):
-    """Split expression into list of tokens (numbers, operators, parens)."""
-    import re
-    tokens = []
-    for m in re.finditer(r'\d+\.?\d*|[+\-*/()]|\b[a-zA-Z_]\w*\b', expr):
-        tokens.append(m.group())
-    return tokens
+    tokens = tokenize(expr_str)
+    result, _ = _parse_expr(tokens, 0, variables)
+    return result
 ```

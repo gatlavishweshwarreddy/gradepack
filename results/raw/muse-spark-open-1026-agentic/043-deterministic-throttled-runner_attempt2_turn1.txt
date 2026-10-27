@@ -52,17 +52,19 @@ class ThrottledRunner:
         if now < self._last_tick:
             raise ValueError("time must be monotonic")
         elapsed = now - self._last_tick
-        self._tokens = min(self.burst, self._tokens + elapsed * self.rps)
+        self._tokens = min(float(self.burst), self._tokens + elapsed * self.rps)
         self._last_tick = now
         started = []
         while self._pending:
-            if len(self._running) >= self.max_concurrent:
-                break
             if self._tokens < 1:
+                break
+            if len(self._running) >= self.max_concurrent:
                 break
             prio, seq, tid = heapq.heappop(self._pending)
             info = self._tasks.get(tid)
-            if not info or info["state"] != "PENDING" or info["seq"] != seq:
+            if not info or info["state"] != "PENDING":
+                continue
+            if info.get("seq") != seq:
                 continue
             self._tokens -= 1
             info["state"] = "RUNNING"

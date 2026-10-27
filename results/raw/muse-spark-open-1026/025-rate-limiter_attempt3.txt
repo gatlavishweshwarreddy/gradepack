@@ -15,13 +15,13 @@ class RateLimiter:
         max_requests in the last window_seconds. Return False otherwise.
         """
         since = now - self._window
+        self._store.prune(key, since)
         recent = self._store.get_since(key, since)
         if len(recent) < self._max:
             self._store.add(key, now)
             return True
         return False
 ```
-
 store.py
 ```python
 class RequestStore:
@@ -39,5 +39,7 @@ class RequestStore:
 
     def prune(self, key, since):
         """Remove timestamps older than since."""
+        if key not in self._data:
+            return
         self._data[key] = self.get_since(key, since)
 ```

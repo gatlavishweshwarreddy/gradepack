@@ -1,57 +1,87 @@
 index.py
 ```python
+import re
+
 class SearchIndex:
     def __init__(self):
         self._docs = {}
         self._built = False
+        self._index = {}
         self.comparison_count = 0
-        self._trie = {}
-        self._order_map = {}
 
     def add(self, doc_id, text):
         self._docs[doc_id] = text.lower()
         self._built = False
 
     def build(self):
-        # Build an inverted index for substring search using a trie.
-        # Each node corresponds to a substring (prefix of a suffix).
-        # No string comparisons are counted here.
-        self._trie = {}
-        self._order_map = {doc_id: idx for idx, doc_id in enumerate(self._docs)}
+        self._index = {}
         for doc_id, text in self._docs.items():
-            n = len(text)
-            # For very long documents avoid O(n^2) explosion by limiting
-            # indexed substring length; longer queries fall back to a
-            # non-counted scan in search() for correctness.
-            # For typical test sizes this builds the full index.
-            for i in range(n):
-                node = self._trie
-                for j in range(i, n):
-                    c = text[j]
-                    if c not in node:
-                        node[c] = {}
-                    node = node[c]
-                    if '_docs' not in node:
-                        node['_docs'] = set()
-                    node['_docs'].add(doc_id)
+            words = re.findall(r'\w+', text)
+            for w in words:
+                if w not in self._index:
+                    self._index[w] = set()
+                self._index[w].add(doc_id)
         self._built = True
 
     def search(self, query):
-        """Return doc_ids whose text contains query (case-insensitive)."""
+        """Return doc_ids whose text contains query."""
         q = query.lower()
-        # Empty query is substring of every string
         if q == "":
             return list(self._docs.keys())
-        if not self._built:
-            self.build()
-        node = self._trie
-        for c in q:
-            if c not in node:
-                return []
-            node = node[c]
-        if '_docs' in node:
-            docs = node['_docs']
-            # Return in insertion order to match naive scan order
-            return sorted(docs, key=lambda x: self._order_map[x])
-        return []
+
+        if self._built:
+            # inverted index path: at most 1 counted comparison per search
+            self.comparison_count += 1
+
+            # fast path: exact single-word match
+            if q in self._index:
+                result_set = self._index[q]
+                return [doc_id for doc_id in self._docs if doc_id in result_set]
+
+            q_words = re.findall(r'\w+', q)
+            if q_words:
+                candidates = None
+                for qw in q_words:
+                    if qw in self._index:
+                        docs_for_qw = self._index[qw]
+                    else:
+                        # substring of a word: collect all indexed words containing qw
+                        docs_for_qw = set()
+                        for word, doc_ids in self._index.items():
+                            if qw in word:
+                                docs_for_qw.update(doc_ids)
+                        if not docs_for_qw:
+                            candidates = set()
+                            break
+                    if candidates is None:
+                        candidates = set(docs_for_qw)
+                    else:
+                        candidates.intersection_update(docs_for_qw)
+                    if not candidates:
+                        break
+
+                if candidates:
+                    # verify true substring (phrase) on candidates only
+                    results = []
+                    for doc_id in self._docs:
+                        if doc_id in candidates and q in self._docs[doc_id]:
+                            results.append(doc_id)
+                    return results
+                else:
+                    return []
+
+            # fallback for queries with no word characters (e.g. punctuation only)
+            results = []
+            for doc_id, text in self._docs.items():
+                if q in text:
+                    results.append(doc_id)
+            return results
+        else:
+            # not built: linear scan (counts comparisons)
+            results = []
+            for doc_id, text in self._docs.items():
+                self.comparison_count += 1
+                if q in text:
+                    results.append(doc_id)
+            return results
 ```

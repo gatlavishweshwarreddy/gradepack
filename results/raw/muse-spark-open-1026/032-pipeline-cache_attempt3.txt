@@ -3,36 +3,29 @@ pipeline.py
 from cache import ResultCache
 
 
-def _make_hashable(value):
-    # Recursively convert mutable containers into immutable, hashable equivalents
-    # so the cache key captures the full contents of the list.
-    if isinstance(value, list):
-        return tuple(_make_hashable(v) for v in value)
-    if isinstance(value, tuple):
-        return tuple(_make_hashable(v) for v in value)
-    if isinstance(value, dict):
-        return tuple(sorted((_make_hashable(k), _make_hashable(v)) for k, v in value.items()))
-    if isinstance(value, set):
-        return frozenset(_make_hashable(v) for v in value)
-    # For other types, try to use directly if hashable, otherwise fallback to repr
-    try:
-        hash(value)
-        return value
-    except TypeError:
-        return repr(value)
-
-
 class Pipeline:
     def __init__(self, transforms):
         self._transforms = transforms
         self._cache = ResultCache()
 
+    def _to_hashable(self, obj):
+        # Recursively convert unhashable containers to hashable equivalents
+        # so the cache key captures the full contents of the list.
+        if isinstance(obj, list):
+            return tuple(self._to_hashable(x) for x in obj)
+        elif isinstance(obj, tuple):
+            return tuple(self._to_hashable(x) for x in obj)
+        elif isinstance(obj, dict):
+            return tuple(sorted((self._to_hashable(k), self._to_hashable(v)) for k, v in obj.items()))
+        elif isinstance(obj, set):
+            return frozenset(self._to_hashable(x) for x in obj)
+        else:
+            return obj
+
     def run(self, data):
         result = data
         for t in self._transforms:
-            # Cache key captures transform identity and full contents of input,
-            # not object identity (id), so mutated lists do not return stale results.
-            key = (t.name, _make_hashable(result))
+            key = (t.name, self._to_hashable(result))
             if self._cache.has(key):
                 result = self._cache.get(key)
             else:

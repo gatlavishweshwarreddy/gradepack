@@ -24,15 +24,18 @@ class Schema:
         return expanded
 
     def _resolve(self, node):
-        if not isinstance(node, dict):
-            return
-        if "$ref" in node:
-            ref_name = node["$ref"]
-            if ref_name in self._definitions:
-                node.update(copy.deepcopy(self._definitions[ref_name]))
-                del node["$ref"]
-        for v in list(node.values()):
-            self._resolve(v)
+        if isinstance(node, dict):
+            if "$ref" in node:
+                ref_name = node["$ref"]
+                if ref_name in self._definitions:
+                    ref_copy = copy.deepcopy(self._definitions[ref_name])
+                    del node["$ref"]
+                    node.update(ref_copy)
+            for v in list(node.values()):
+                self._resolve(v)
+        elif isinstance(node, list):
+            for item in node:
+                self._resolve(item)
 ```
 
 validator.py

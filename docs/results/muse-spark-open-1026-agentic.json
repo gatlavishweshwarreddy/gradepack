@@ -1,148 +1,10 @@
 [
   {
-    "task_id": "001-pagination-off-by-one",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:22Z",
-    "passed": 7,
-    "failed": 0,
-    "total": 7,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 3.58,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/001-pagination-off-by-one_attempt2_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 7,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 404,
-      "completion_tokens": 588,
-      "total_tokens": 992,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 384
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 423,
-        "audio_tokens": 0,
-        "reasoning_tokens": 481,
-        "rejected_prediction_tokens": 732
-      }
-    },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "001-pagination-off-by-one",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:23Z",
-    "passed": 7,
-    "failed": 0,
-    "total": 7,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 4.09,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/001-pagination-off-by-one_attempt1_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 7,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 404,
-      "completion_tokens": 924,
-      "total_tokens": 1328,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 384
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 720,
-        "audio_tokens": 0,
-        "reasoning_tokens": 817,
-        "rejected_prediction_tokens": 708
-      }
-    },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "003-date-diff",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:26Z",
-    "passed": 5,
-    "failed": 0,
-    "total": 5,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 3.08,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/003-date-diff_attempt1_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 5,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 474,
-      "completion_tokens": 717,
-      "total_tokens": 1191,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 384
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 535,
-        "audio_tokens": 0,
-        "reasoning_tokens": 638,
-        "rejected_prediction_tokens": 746
-      }
-    },
-    "run_id": "20261027T182419Z"
-  },
-  {
     "task_id": "002-csv-parse-strip",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:26Z",
+    "date": "2026-10-27T19:31:44Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -150,7 +12,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 7.73,
+    "elapsed_s": 3.76,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/002-csv-parse-strip_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -168,27 +30,119 @@
     ],
     "token_usage": {
       "prompt_tokens": 451,
-      "completion_tokens": 1849,
-      "total_tokens": 2300,
+      "completion_tokens": 915,
+      "total_tokens": 1366,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 1372,
+        "accepted_prediction_tokens": 669,
         "audio_tokens": 0,
-        "reasoning_tokens": 1720,
-        "rejected_prediction_tokens": 1967
+        "reasoning_tokens": 785,
+        "rejected_prediction_tokens": 1060
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "001-pagination-off-by-one",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:31:46Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 5.85,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/001-pagination-off-by-one_attempt1_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 7,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 1368,
+      "total_tokens": 1772,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1036,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1261,
+        "rejected_prediction_tokens": 1309
+      }
+    },
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "001-pagination-off-by-one",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:31:48Z",
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 6.98,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/001-pagination-off-by-one_attempt2_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 7,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 404,
+      "completion_tokens": 1796,
+      "total_tokens": 2200,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1344,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1690,
+        "rejected_prediction_tokens": 1820
+      }
+    },
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "002-csv-parse-strip",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:28Z",
+    "date": "2026-10-27T19:31:49Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -196,7 +150,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 6.06,
+    "elapsed_s": 4.44,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/002-csv-parse-strip_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -214,27 +168,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 451,
-      "completion_tokens": 1704,
-      "total_tokens": 2155,
+      "completion_tokens": 1284,
+      "total_tokens": 1735,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 1290,
+        "accepted_prediction_tokens": 972,
         "audio_tokens": 0,
-        "reasoning_tokens": 1575,
-        "rejected_prediction_tokens": 1608
+        "reasoning_tokens": 1173,
+        "rejected_prediction_tokens": 1212
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "003-date-diff",
-    "attempt": 2,
+    "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:30Z",
+    "date": "2026-10-27T19:31:51Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -242,7 +196,53 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 4.46,
+    "elapsed_s": 4.54,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/003-date-diff_attempt1_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 5,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 474,
+      "completion_tokens": 1004,
+      "total_tokens": 1478,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 731,
+        "audio_tokens": 0,
+        "reasoning_tokens": 925,
+        "rejected_prediction_tokens": 1180
+      }
+    },
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "003-date-diff",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:31:52Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 4.39,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/003-date-diff_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -260,27 +260,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 474,
-      "completion_tokens": 1127,
-      "total_tokens": 1601,
+      "completion_tokens": 1075,
+      "total_tokens": 1549,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 826,
+        "accepted_prediction_tokens": 811,
         "audio_tokens": 0,
-        "reasoning_tokens": 1048,
-        "rejected_prediction_tokens": 1281
+        "reasoning_tokens": 996,
+        "rejected_prediction_tokens": 1051
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "004-word-frequency",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:31Z",
+    "date": "2026-10-27T19:31:53Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -288,7 +288,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 4.78,
+    "elapsed_s": 4.65,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/004-word-frequency_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -306,73 +306,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 413,
-      "completion_tokens": 1115,
-      "total_tokens": 1528,
+      "completion_tokens": 1198,
+      "total_tokens": 1611,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 806,
+        "accepted_prediction_tokens": 874,
         "audio_tokens": 0,
-        "reasoning_tokens": 1026,
-        "rejected_prediction_tokens": 1357
+        "reasoning_tokens": 1109,
+        "rejected_prediction_tokens": 1394
       }
     },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "005-lru-cache",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:34Z",
-    "passed": 5,
-    "failed": 0,
-    "total": 5,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 2.83,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/005-lru-cache_attempt2_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 5,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 510,
-      "completion_tokens": 589,
-      "total_tokens": 1099,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 128
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 439,
-        "audio_tokens": 0,
-        "reasoning_tokens": 444,
-        "rejected_prediction_tokens": 611
-      }
-    },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "005-lru-cache",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:34Z",
+    "date": "2026-10-27T19:31:55Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -380,7 +334,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 3.78,
+    "elapsed_s": 3.07,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/005-lru-cache_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -398,27 +352,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 510,
-      "completion_tokens": 966,
-      "total_tokens": 1476,
+      "completion_tokens": 645,
+      "total_tokens": 1155,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 128
+        "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 706,
+        "accepted_prediction_tokens": 505,
         "audio_tokens": 0,
-        "reasoning_tokens": 821,
-        "rejected_prediction_tokens": 1114
+        "reasoning_tokens": 500,
+        "rejected_prediction_tokens": 475
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
-    "task_id": "004-word-frequency",
+    "task_id": "005-lru-cache",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:35Z",
+    "date": "2026-10-27T19:31:56Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -426,8 +380,8 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 6.54,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/004-word-frequency_attempt2_turn1.txt",
+    "elapsed_s": 2.15,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/005-lru-cache_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
     "solved_at_turn": 1,
@@ -443,28 +397,28 @@
       }
     ],
     "token_usage": {
-      "prompt_tokens": 413,
-      "completion_tokens": 1640,
-      "total_tokens": 2053,
+      "prompt_tokens": 510,
+      "completion_tokens": 477,
+      "total_tokens": 987,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 1177,
+        "accepted_prediction_tokens": 379,
         "audio_tokens": 0,
-        "reasoning_tokens": 1543,
-        "rejected_prediction_tokens": 2064
+        "reasoning_tokens": 332,
+        "rejected_prediction_tokens": 307
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "006-stack-with-min",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:36Z",
+    "date": "2026-10-27T19:31:58Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -472,7 +426,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 2.21,
+    "elapsed_s": 2.5,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/006-stack-with-min_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -490,27 +444,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 453,
-      "completion_tokens": 496,
-      "total_tokens": 949,
+      "completion_tokens": 510,
+      "total_tokens": 963,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 387,
+        "accepted_prediction_tokens": 386,
         "audio_tokens": 0,
-        "reasoning_tokens": 360,
-        "rejected_prediction_tokens": 383
+        "reasoning_tokens": 374,
+        "rejected_prediction_tokens": 489
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "006-stack-with-min",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:37Z",
+    "date": "2026-10-27T19:31:59Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -518,7 +472,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 3.33,
+    "elapsed_s": 3.73,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/006-stack-with-min_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -536,73 +490,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 453,
-      "completion_tokens": 826,
-      "total_tokens": 1279,
+      "completion_tokens": 859,
+      "total_tokens": 1312,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 384
+        "cached_tokens": 128
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 616,
+        "accepted_prediction_tokens": 668,
         "audio_tokens": 0,
-        "reasoning_tokens": 690,
-        "rejected_prediction_tokens": 861
+        "reasoning_tokens": 723,
+        "rejected_prediction_tokens": 676
       }
     },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "008-run-length-encoding",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:39Z",
-    "passed": 8,
-    "failed": 0,
-    "total": 8,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 1.87,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/008-run-length-encoding_attempt1_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 8,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 465,
-      "completion_tokens": 378,
-      "total_tokens": 843,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 384
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 296,
-        "audio_tokens": 0,
-        "reasoning_tokens": 228,
-        "rejected_prediction_tokens": 278
-      }
-    },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "007-slug-generator",
-    "attempt": 1,
+    "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:40Z",
+    "date": "2026-10-27T19:32:02Z",
     "passed": 6,
     "failed": 0,
     "total": 6,
@@ -610,99 +518,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 5.16,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/007-slug-generator_attempt1_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 6,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 467,
-      "completion_tokens": 1319,
-      "total_tokens": 1786,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 384
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 990,
-        "audio_tokens": 0,
-        "reasoning_tokens": 1197,
-        "rejected_prediction_tokens": 1313
-      }
-    },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "008-run-length-encoding",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:42Z",
-    "passed": 8,
-    "failed": 0,
-    "total": 8,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 2.47,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/008-run-length-encoding_attempt2_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 8,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 465,
-      "completion_tokens": 420,
-      "total_tokens": 885,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 384
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 331,
-        "audio_tokens": 0,
-        "reasoning_tokens": 270,
-        "rejected_prediction_tokens": 292
-      }
-    },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "007-slug-generator",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:42Z",
-    "passed": 6,
-    "failed": 0,
-    "total": 6,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 5.66,
+    "elapsed_s": 3.15,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/007-slug-generator_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -720,27 +536,211 @@
     ],
     "token_usage": {
       "prompt_tokens": 467,
-      "completion_tokens": 1164,
-      "total_tokens": 1631,
+      "completion_tokens": 598,
+      "total_tokens": 1065,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 852,
+        "accepted_prediction_tokens": 437,
         "audio_tokens": 0,
-        "reasoning_tokens": 1043,
-        "rejected_prediction_tokens": 1339
+        "reasoning_tokens": 472,
+        "rejected_prediction_tokens": 697
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "007-slug-generator",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:32:03Z",
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 4.76,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/007-slug-generator_attempt1_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 6,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 467,
+      "completion_tokens": 1067,
+      "total_tokens": 1534,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 783,
+        "audio_tokens": 0,
+        "reasoning_tokens": 972,
+        "rejected_prediction_tokens": 1205
+      }
+    },
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "008-run-length-encoding",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:32:05Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.65,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/008-run-length-encoding_attempt1_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 8,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 465,
+      "completion_tokens": 402,
+      "total_tokens": 867,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 312,
+        "audio_tokens": 0,
+        "reasoning_tokens": 247,
+        "rejected_prediction_tokens": 325
+      }
+    },
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "008-run-length-encoding",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:32:05Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 1.97,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/008-run-length-encoding_attempt2_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 8,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 465,
+      "completion_tokens": 359,
+      "total_tokens": 824,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 277,
+        "audio_tokens": 0,
+        "reasoning_tokens": 204,
+        "rejected_prediction_tokens": 304
+      }
+    },
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "004-word-frequency",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:32:08Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 16.58,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/004-word-frequency_attempt2_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 5,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 413,
+      "completion_tokens": 4723,
+      "total_tokens": 5136,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 3324,
+        "audio_tokens": 0,
+        "reasoning_tokens": 4630,
+        "rejected_prediction_tokens": 6469
+      }
+    },
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "010-json-flattener",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:45Z",
+    "date": "2026-10-27T19:32:11Z",
     "passed": 7,
     "failed": 0,
     "total": 7,
@@ -748,7 +748,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 3.41,
+    "elapsed_s": 3.2,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/010-json-flattener_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -766,27 +766,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 481,
-      "completion_tokens": 871,
-      "total_tokens": 1352,
+      "completion_tokens": 642,
+      "total_tokens": 1123,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 667,
+        "accepted_prediction_tokens": 486,
         "audio_tokens": 0,
-        "reasoning_tokens": 761,
-        "rejected_prediction_tokens": 768
+        "reasoning_tokens": 530,
+        "rejected_prediction_tokens": 606
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "010-json-flattener",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:48Z",
+    "date": "2026-10-27T19:32:13Z",
     "passed": 7,
     "failed": 0,
     "total": 7,
@@ -794,7 +794,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 2.45,
+    "elapsed_s": 2.67,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/010-json-flattener_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -812,165 +812,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 481,
-      "completion_tokens": 527,
-      "total_tokens": 1008,
+      "completion_tokens": 410,
+      "total_tokens": 891,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 393,
+        "accepted_prediction_tokens": 312,
         "audio_tokens": 0,
-        "reasoning_tokens": 415,
-        "rejected_prediction_tokens": 552
+        "reasoning_tokens": 299,
+        "rejected_prediction_tokens": 381
       }
     },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "009-token-bucket",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:50Z",
-    "passed": 5,
-    "failed": 0,
-    "total": 5,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 10.03,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/009-token-bucket_attempt1_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 5,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 538,
-      "completion_tokens": 2902,
-      "total_tokens": 3440,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 512
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 2107,
-        "audio_tokens": 0,
-        "reasoning_tokens": 2761,
-        "rejected_prediction_tokens": 3465
-      }
-    },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "011-iso-week",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:55Z",
-    "passed": 5,
-    "failed": 0,
-    "total": 5,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 4.83,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/011-iso-week_attempt2_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 5,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 484,
-      "completion_tokens": 1093,
-      "total_tokens": 1577,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 384
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 822,
-        "audio_tokens": 0,
-        "reasoning_tokens": 1015,
-        "rejected_prediction_tokens": 1075
-      }
-    },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "011-iso-week",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:55Z",
-    "passed": 5,
-    "failed": 0,
-    "total": 5,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 7.11,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/011-iso-week_attempt1_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 5,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 484,
-      "completion_tokens": 1731,
-      "total_tokens": 2215,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 128
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 1245,
-        "audio_tokens": 0,
-        "reasoning_tokens": 1653,
-        "rejected_prediction_tokens": 2157
-      }
-    },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "009-token-bucket",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:24:59Z",
+    "date": "2026-10-27T19:32:14Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -978,7 +840,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 17.61,
+    "elapsed_s": 8.69,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/009-token-bucket_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -996,27 +858,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 538,
-      "completion_tokens": 4768,
-      "total_tokens": 5306,
+      "completion_tokens": 2281,
+      "total_tokens": 2819,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 128
+        "cached_tokens": 512
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 3441,
+        "accepted_prediction_tokens": 1697,
         "audio_tokens": 0,
-        "reasoning_tokens": 4634,
-        "rejected_prediction_tokens": 5848
+        "reasoning_tokens": 2134,
+        "rejected_prediction_tokens": 2398
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
-    "task_id": "012-retry-decorator",
-    "attempt": 2,
+    "task_id": "011-iso-week",
+    "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:25:01Z",
+    "date": "2026-10-27T19:32:16Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -1024,8 +886,8 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 6.02,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/012-retry-decorator_attempt2_turn1.txt",
+    "elapsed_s": 2.5,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/011-iso-week_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
     "solved_at_turn": 1,
@@ -1041,28 +903,28 @@
       }
     ],
     "token_usage": {
-      "prompt_tokens": 506,
-      "completion_tokens": 1434,
-      "total_tokens": 1940,
+      "prompt_tokens": 484,
+      "completion_tokens": 499,
+      "total_tokens": 983,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 1056,
+        "accepted_prediction_tokens": 373,
         "audio_tokens": 0,
-        "reasoning_tokens": 1317,
-        "rejected_prediction_tokens": 1590
+        "reasoning_tokens": 421,
+        "rejected_prediction_tokens": 509
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
-    "task_id": "012-retry-decorator",
+    "task_id": "009-token-bucket",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:25:01Z",
+    "date": "2026-10-27T19:32:18Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -1070,7 +932,99 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 6.06,
+    "elapsed_s": 13.62,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/009-token-bucket_attempt1_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 5,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 538,
+      "completion_tokens": 3681,
+      "total_tokens": 4219,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2680,
+        "audio_tokens": 0,
+        "reasoning_tokens": 3534,
+        "rejected_prediction_tokens": 4327
+      }
+    },
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "011-iso-week",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:32:18Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 4.68,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/011-iso-week_attempt2_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 5,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 484,
+      "completion_tokens": 1022,
+      "total_tokens": 1506,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 746,
+        "audio_tokens": 0,
+        "reasoning_tokens": 944,
+        "rejected_prediction_tokens": 1186
+      }
+    },
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "012-retry-decorator",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:32:22Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 6.16,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/012-retry-decorator_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -1088,27 +1042,73 @@
     ],
     "token_usage": {
       "prompt_tokens": 506,
-      "completion_tokens": 1471,
-      "total_tokens": 1977,
+      "completion_tokens": 1610,
+      "total_tokens": 2116,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 1099,
+        "accepted_prediction_tokens": 1154,
         "audio_tokens": 0,
-        "reasoning_tokens": 1354,
-        "rejected_prediction_tokens": 1512
+        "reasoning_tokens": 1493,
+        "rejected_prediction_tokens": 2038
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "012-retry-decorator",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:32:22Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 3.92,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/012-retry-decorator_attempt2_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 5,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 506,
+      "completion_tokens": 1002,
+      "total_tokens": 1508,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 741,
+        "audio_tokens": 0,
+        "reasoning_tokens": 886,
+        "rejected_prediction_tokens": 1086
+      }
+    },
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "014-mutable-default",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:25:05Z",
+    "date": "2026-10-27T19:32:25Z",
     "passed": 9,
     "failed": 0,
     "total": 9,
@@ -1116,7 +1116,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 4.27,
+    "elapsed_s": 2.81,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/014-mutable-default_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -1134,27 +1134,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 423,
-      "completion_tokens": 1053,
-      "total_tokens": 1476,
+      "completion_tokens": 615,
+      "total_tokens": 1038,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 757,
+        "accepted_prediction_tokens": 456,
         "audio_tokens": 0,
-        "reasoning_tokens": 961,
-        "rejected_prediction_tokens": 1315
+        "reasoning_tokens": 523,
+        "rejected_prediction_tokens": 657
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "014-mutable-default",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:25:07Z",
+    "date": "2026-10-27T19:32:28Z",
     "passed": 9,
     "failed": 0,
     "total": 9,
@@ -1162,7 +1162,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 2.3,
+    "elapsed_s": 3.29,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/014-mutable-default_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -1180,27 +1180,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 423,
-      "completion_tokens": 442,
-      "total_tokens": 865,
+      "completion_tokens": 696,
+      "total_tokens": 1119,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 323,
+        "accepted_prediction_tokens": 507,
         "audio_tokens": 0,
-        "reasoning_tokens": 350,
-        "rejected_prediction_tokens": 510
+        "reasoning_tokens": 604,
+        "rejected_prediction_tokens": 816
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "015-sliding-window-max",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:25:16Z",
+    "date": "2026-10-27T19:32:37Z",
     "passed": 12,
     "failed": 0,
     "total": 12,
@@ -1208,7 +1208,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 8.26,
+    "elapsed_s": 8.56,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/015-sliding-window-max_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -1226,73 +1226,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 551,
-      "completion_tokens": 2098,
-      "total_tokens": 2649,
+      "completion_tokens": 2564,
+      "total_tokens": 3115,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 512
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 1553,
+        "accepted_prediction_tokens": 1889,
         "audio_tokens": 0,
-        "reasoning_tokens": 1936,
-        "rejected_prediction_tokens": 2255
+        "reasoning_tokens": 2401,
+        "rejected_prediction_tokens": 2836
       }
     },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "013-timezone-scheduler",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:25:18Z",
-    "passed": 8,
-    "failed": 0,
-    "total": 8,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 17.4,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/013-timezone-scheduler_attempt2_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 8,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 764,
-      "completion_tokens": 4584,
-      "total_tokens": 5348,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 640
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 3346,
-        "audio_tokens": 0,
-        "reasoning_tokens": 4303,
-        "rejected_prediction_tokens": 5313
-      }
-    },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "015-sliding-window-max",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:25:22Z",
+    "date": "2026-10-27T19:32:41Z",
     "passed": 12,
     "failed": 0,
     "total": 12,
@@ -1300,7 +1254,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 6.14,
+    "elapsed_s": 4.2,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/015-sliding-window-max_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -1318,27 +1272,73 @@
     ],
     "token_usage": {
       "prompt_tokens": 551,
-      "completion_tokens": 1669,
-      "total_tokens": 2220,
+      "completion_tokens": 1078,
+      "total_tokens": 1629,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 512
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 1206,
+        "accepted_prediction_tokens": 796,
         "audio_tokens": 0,
-        "reasoning_tokens": 1512,
-        "rejected_prediction_tokens": 2035
+        "reasoning_tokens": 911,
+        "rejected_prediction_tokens": 1171
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "013-timezone-scheduler",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:32:45Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 22.96,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/013-timezone-scheduler_attempt2_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 8,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 764,
+      "completion_tokens": 6000,
+      "total_tokens": 6764,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 4372,
+        "audio_tokens": 0,
+        "reasoning_tokens": 5738,
+        "rejected_prediction_tokens": 7017
+      }
+    },
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "016-decimal-money",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:25:26Z",
+    "date": "2026-10-27T19:32:46Z",
     "passed": 13,
     "failed": 0,
     "total": 13,
@@ -1346,7 +1346,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 7.61,
+    "elapsed_s": 5.01,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/016-decimal-money_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -1364,27 +1364,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 472,
-      "completion_tokens": 2056,
-      "total_tokens": 2528,
+      "completion_tokens": 1169,
+      "total_tokens": 1641,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 1457,
+        "accepted_prediction_tokens": 827,
         "audio_tokens": 0,
-        "reasoning_tokens": 1841,
-        "rejected_prediction_tokens": 2736
+        "reasoning_tokens": 966,
+        "rejected_prediction_tokens": 1574
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "013-timezone-scheduler",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:25:33Z",
+    "date": "2026-10-27T19:32:48Z",
     "passed": 8,
     "failed": 0,
     "total": 8,
@@ -1392,7 +1392,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 33.87,
+    "elapsed_s": 29.92,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/013-timezone-scheduler_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -1410,27 +1410,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 764,
-      "completion_tokens": 9582,
-      "total_tokens": 10346,
+      "completion_tokens": 8245,
+      "total_tokens": 9009,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 640
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 6861,
+        "accepted_prediction_tokens": 5973,
         "audio_tokens": 0,
-        "reasoning_tokens": 9317,
-        "rejected_prediction_tokens": 12179
+        "reasoning_tokens": 7938,
+        "rejected_prediction_tokens": 9924
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "016-decimal-money",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:25:39Z",
+    "date": "2026-10-27T19:32:57Z",
     "passed": 13,
     "failed": 0,
     "total": 13,
@@ -1438,7 +1438,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 17.58,
+    "elapsed_s": 12.14,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/016-decimal-money_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -1456,73 +1456,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 472,
-      "completion_tokens": 5276,
-      "total_tokens": 5748,
+      "completion_tokens": 3300,
+      "total_tokens": 3772,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 384
+        "cached_tokens": 128
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 3799,
+        "accepted_prediction_tokens": 2407,
         "audio_tokens": 0,
-        "reasoning_tokens": 5092,
-        "rejected_prediction_tokens": 6533
+        "reasoning_tokens": 3086,
+        "rejected_prediction_tokens": 3844
       }
     },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "017-unicode-dedup",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:25:41Z",
-    "passed": 11,
-    "failed": 0,
-    "total": 11,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 8.34,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/017-unicode-dedup_attempt2_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 11,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 438,
-      "completion_tokens": 1856,
-      "total_tokens": 2294,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 384
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 1331,
-        "audio_tokens": 0,
-        "reasoning_tokens": 1761,
-        "rejected_prediction_tokens": 2372
-      }
-    },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "017-unicode-dedup",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:26:01Z",
+    "date": "2026-10-27T19:33:04Z",
     "passed": 11,
     "failed": 0,
     "total": 11,
@@ -1530,7 +1484,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 35.42,
+    "elapsed_s": 18.18,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/017-unicode-dedup_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -1548,27 +1502,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 438,
-      "completion_tokens": 9297,
-      "total_tokens": 9735,
+      "completion_tokens": 4368,
+      "total_tokens": 4806,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 384
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 6348,
+        "accepted_prediction_tokens": 3066,
         "audio_tokens": 0,
-        "reasoning_tokens": 9170,
-        "rejected_prediction_tokens": 14309
+        "reasoning_tokens": 4252,
+        "rejected_prediction_tokens": 6090
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
-    "task_id": "019-invoice-total",
-    "attempt": 1,
+    "task_id": "017-unicode-dedup",
+    "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:26:05Z",
+    "date": "2026-10-27T19:33:10Z",
     "passed": 11,
     "failed": 0,
     "total": 11,
@@ -1576,7 +1530,53 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 4.16,
+    "elapsed_s": 22.13,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/017-unicode-dedup_attempt2_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 11,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 438,
+      "completion_tokens": 5314,
+      "total_tokens": 5752,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 384
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 3649,
+        "audio_tokens": 0,
+        "reasoning_tokens": 5219,
+        "rejected_prediction_tokens": 8006
+      }
+    },
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "019-invoice-total",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:33:13Z",
+    "passed": 11,
+    "failed": 0,
+    "total": 11,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 3.09,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/019-invoice-total_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -1594,27 +1594,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 683,
-      "completion_tokens": 956,
-      "total_tokens": 1639,
+      "completion_tokens": 592,
+      "total_tokens": 1275,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 640
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 683,
+        "accepted_prediction_tokens": 437,
         "audio_tokens": 0,
-        "reasoning_tokens": 785,
-        "rejected_prediction_tokens": 1235
+        "reasoning_tokens": 421,
+        "rejected_prediction_tokens": 655
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "019-invoice-total",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:26:08Z",
+    "date": "2026-10-27T19:33:16Z",
     "passed": 11,
     "failed": 0,
     "total": 11,
@@ -1622,7 +1622,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 2.71,
+    "elapsed_s": 2.8,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/019-invoice-total_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -1640,27 +1640,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 683,
-      "completion_tokens": 567,
-      "total_tokens": 1250,
+      "completion_tokens": 591,
+      "total_tokens": 1274,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 640
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 414,
+        "accepted_prediction_tokens": 450,
         "audio_tokens": 0,
-        "reasoning_tokens": 396,
-        "rejected_prediction_tokens": 664
+        "reasoning_tokens": 420,
+        "rejected_prediction_tokens": 544
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "020-log-parser",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:26:22Z",
+    "date": "2026-10-27T19:33:24Z",
     "passed": 9,
     "failed": 0,
     "total": 9,
@@ -1668,7 +1668,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 13.51,
+    "elapsed_s": 8.26,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/020-log-parser_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -1686,27 +1686,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 795,
-      "completion_tokens": 3704,
-      "total_tokens": 4499,
+      "completion_tokens": 2445,
+      "total_tokens": 3240,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 768
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 2584,
+        "accepted_prediction_tokens": 1797,
         "audio_tokens": 0,
-        "reasoning_tokens": 3514,
-        "rejected_prediction_tokens": 5263
+        "reasoning_tokens": 1986,
+        "rejected_prediction_tokens": 2739
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "020-log-parser",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:26:39Z",
+    "date": "2026-10-27T19:33:34Z",
     "passed": 9,
     "failed": 0,
     "total": 9,
@@ -1714,7 +1714,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 17.28,
+    "elapsed_s": 9.86,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/020-log-parser_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -1732,27 +1732,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 795,
-      "completion_tokens": 5147,
-      "total_tokens": 5942,
+      "completion_tokens": 2788,
+      "total_tokens": 3583,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 768
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 3687,
+        "accepted_prediction_tokens": 2002,
         "audio_tokens": 0,
-        "reasoning_tokens": 4947,
-        "rejected_prediction_tokens": 6547
+        "reasoning_tokens": 2585,
+        "rejected_prediction_tokens": 3500
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "021-config-merger",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:26:45Z",
+    "date": "2026-10-27T19:33:38Z",
     "passed": 8,
     "failed": 0,
     "total": 8,
@@ -1760,7 +1760,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 6.42,
+    "elapsed_s": 4.17,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/021-config-merger_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -1778,27 +1778,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 588,
-      "completion_tokens": 1764,
-      "total_tokens": 2352,
+      "completion_tokens": 915,
+      "total_tokens": 1503,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 512
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 1271,
+        "accepted_prediction_tokens": 684,
         "audio_tokens": 0,
-        "reasoning_tokens": 1634,
-        "rejected_prediction_tokens": 2187
+        "reasoning_tokens": 784,
+        "rejected_prediction_tokens": 947
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "021-config-merger",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:26:50Z",
+    "date": "2026-10-27T19:33:44Z",
     "passed": 8,
     "failed": 0,
     "total": 8,
@@ -1806,7 +1806,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 4.22,
+    "elapsed_s": 5.67,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/021-config-merger_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -1824,27 +1824,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 588,
-      "completion_tokens": 1091,
-      "total_tokens": 1679,
+      "completion_tokens": 1544,
+      "total_tokens": 2132,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 512
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 794,
+        "accepted_prediction_tokens": 1117,
         "audio_tokens": 0,
-        "reasoning_tokens": 961,
-        "rejected_prediction_tokens": 1292
+        "reasoning_tokens": 1365,
+        "rejected_prediction_tokens": 1886
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "022-permissions",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:26:52Z",
+    "date": "2026-10-27T19:33:49Z",
     "passed": 9,
     "failed": 0,
     "total": 9,
@@ -1852,7 +1852,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 2.29,
+    "elapsed_s": 4.38,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/022-permissions_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -1870,27 +1870,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 584,
-      "completion_tokens": 404,
-      "total_tokens": 988,
+      "completion_tokens": 1114,
+      "total_tokens": 1698,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 512
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 286,
+        "accepted_prediction_tokens": 811,
         "audio_tokens": 0,
-        "reasoning_tokens": 339,
-        "rejected_prediction_tokens": 540
+        "reasoning_tokens": 981,
+        "rejected_prediction_tokens": 1303
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "022-permissions",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:26:56Z",
+    "date": "2026-10-27T19:33:52Z",
     "passed": 9,
     "failed": 0,
     "total": 9,
@@ -1898,7 +1898,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 4.3,
+    "elapsed_s": 3.6,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/022-permissions_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -1916,27 +1916,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 584,
-      "completion_tokens": 1083,
-      "total_tokens": 1667,
+      "completion_tokens": 815,
+      "total_tokens": 1399,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 512
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 783,
+        "accepted_prediction_tokens": 587,
         "audio_tokens": 0,
-        "reasoning_tokens": 1018,
-        "rejected_prediction_tokens": 1317
+        "reasoning_tokens": 750,
+        "rejected_prediction_tokens": 1009
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "023-inventory",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:27:10Z",
+    "date": "2026-10-27T19:34:05Z",
     "passed": 7,
     "failed": 0,
     "total": 7,
@@ -1944,7 +1944,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 13.71,
+    "elapsed_s": 12.61,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/023-inventory_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -1962,27 +1962,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 616,
-      "completion_tokens": 3986,
-      "total_tokens": 4602,
+      "completion_tokens": 3651,
+      "total_tokens": 4267,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 512
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 2870,
+        "accepted_prediction_tokens": 2604,
         "audio_tokens": 0,
-        "reasoning_tokens": 3676,
-        "rejected_prediction_tokens": 4935
+        "reasoning_tokens": 3325,
+        "rejected_prediction_tokens": 4725
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "023-inventory",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:27:24Z",
+    "date": "2026-10-27T19:34:15Z",
     "passed": 7,
     "failed": 0,
     "total": 7,
@@ -1990,7 +1990,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 14.27,
+    "elapsed_s": 10.48,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/023-inventory_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -2008,27 +2008,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 616,
-      "completion_tokens": 4034,
-      "total_tokens": 4650,
+      "completion_tokens": 2674,
+      "total_tokens": 3290,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 512
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 2859,
+        "accepted_prediction_tokens": 1858,
         "audio_tokens": 0,
-        "reasoning_tokens": 3725,
-        "rejected_prediction_tokens": 5366
+        "reasoning_tokens": 2346,
+        "rejected_prediction_tokens": 3847
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "024-csv-importer",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:27:33Z",
+    "date": "2026-10-27T19:34:27Z",
     "passed": 9,
     "failed": 0,
     "total": 9,
@@ -2036,7 +2036,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 9.14,
+    "elapsed_s": 12.03,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/024-csv-importer_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -2054,327 +2054,35 @@
     ],
     "token_usage": {
       "prompt_tokens": 749,
-      "completion_tokens": 2684,
-      "total_tokens": 3433,
+      "completion_tokens": 3481,
+      "total_tokens": 4230,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 640
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 1953,
+        "accepted_prediction_tokens": 2529,
         "audio_tokens": 0,
-        "reasoning_tokens": 2587,
-        "rejected_prediction_tokens": 3178
+        "reasoning_tokens": 3384,
+        "rejected_prediction_tokens": 4128
       }
     },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "024-csv-importer",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:27:40Z",
-    "passed": 9,
-    "failed": 0,
-    "total": 9,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 6.63,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/024-csv-importer_attempt2_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 9,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 749,
-      "completion_tokens": 1913,
-      "total_tokens": 2662,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 640
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 1403,
-        "audio_tokens": 0,
-        "reasoning_tokens": 1816,
-        "rejected_prediction_tokens": 2167
-      }
-    },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "025-rate-limiter",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:27:50Z",
-    "passed": 6,
-    "failed": 0,
-    "total": 6,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 10.12,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/025-rate-limiter_attempt1_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 6,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 676,
-      "completion_tokens": 2822,
-      "total_tokens": 3498,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 640
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 2007,
-        "audio_tokens": 0,
-        "reasoning_tokens": 2545,
-        "rejected_prediction_tokens": 3705
-      }
-    },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "025-rate-limiter",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:27:58Z",
-    "passed": 6,
-    "failed": 0,
-    "total": 6,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 8.03,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/025-rate-limiter_attempt2_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 6,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 676,
-      "completion_tokens": 2126,
-      "total_tokens": 2802,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 640
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 1498,
-        "audio_tokens": 0,
-        "reasoning_tokens": 1972,
-        "rejected_prediction_tokens": 2891
-      }
-    },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "026-retry-client",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:28:02Z",
-    "passed": 10,
-    "failed": 0,
-    "total": 10,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 4.34,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/026-retry-client_attempt1_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 10,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 914,
-      "completion_tokens": 1167,
-      "total_tokens": 2081,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 896
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 924,
-        "audio_tokens": 0,
-        "reasoning_tokens": 732,
-        "rejected_prediction_tokens": 784
-      }
-    },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "026-retry-client",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:28:06Z",
-    "passed": 10,
-    "failed": 0,
-    "total": 10,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 3.14,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/026-retry-client_attempt2_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 10,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 914,
-      "completion_tokens": 739,
-      "total_tokens": 1653,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 896
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 569,
-        "audio_tokens": 0,
-        "reasoning_tokens": 437,
-        "rejected_prediction_tokens": 621
-      }
-    },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "018-thread-safe-cache",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:28:10Z",
-    "passed": 0,
-    "failed": 0,
-    "total": 0,
-    "score": 0.0,
-    "failing_tests": [],
-    "failure_reason": "timeout",
-    "finish_reason": "length",
-    "elapsed_s": 150.53,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/018-thread-safe-cache_attempt1_turn3.txt",
-    "agentic": true,
-    "turns_used": 3,
-    "solved_at_turn": null,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 0,
-        "failed": 0
-      },
-      {
-        "turn": 2,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 0,
-        "failed": 0
-      },
-      {
-        "turn": 3,
-        "finish_reason": "length",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 0,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 520,
-      "completion_tokens": 2269,
-      "total_tokens": 2789,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 128
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 1546,
-        "audio_tokens": 0,
-        "reasoning_tokens": 2166,
-        "rejected_prediction_tokens": 3515
-      }
-    },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "018-thread-safe-cache",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:28:34Z",
+    "date": "2026-10-27T19:34:30Z",
     "passed": 0,
     "failed": 0,
     "total": 0,
     "score": 0.0,
     "failing_tests": [],
-    "failure_reason": "timeout",
+    "failure_reason": "invalid_output",
     "finish_reason": "stop",
-    "elapsed_s": 173.07,
+    "elapsed_s": 85.82,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/018-thread-safe-cache_attempt2_turn3.txt",
     "agentic": true,
     "turns_used": 3,
@@ -2408,27 +2116,303 @@
     ],
     "token_usage": {
       "prompt_tokens": 520,
-      "completion_tokens": 1449,
-      "total_tokens": 1969,
+      "completion_tokens": 2611,
+      "total_tokens": 3131,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 512
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 1029,
+        "accepted_prediction_tokens": 1816,
         "audio_tokens": 0,
-        "reasoning_tokens": 1359,
-        "rejected_prediction_tokens": 1911
+        "reasoning_tokens": 2480,
+        "rejected_prediction_tokens": 3777
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "024-csv-importer",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:34:35Z",
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 7.45,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/024-csv-importer_attempt2_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 9,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 749,
+      "completion_tokens": 1994,
+      "total_tokens": 2743,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1419,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1897,
+        "rejected_prediction_tokens": 2606
+      }
+    },
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "025-rate-limiter",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:34:40Z",
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 10.32,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/025-rate-limiter_attempt1_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 6,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 676,
+      "completion_tokens": 2407,
+      "total_tokens": 3083,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1669,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2130,
+        "rejected_prediction_tokens": 3518
+      }
+    },
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "026-retry-client",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:34:44Z",
+    "passed": 10,
+    "failed": 0,
+    "total": 10,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 3.85,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/026-retry-client_attempt1_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 10,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 914,
+      "completion_tokens": 1197,
+      "total_tokens": 2111,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 896
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 948,
+        "audio_tokens": 0,
+        "reasoning_tokens": 895,
+        "rejected_prediction_tokens": 802
+      }
+    },
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "026-retry-client",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:34:47Z",
+    "passed": 10,
+    "failed": 0,
+    "total": 10,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 2.9,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/026-retry-client_attempt2_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 10,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 914,
+      "completion_tokens": 676,
+      "total_tokens": 1590,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 896
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 525,
+        "audio_tokens": 0,
+        "reasoning_tokens": 367,
+        "rejected_prediction_tokens": 539
+      }
+    },
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "025-rate-limiter",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:34:48Z",
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 12.79,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/025-rate-limiter_attempt2_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 6,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 676,
+      "completion_tokens": 3216,
+      "total_tokens": 3892,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2232,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2942,
+        "rejected_prediction_tokens": 4656
+      }
+    },
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "027-search-index",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:35:28Z",
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 40.44,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/027-search-index_attempt2_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 6,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 538,
+      "completion_tokens": 9245,
+      "total_tokens": 9783,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 6288,
+        "audio_tokens": 0,
+        "reasoning_tokens": 8793,
+        "rejected_prediction_tokens": 14411
+      }
+    },
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "028-order-pipeline",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:28:37Z",
+    "date": "2026-10-27T19:35:32Z",
     "passed": 8,
     "failed": 0,
     "total": 8,
@@ -2436,7 +2420,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 2.68,
+    "elapsed_s": 4.41,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/028-order-pipeline_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -2454,27 +2438,89 @@
     ],
     "token_usage": {
       "prompt_tokens": 714,
-      "completion_tokens": 553,
-      "total_tokens": 1267,
+      "completion_tokens": 1183,
+      "total_tokens": 1897,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 640
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 427,
+        "accepted_prediction_tokens": 879,
         "audio_tokens": 0,
-        "reasoning_tokens": 409,
-        "rejected_prediction_tokens": 462
+        "reasoning_tokens": 1048,
+        "rejected_prediction_tokens": 1249
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "018-thread-safe-cache",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:35:33Z",
+    "passed": 0,
+    "failed": 0,
+    "total": 0,
+    "score": 0.0,
+    "failing_tests": [],
+    "failure_reason": "timeout",
+    "finish_reason": "stop",
+    "elapsed_s": 155.39,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/018-thread-safe-cache_attempt1_turn3.txt",
+    "agentic": true,
+    "turns_used": 3,
+    "solved_at_turn": null,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 0,
+        "failed": 0
+      },
+      {
+        "turn": 2,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 0,
+        "failed": 0
+      },
+      {
+        "turn": 3,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 0,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 520,
+      "completion_tokens": 1816,
+      "total_tokens": 2336,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1291,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1674,
+        "rejected_prediction_tokens": 2412
+      }
+    },
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "028-order-pipeline",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:28:40Z",
+    "date": "2026-10-27T19:35:35Z",
     "passed": 8,
     "failed": 0,
     "total": 8,
@@ -2482,7 +2528,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 3.17,
+    "elapsed_s": 2.99,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/028-order-pipeline_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -2500,27 +2546,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 714,
-      "completion_tokens": 731,
-      "total_tokens": 1445,
+      "completion_tokens": 708,
+      "total_tokens": 1422,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 640
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 532,
+        "accepted_prediction_tokens": 538,
         "audio_tokens": 0,
-        "reasoning_tokens": 587,
-        "rejected_prediction_tokens": 861
+        "reasoning_tokens": 564,
+        "rejected_prediction_tokens": 652
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "029-report-generator",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:28:45Z",
+    "date": "2026-10-27T19:35:36Z",
     "passed": 7,
     "failed": 0,
     "total": 7,
@@ -2528,7 +2574,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 4.61,
+    "elapsed_s": 2.99,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/029-report-generator_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -2546,27 +2592,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 926,
-      "completion_tokens": 1106,
-      "total_tokens": 2032,
+      "completion_tokens": 731,
+      "total_tokens": 1657,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 896
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 804,
+        "accepted_prediction_tokens": 556,
         "audio_tokens": 0,
-        "reasoning_tokens": 924,
-        "rejected_prediction_tokens": 1303
+        "reasoning_tokens": 549,
+        "rejected_prediction_tokens": 662
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "029-report-generator",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:28:48Z",
+    "date": "2026-10-27T19:35:39Z",
     "passed": 7,
     "failed": 0,
     "total": 7,
@@ -2574,7 +2620,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 3.38,
+    "elapsed_s": 3.92,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/029-report-generator_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -2592,36 +2638,36 @@
     ],
     "token_usage": {
       "prompt_tokens": 926,
-      "completion_tokens": 914,
-      "total_tokens": 1840,
+      "completion_tokens": 750,
+      "total_tokens": 1676,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 896
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 704,
+        "accepted_prediction_tokens": 570,
         "audio_tokens": 0,
-        "reasoning_tokens": 733,
-        "rejected_prediction_tokens": 773
+        "reasoning_tokens": 570,
+        "rejected_prediction_tokens": 683
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
-    "task_id": "027-search-index",
+    "task_id": "030-expr-parser",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:28:52Z",
-    "passed": 6,
+    "date": "2026-10-27T19:35:50Z",
+    "passed": 10,
     "failed": 0,
-    "total": 6,
+    "total": 10,
     "score": 1.0,
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 46.02,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/027-search-index_attempt1_turn1.txt",
+    "elapsed_s": 14.25,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/030-expr-parser_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
     "solved_at_turn": 1,
@@ -2632,47 +2678,45 @@
         "finish_reason": "stop",
         "retried": false,
         "had_candidate": true,
-        "passed": 6,
+        "passed": 10,
         "failed": 0
       }
     ],
     "token_usage": {
-      "prompt_tokens": 538,
-      "completion_tokens": 11904,
-      "total_tokens": 12442,
+      "prompt_tokens": 860,
+      "completion_tokens": 3762,
+      "total_tokens": 4622,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 512
+        "cached_tokens": 768
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 8262,
+        "accepted_prediction_tokens": 2828,
         "audio_tokens": 0,
-        "reasoning_tokens": 10967,
-        "rejected_prediction_tokens": 17225
+        "reasoning_tokens": 3241,
+        "rejected_prediction_tokens": 3703
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
-    "task_id": "027-search-index",
+    "task_id": "030-expr-parser",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:29:36Z",
-    "passed": 0,
-    "failed": 6,
-    "total": 6,
-    "score": 0.0,
-    "failing_tests": [
-      "test_search_comparison_count_for_common_term"
-    ],
-    "failure_reason": "invalid_output",
+    "date": "2026-10-27T19:35:53Z",
+    "passed": 10,
+    "failed": 0,
+    "total": 10,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 85.77,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/027-search-index_attempt2_turn3.txt",
+    "elapsed_s": 13.85,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/030-expr-parser_attempt2_turn1.txt",
     "agentic": true,
-    "turns_used": 3,
-    "solved_at_turn": null,
+    "turns_used": 1,
+    "solved_at_turn": 1,
     "max_turns": 3,
     "turn_log": [
       {
@@ -2680,20 +2724,50 @@
         "finish_reason": "stop",
         "retried": false,
         "had_candidate": true,
-        "passed": 5,
-        "failed": 1
-      },
-      {
-        "turn": 2,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": false,
-        "passed": 0,
+        "passed": 10,
         "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 860,
+      "completion_tokens": 3204,
+      "total_tokens": 4064,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 768
       },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2275,
+        "audio_tokens": 0,
+        "reasoning_tokens": 2708,
+        "rejected_prediction_tokens": 4228
+      }
+    },
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "027-search-index",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:35:55Z",
+    "passed": 0,
+    "failed": 0,
+    "total": 0,
+    "score": 0.0,
+    "failing_tests": [],
+    "failure_reason": "no_answer",
+    "finish_reason": "length",
+    "elapsed_s": 67.87,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/027-search-index_attempt1_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": null,
+    "max_turns": 3,
+    "turn_log": [
       {
-        "turn": 3,
-        "finish_reason": "stop",
+        "turn": 1,
+        "finish_reason": "length",
         "retried": false,
         "had_candidate": false,
         "passed": 0,
@@ -2702,27 +2776,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 538,
-      "completion_tokens": 7395,
-      "total_tokens": 7933,
+      "completion_tokens": 16384,
+      "total_tokens": 16922,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 512
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 5116,
+        "accepted_prediction_tokens": 10926,
         "audio_tokens": 0,
-        "reasoning_tokens": 6804,
-        "rejected_prediction_tokens": 10872
+        "reasoning_tokens": 16163,
+        "rejected_prediction_tokens": 27287
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "031-graph-paths",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:29:49Z",
+    "date": "2026-10-27T19:35:58Z",
     "passed": 8,
     "failed": 0,
     "total": 8,
@@ -2730,7 +2804,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 13.73,
+    "elapsed_s": 7.97,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/031-graph-paths_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -2748,27 +2822,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 629,
-      "completion_tokens": 3518,
-      "total_tokens": 4147,
+      "completion_tokens": 2245,
+      "total_tokens": 2874,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 128
+        "cached_tokens": 512
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 2532,
+        "accepted_prediction_tokens": 1618,
         "audio_tokens": 0,
-        "reasoning_tokens": 3285,
-        "rejected_prediction_tokens": 4363
+        "reasoning_tokens": 2009,
+        "rejected_prediction_tokens": 2771
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "031-graph-paths",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:29:55Z",
+    "date": "2026-10-27T19:36:03Z",
     "passed": 8,
     "failed": 0,
     "total": 8,
@@ -2776,7 +2850,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 5.79,
+    "elapsed_s": 9.42,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/031-graph-paths_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -2794,27 +2868,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 629,
-      "completion_tokens": 1493,
-      "total_tokens": 2122,
+      "completion_tokens": 2812,
+      "total_tokens": 3441,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 0
+        "cached_tokens": 512
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 1085,
+        "accepted_prediction_tokens": 2056,
         "audio_tokens": 0,
-        "reasoning_tokens": 1261,
-        "rejected_prediction_tokens": 1778
+        "reasoning_tokens": 2573,
+        "rejected_prediction_tokens": 3243
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "032-pipeline-cache",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:30:06Z",
+    "date": "2026-10-27T19:36:08Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -2822,7 +2896,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 10.8,
+    "elapsed_s": 13.11,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/032-pipeline-cache_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -2840,27 +2914,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 657,
-      "completion_tokens": 2976,
-      "total_tokens": 3633,
+      "completion_tokens": 3443,
+      "total_tokens": 4100,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 640
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 2107,
+        "accepted_prediction_tokens": 2496,
         "audio_tokens": 0,
-        "reasoning_tokens": 2730,
-        "rejected_prediction_tokens": 3976
+        "reasoning_tokens": 3128,
+        "rejected_prediction_tokens": 4126
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "032-pipeline-cache",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:30:14Z",
+    "date": "2026-10-27T19:36:15Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -2868,7 +2942,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 7.84,
+    "elapsed_s": 17.48,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/032-pipeline-cache_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -2886,151 +2960,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 657,
-      "completion_tokens": 2110,
-      "total_tokens": 2767,
+      "completion_tokens": 4657,
+      "total_tokens": 5314,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 640
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 1489,
+        "accepted_prediction_tokens": 3323,
         "audio_tokens": 0,
-        "reasoning_tokens": 1824,
-        "rejected_prediction_tokens": 2851
+        "reasoning_tokens": 4255,
+        "rejected_prediction_tokens": 6008
       }
     },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "030-expr-parser",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:30:20Z",
-    "passed": 10,
-    "failed": 0,
-    "total": 10,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 91.74,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/030-expr-parser_attempt1_turn3.txt",
-    "agentic": true,
-    "turns_used": 3,
-    "solved_at_turn": 3,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 8,
-        "failed": 2
-      },
-      {
-        "turn": 2,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 0,
-        "failed": 0
-      },
-      {
-        "turn": 3,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 10,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 839,
-      "completion_tokens": 8948,
-      "total_tokens": 9787,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 768
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 6485,
-        "audio_tokens": 0,
-        "reasoning_tokens": 8250,
-        "rejected_prediction_tokens": 10749
-      }
-    },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "030-expr-parser",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:30:24Z",
-    "passed": 10,
-    "failed": 0,
-    "total": 10,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 92.37,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/030-expr-parser_attempt2_turn3.txt",
-    "agentic": true,
-    "turns_used": 3,
-    "solved_at_turn": 3,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 8,
-        "failed": 2
-      },
-      {
-        "turn": 2,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 0,
-        "failed": 0
-      },
-      {
-        "turn": 3,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 10,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 839,
-      "completion_tokens": 12085,
-      "total_tokens": 12924,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 768
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 8670,
-        "audio_tokens": 0,
-        "reasoning_tokens": 11122,
-        "rejected_prediction_tokens": 15235
-      }
-    },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "033-matrix-ops",
-    "attempt": 1,
+    "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:30:29Z",
+    "date": "2026-10-27T19:36:17Z",
     "passed": 7,
     "failed": 0,
     "total": 7,
@@ -3038,53 +2988,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 15.42,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/033-matrix-ops_attempt1_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 7,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 682,
-      "completion_tokens": 4180,
-      "total_tokens": 4862,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 640
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 3042,
-        "audio_tokens": 0,
-        "reasoning_tokens": 3773,
-        "rejected_prediction_tokens": 4931
-      }
-    },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "033-matrix-ops",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:30:32Z",
-    "passed": 7,
-    "failed": 0,
-    "total": 7,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 11.55,
+    "elapsed_s": 9.3,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/033-matrix-ops_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -3102,36 +3006,36 @@
     ],
     "token_usage": {
       "prompt_tokens": 682,
-      "completion_tokens": 3014,
-      "total_tokens": 3696,
+      "completion_tokens": 2700,
+      "total_tokens": 3382,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 640
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 2196,
+        "accepted_prediction_tokens": 1961,
         "audio_tokens": 0,
-        "reasoning_tokens": 2636,
-        "rejected_prediction_tokens": 3544
+        "reasoning_tokens": 2268,
+        "rejected_prediction_tokens": 3219
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
-    "task_id": "035-schema-validator",
+    "task_id": "033-matrix-ops",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:30:37Z",
-    "passed": 5,
+    "date": "2026-10-27T19:36:25Z",
+    "passed": 7,
     "failed": 0,
-    "total": 5,
+    "total": 7,
     "score": 1.0,
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 5.53,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/035-schema-validator_attempt1_turn1.txt",
+    "elapsed_s": 22.64,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/033-matrix-ops_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
     "solved_at_turn": 1,
@@ -3142,33 +3046,33 @@
         "finish_reason": "stop",
         "retried": false,
         "had_candidate": true,
-        "passed": 5,
+        "passed": 7,
         "failed": 0
       }
     ],
     "token_usage": {
-      "prompt_tokens": 822,
-      "completion_tokens": 1408,
-      "total_tokens": 2230,
+      "prompt_tokens": 682,
+      "completion_tokens": 7196,
+      "total_tokens": 7878,
       "prompt_tokens_details": {
         "audio_tokens": 0,
-        "cached_tokens": 768
+        "cached_tokens": 640
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 996,
+        "accepted_prediction_tokens": 5246,
         "audio_tokens": 0,
-        "reasoning_tokens": 1180,
-        "rejected_prediction_tokens": 1881
+        "reasoning_tokens": 6714,
+        "rejected_prediction_tokens": 8404
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "034-work-queue",
-    "attempt": 1,
+    "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:30:40Z",
+    "date": "2026-10-27T19:36:29Z",
     "passed": 4,
     "failed": 0,
     "total": 4,
@@ -3176,145 +3080,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 15.81,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/034-work-queue_attempt1_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 4,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 602,
-      "completion_tokens": 4028,
-      "total_tokens": 4630,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 512
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 2814,
-        "audio_tokens": 0,
-        "reasoning_tokens": 3759,
-        "rejected_prediction_tokens": 5684
-      }
-    },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "035-schema-validator",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:30:44Z",
-    "passed": 5,
-    "failed": 0,
-    "total": 5,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 7.09,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/035-schema-validator_attempt2_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 5,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 822,
-      "completion_tokens": 1949,
-      "total_tokens": 2771,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 768
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 1400,
-        "audio_tokens": 0,
-        "reasoning_tokens": 1535,
-        "rejected_prediction_tokens": 2443
-      }
-    },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "036-event-sourcing",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:30:46Z",
-    "passed": 5,
-    "failed": 0,
-    "total": 5,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 5.85,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/036-event-sourcing_attempt1_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 5,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 690,
-      "completion_tokens": 1507,
-      "total_tokens": 2197,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 640
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 1099,
-        "audio_tokens": 0,
-        "reasoning_tokens": 1281,
-        "rejected_prediction_tokens": 1757
-      }
-    },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "034-work-queue",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:30:49Z",
-    "passed": 4,
-    "failed": 0,
-    "total": 4,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 19.31,
+    "elapsed_s": 11.13,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/034-work-queue_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -3332,27 +3098,73 @@
     ],
     "token_usage": {
       "prompt_tokens": 602,
-      "completion_tokens": 5428,
-      "total_tokens": 6030,
+      "completion_tokens": 2358,
+      "total_tokens": 2960,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 512
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 3750,
+        "accepted_prediction_tokens": 1629,
         "audio_tokens": 0,
-        "reasoning_tokens": 5183,
-        "rejected_prediction_tokens": 8003
+        "reasoning_tokens": 2088,
+        "rejected_prediction_tokens": 3474
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
-    "task_id": "036-event-sourcing",
-    "attempt": 2,
+    "task_id": "034-work-queue",
+    "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:30:49Z",
+    "date": "2026-10-27T19:36:34Z",
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 18.85,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/034-work-queue_attempt1_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 4,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 602,
+      "completion_tokens": 4682,
+      "total_tokens": 5284,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 512
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 3231,
+        "audio_tokens": 0,
+        "reasoning_tokens": 4415,
+        "rejected_prediction_tokens": 6926
+      }
+    },
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "035-schema-validator",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:36:35Z",
     "passed": 5,
     "failed": 0,
     "total": 5,
@@ -3360,7 +3172,145 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 4.54,
+    "elapsed_s": 9.37,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/035-schema-validator_attempt1_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 5,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 822,
+      "completion_tokens": 2001,
+      "total_tokens": 2823,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 768
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1425,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1555,
+        "rejected_prediction_tokens": 2607
+      }
+    },
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "035-schema-validator",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:36:35Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 6.3,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/035-schema-validator_attempt2_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 5,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 822,
+      "completion_tokens": 1360,
+      "total_tokens": 2182,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 768
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 977,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1112,
+        "rejected_prediction_tokens": 1697
+      }
+    },
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "036-event-sourcing",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:36:41Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 6.56,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/036-event-sourcing_attempt1_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 5,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 690,
+      "completion_tokens": 1643,
+      "total_tokens": 2333,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 640
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 1245,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1422,
+        "rejected_prediction_tokens": 1541
+      }
+    },
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "036-event-sourcing",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:36:42Z",
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 7.06,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/036-event-sourcing_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -3378,73 +3328,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 690,
-      "completion_tokens": 1308,
-      "total_tokens": 1998,
+      "completion_tokens": 1945,
+      "total_tokens": 2635,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 640
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 990,
+        "accepted_prediction_tokens": 1479,
         "audio_tokens": 0,
-        "reasoning_tokens": 1087,
-        "rejected_prediction_tokens": 1229
+        "reasoning_tokens": 1724,
+        "rejected_prediction_tokens": 1790
       }
     },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "037-interval-map-merge",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:30:56Z",
-    "passed": 34,
-    "failed": 0,
-    "total": 34,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 7.27,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/037-interval-map-merge_attempt2_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 34,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 1396,
-      "completion_tokens": 2295,
-      "total_tokens": 3691,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 1280
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 1726,
-        "audio_tokens": 0,
-        "reasoning_tokens": 1614,
-        "rejected_prediction_tokens": 2257
-      }
-    },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "037-interval-map-merge",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:31:05Z",
+    "date": "2026-10-27T19:36:42Z",
     "passed": 34,
     "failed": 0,
     "total": 34,
@@ -3452,7 +3356,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 19.13,
+    "elapsed_s": 7.28,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/037-interval-map-merge_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -3470,27 +3374,73 @@
     ],
     "token_usage": {
       "prompt_tokens": 1396,
-      "completion_tokens": 6700,
-      "total_tokens": 8096,
+      "completion_tokens": 2225,
+      "total_tokens": 3621,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 1280
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 5075,
+        "accepted_prediction_tokens": 1663,
         "audio_tokens": 0,
-        "reasoning_tokens": 6103,
-        "rejected_prediction_tokens": 6321
+        "reasoning_tokens": 1609,
+        "rejected_prediction_tokens": 2278
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "037-interval-map-merge",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:36:52Z",
+    "passed": 34,
+    "failed": 0,
+    "total": 34,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 11.1,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/037-interval-map-merge_attempt2_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 34,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 1396,
+      "completion_tokens": 3704,
+      "total_tokens": 5100,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 1280
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 2803,
+        "audio_tokens": 0,
+        "reasoning_tokens": 3095,
+        "rejected_prediction_tokens": 3497
+      }
+    },
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "043-deterministic-throttled-runner",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:31:05Z",
+    "date": "2026-10-27T19:37:03Z",
     "passed": 16,
     "failed": 0,
     "total": 16,
@@ -3498,7 +3448,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 16.2,
+    "elapsed_s": 21.42,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/043-deterministic-throttled-runner_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -3516,27 +3466,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 1230,
-      "completion_tokens": 4497,
-      "total_tokens": 5727,
+      "completion_tokens": 5703,
+      "total_tokens": 6933,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 1152
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 3259,
+        "accepted_prediction_tokens": 4174,
         "audio_tokens": 0,
-        "reasoning_tokens": 3520,
-        "rejected_prediction_tokens": 5407
+        "reasoning_tokens": 4714,
+        "rejected_prediction_tokens": 6529
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "043-deterministic-throttled-runner",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:31:11Z",
+    "date": "2026-10-27T19:37:04Z",
     "passed": 16,
     "failed": 0,
     "total": 16,
@@ -3544,7 +3494,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 14.97,
+    "elapsed_s": 21.54,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/043-deterministic-throttled-runner_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -3562,73 +3512,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 1230,
-      "completion_tokens": 4260,
-      "total_tokens": 5490,
+      "completion_tokens": 6137,
+      "total_tokens": 7367,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 1152
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 3127,
+        "accepted_prediction_tokens": 4581,
         "audio_tokens": 0,
-        "reasoning_tokens": 3287,
-        "rejected_prediction_tokens": 4811
+        "reasoning_tokens": 5156,
+        "rejected_prediction_tokens": 6311
       }
     },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "044-lifecycle-registry-invariants",
-    "attempt": 2,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:31:35Z",
-    "passed": 9,
-    "failed": 0,
-    "total": 9,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 30.05,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/044-lifecycle-registry-invariants_attempt2_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 9,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 2359,
-      "completion_tokens": 8858,
-      "total_tokens": 11217,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 2304
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 6676,
-        "audio_tokens": 0,
-        "reasoning_tokens": 6886,
-        "rejected_prediction_tokens": 8612
-      }
-    },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "044-lifecycle-registry-invariants",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:31:42Z",
+    "date": "2026-10-27T19:37:25Z",
     "passed": 9,
     "failed": 0,
     "total": 9,
@@ -3636,7 +3540,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 37.74,
+    "elapsed_s": 33.5,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/044-lifecycle-registry-invariants_attempt1_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -3654,27 +3558,73 @@
     ],
     "token_usage": {
       "prompt_tokens": 2359,
-      "completion_tokens": 11423,
-      "total_tokens": 13782,
+      "completion_tokens": 10776,
+      "total_tokens": 13135,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 2304
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 8576,
+        "accepted_prediction_tokens": 8238,
         "audio_tokens": 0,
-        "reasoning_tokens": 9408,
-        "rejected_prediction_tokens": 11367
+        "reasoning_tokens": 8812,
+        "rejected_prediction_tokens": 9556
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "044-lifecycle-registry-invariants",
+    "attempt": 2,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:38:00Z",
+    "passed": 0,
+    "failed": 0,
+    "total": 0,
+    "score": 0.0,
+    "failing_tests": [],
+    "failure_reason": "no_answer",
+    "finish_reason": "length",
+    "elapsed_s": 56.75,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/044-lifecycle-registry-invariants_attempt2_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": null,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "length",
+        "retried": false,
+        "had_candidate": false,
+        "passed": 0,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 2359,
+      "completion_tokens": 16384,
+      "total_tokens": 18743,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 2304
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 11805,
+        "audio_tokens": 0,
+        "reasoning_tokens": 15580,
+        "rejected_prediction_tokens": 20262
+      }
+    },
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "048-peekable-windowed-iterator",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:32:23Z",
+    "date": "2026-10-27T19:38:15Z",
     "passed": 8,
     "failed": 0,
     "total": 8,
@@ -3682,7 +3632,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 47.6,
+    "elapsed_s": 49.46,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/048-peekable-windowed-iterator_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -3700,27 +3650,119 @@
     ],
     "token_usage": {
       "prompt_tokens": 1269,
-      "completion_tokens": 13173,
-      "total_tokens": 14442,
+      "completion_tokens": 13808,
+      "total_tokens": 15077,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 1152
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 9592,
+        "accepted_prediction_tokens": 9649,
         "audio_tokens": 0,
-        "reasoning_tokens": 12172,
-        "rejected_prediction_tokens": 15475
+        "reasoning_tokens": 12743,
+        "rejected_prediction_tokens": 19464
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "048-peekable-windowed-iterator",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:38:43Z",
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 99.01,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/048-peekable-windowed-iterator_attempt1_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": true,
+        "had_candidate": true,
+        "passed": 8,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 1269,
+      "completion_tokens": 16384,
+      "total_tokens": 17653,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 1152
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 11359,
+        "audio_tokens": 0,
+        "reasoning_tokens": 16391,
+        "rejected_prediction_tokens": 23823
+      }
+    },
+    "run_id": "20261027T193141Z"
+  },
+  {
+    "task_id": "052-priority-rate-scheduler",
+    "attempt": 1,
+    "provider": "https://inference.baseten.co/v1",
+    "model": "meta-models/muse-spark-open-1026",
+    "date": "2026-10-27T19:39:18Z",
+    "passed": 15,
+    "failed": 0,
+    "total": 15,
+    "score": 1.0,
+    "failing_tests": [],
+    "failure_reason": "none",
+    "finish_reason": "stop",
+    "elapsed_s": 34.98,
+    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/052-priority-rate-scheduler_attempt1_turn1.txt",
+    "agentic": true,
+    "turns_used": 1,
+    "solved_at_turn": 1,
+    "max_turns": 3,
+    "turn_log": [
+      {
+        "turn": 1,
+        "finish_reason": "stop",
+        "retried": false,
+        "had_candidate": true,
+        "passed": 15,
+        "failed": 0
+      }
+    ],
+    "token_usage": {
+      "prompt_tokens": 1756,
+      "completion_tokens": 10915,
+      "total_tokens": 12671,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 1664
+      },
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 7836,
+        "audio_tokens": 0,
+        "reasoning_tokens": 9336,
+        "rejected_prediction_tokens": 13717
+      }
+    },
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "050-canonical-binary-codec",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:33:14Z",
+    "date": "2026-10-27T19:39:23Z",
     "passed": 0,
     "failed": 0,
     "total": 0,
@@ -3728,7 +3770,7 @@
     "failing_tests": [],
     "failure_reason": "no_answer",
     "finish_reason": "length",
-    "elapsed_s": 51.74,
+    "elapsed_s": 68.2,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/050-canonical-binary-codec_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -3753,66 +3795,20 @@
         "cached_tokens": 1792
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 11871,
+        "accepted_prediction_tokens": 11321,
         "audio_tokens": 0,
-        "reasoning_tokens": 15621,
-        "rejected_prediction_tokens": 19720
+        "reasoning_tokens": 15945,
+        "rejected_prediction_tokens": 24113
       }
     },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "052-priority-rate-scheduler",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:33:46Z",
-    "passed": 15,
-    "failed": 0,
-    "total": 15,
-    "score": 1.0,
-    "failing_tests": [],
-    "failure_reason": "none",
-    "finish_reason": "stop",
-    "elapsed_s": 32.04,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/052-priority-rate-scheduler_attempt1_turn1.txt",
-    "agentic": true,
-    "turns_used": 1,
-    "solved_at_turn": 1,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 15,
-        "failed": 0
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 1756,
-      "completion_tokens": 9831,
-      "total_tokens": 11587,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 1664
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 7258,
-        "audio_tokens": 0,
-        "reasoning_tokens": 8312,
-        "rejected_prediction_tokens": 10753
-      }
-    },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "052-priority-rate-scheduler",
     "attempt": 2,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:34:07Z",
+    "date": "2026-10-27T19:39:46Z",
     "passed": 15,
     "failed": 0,
     "total": 15,
@@ -3820,7 +3816,7 @@
     "failing_tests": [],
     "failure_reason": "none",
     "finish_reason": "stop",
-    "elapsed_s": 20.23,
+    "elapsed_s": 28.24,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/052-priority-rate-scheduler_attempt2_turn1.txt",
     "agentic": true,
     "turns_used": 1,
@@ -3838,27 +3834,27 @@
     ],
     "token_usage": {
       "prompt_tokens": 1756,
-      "completion_tokens": 6365,
-      "total_tokens": 8121,
+      "completion_tokens": 8658,
+      "total_tokens": 10414,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 1664
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 4618,
+        "accepted_prediction_tokens": 6187,
         "audio_tokens": 0,
-        "reasoning_tokens": 4778,
-        "rejected_prediction_tokens": 7611
+        "reasoning_tokens": 7107,
+        "rejected_prediction_tokens": 11117
       }
     },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   },
   {
     "task_id": "050-canonical-binary-codec",
     "attempt": 1,
     "provider": "https://inference.baseten.co/v1",
     "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:35:11Z",
+    "date": "2026-10-27T19:41:59Z",
     "passed": 0,
     "failed": 10,
     "total": 10,
@@ -3868,7 +3864,7 @@
     ],
     "failure_reason": "no_answer",
     "finish_reason": "length",
-    "elapsed_s": 208.08,
+    "elapsed_s": 239.42,
     "raw_output_path": "results/raw/muse-spark-open-1026-agentic/050-canonical-binary-codec_attempt1_turn3.txt",
     "agentic": true,
     "turns_used": 3,
@@ -3878,7 +3874,7 @@
       {
         "turn": 1,
         "finish_reason": "stop",
-        "retried": false,
+        "retried": true,
         "had_candidate": true,
         "passed": 9,
         "failed": 1
@@ -3886,7 +3882,7 @@
       {
         "turn": 2,
         "finish_reason": "stop",
-        "retried": true,
+        "retried": false,
         "had_candidate": true,
         "passed": 9,
         "failed": 1
@@ -3902,87 +3898,19 @@
     ],
     "token_usage": {
       "prompt_tokens": 1919,
-      "completion_tokens": 12583,
-      "total_tokens": 14502,
+      "completion_tokens": 16384,
+      "total_tokens": 18303,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cached_tokens": 1792
       },
       "completion_tokens_details": {
-        "accepted_prediction_tokens": 8913,
+        "accepted_prediction_tokens": 11824,
         "audio_tokens": 0,
-        "reasoning_tokens": 10788,
-        "rejected_prediction_tokens": 16777
+        "reasoning_tokens": 16390,
+        "rejected_prediction_tokens": 20103
       }
     },
-    "run_id": "20261027T182419Z"
-  },
-  {
-    "task_id": "048-peekable-windowed-iterator",
-    "attempt": 1,
-    "provider": "https://inference.baseten.co/v1",
-    "model": "meta-models/muse-spark-open-1026",
-    "date": "2026-10-27T18:35:20Z",
-    "passed": 3,
-    "failed": 5,
-    "total": 8,
-    "score": 0.375,
-    "failing_tests": [
-      "test_iterator_protocol_identity_and_exhaustion",
-      "test_peek_lookahead_efficiency",
-      "test_push_back_ordering_and_interaction",
-      "test_take_uses_buffer",
-      "test_close_delegation_and_state"
-    ],
-    "failure_reason": "wrong_answer",
-    "finish_reason": "stop",
-    "elapsed_s": 248.99,
-    "raw_output_path": "results/raw/muse-spark-open-1026-agentic/048-peekable-windowed-iterator_attempt1_turn3.txt",
-    "agentic": true,
-    "turns_used": 3,
-    "solved_at_turn": null,
-    "max_turns": 3,
-    "turn_log": [
-      {
-        "turn": 1,
-        "finish_reason": "stop",
-        "retried": true,
-        "had_candidate": true,
-        "passed": 7,
-        "failed": 1
-      },
-      {
-        "turn": 2,
-        "finish_reason": "stop",
-        "retried": false,
-        "had_candidate": true,
-        "passed": 6,
-        "failed": 2
-      },
-      {
-        "turn": 3,
-        "finish_reason": "stop",
-        "retried": true,
-        "had_candidate": true,
-        "passed": 3,
-        "failed": 5
-      }
-    ],
-    "token_usage": {
-      "prompt_tokens": 1269,
-      "completion_tokens": 16384,
-      "total_tokens": 17653,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 1152
-      },
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 11402,
-        "audio_tokens": 0,
-        "reasoning_tokens": 16389,
-        "rejected_prediction_tokens": 23514
-      }
-    },
-    "run_id": "20261027T182419Z"
+    "run_id": "20261027T193141Z"
   }
 ]

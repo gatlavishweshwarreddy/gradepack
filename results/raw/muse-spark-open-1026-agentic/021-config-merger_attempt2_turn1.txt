@@ -8,6 +8,7 @@ def merge(base, override):
     Deep-merge override into base. Keys only in base are kept.
     Keys only in override are added. When both values are dicts,
     merge recursively; otherwise override wins.
+    Does not mutate base or override.
     """
     result = copy.deepcopy(base)
     for k, v in override.items():
@@ -16,4 +17,15 @@ def merge(base, override):
         else:
             result[k] = copy.deepcopy(v)
     return result
+```
+
+loader.py
+```python
+import json
+
+
+def load_config(path):
+    """Load a JSON config file and return a dict."""
+    with open(path) as f:
+        return json.load(f)
 ```

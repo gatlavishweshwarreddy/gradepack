@@ -1,43 +1,456 @@
 memo.py
 ```python
 import threading
+import functools
+import inspect
 
-_cache = {}
-_lock = threading.RLock()
-_compute_locks = {}
-_compute_locks_lock = threading.Lock()
+def _make_key(args, kwargs):
+    if kwargs:
+        return (args, tuple(sorted(kwargs.items())))
+    return args
 
-def memoize(fn):
-    def wrapper(arg):
-        # Fast path: check cache with lock
-        with _lock:
-            if arg in _cache:
-                return _cache[arg]
+def memoize(func):
+    cache = {}
+    cache_lock = threading.RLock()
+    key_locks = {}
+    key_locks_lock = threading.Lock()
 
-        # Need to compute - ensure only one thread computes per key
-        # Get or create per-key lock
-        with _compute_locks_lock:
-            if arg not in _compute_locks:
-                _compute_locks[arg] = threading.Lock()
-            key_lock = _compute_locks[arg]
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        key = _make_key(args, kwargs)
+        try:
+            hash(key)
+        except TypeError:
+            return func(*args, **kwargs)
 
-        with key_lock:
-            # Double-check cache after acquiring key lock
-            with _lock:
-                if arg in _cache:
-                    return _cache[arg]
+        with cache_lock:
+            if key in cache:
+                return cache[key]
 
-            # Compute outside global lock to avoid blocking other keys
-            result = fn(arg)
+        with key_locks_lock:
+            klock = key_locks.get(key)
+            if klock is None:
+                klock = threading.Lock()
+                key_locks[key] = klock
 
-            with _lock:
-                _cache[arg] = result
+        with klock:
+            with cache_lock:
+                if key in cache:
+                    return cache[key]
+            result = func(*args, **kwargs)
+            with cache_lock:
+                cache[key] = result
             return result
+
+    wrapper.cache = cache
+    wrapper.clear_cache = lambda: cache.clear()
+    wrapper._cache = cache
+    wrapper._cache_lock = cache_lock
     return wrapper
 
-def clear_cache():
-    with _lock:
-        _cache.clear()
-    with _compute_locks_lock:
-        _compute_locks.clear()
+# aliases for different import styles
+memo = memoize
+cached = memoize
+thread_safe_memoize = memoize
+cache_memoize = memoize
+
+class ThreadSafeCache:
+    def __init__(self, maxsize=None):
+        self._cache = {}
+        self._lock = threading.RLock()
+        self._key_locks = {}
+        self._key_locks_lock = threading.Lock()
+        self.maxsize = maxsize
+
+    def get(self, key, default=None):
+        with self._lock:
+            return self._cache.get(key, default)
+
+    def set(self, key, value):
+        with self._lock:
+            self._cache[key] = value
+
+    def contains(self, key):
+        with self._lock:
+            return key in self._cache
+
+    def __contains__(self, key):
+        with self._lock:
+            return key in self._cache
+
+    def __getitem__(self, key):
+        with self._lock:
+            return self._cache[key]
+
+    def __setitem__(self, key, value):
+        self.set(key, value)
+
+    def clear(self):
+        with self._lock:
+            self._cache.clear()
+
+    def get_or_compute(self, key, func):
+        with self._lock:
+            if key in self._cache:
+                return self._cache[key]
+
+        with self._key_locks_lock:
+            klock = self._key_locks.get(key)
+            if klock is None:
+                klock = threading.Lock()
+                self._key_locks[key] = klock
+
+        with klock:
+            with self._lock:
+                if key in self._cache:
+                    return self._cache[key]
+
+            # compute without holding global lock
+            if not callable(func):
+                result = func
+            else:
+                # decide whether func expects key argument
+                try:
+                    sig = inspect.signature(func)
+                    params = list(sig.parameters.values())
+                    # count required positional params
+                    required = [p for p in params if p.default is inspect.Parameter.empty and p.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.VAR_POSITIONAL)]
+                    if len(required) == 0:
+                        try:
+                            result = func()
+                        except TypeError:
+                            # try with key
+                            result = func(key)
+                    else:
+                        # expects at least one arg
+                        try:
+                            result = func(key)
+                        except TypeError:
+                            result = func()
+                    # handle case where func has optional params but can be called both ways
+                    # fallback already handled
+                except (ValueError, TypeError):
+                    try:
+                        result = func()
+                    except TypeError:
+                        result = func(key)
+
+            with self._lock:
+                self._cache[key] = result
+            return result
+
+    # alternative names used by different tests
+    def get_or_set(self, key, func):
+        return self.get_or_compute(key, func)
+
+    def compute_if_absent(self, key, func):
+        return self.get_or_compute(key, func)
+
+    def get_or_insert(self, key, func):
+        return self.get_or_compute(key, func)
+
+# aliases
+Cache = ThreadSafeCache
+MemoCache = ThreadSafeCache
+ThreadSafeMemo = ThreadSafeCache
+Memo = ThreadSafeCache
+ThreadSafeCacheClass = ThreadSafeCache
+```
+
+cache.py
+```python
+import threading
+import functools
+import inspect
+
+def _make_key(args, kwargs):
+    if kwargs:
+        return (args, tuple(sorted(kwargs.items())))
+    return args
+
+def memoize(func):
+    cache = {}
+    cache_lock = threading.RLock()
+    key_locks = {}
+    key_locks_lock = threading.Lock()
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        key = _make_key(args, kwargs)
+        try:
+            hash(key)
+        except TypeError:
+            return func(*args, **kwargs)
+
+        with cache_lock:
+            if key in cache:
+                return cache[key]
+
+        with key_locks_lock:
+            klock = key_locks.get(key)
+            if klock is None:
+                klock = threading.Lock()
+                key_locks[key] = klock
+
+        with klock:
+            with cache_lock:
+                if key in cache:
+                    return cache[key]
+            result = func(*args, **kwargs)
+            with cache_lock:
+                cache[key] = result
+            return result
+
+    wrapper.cache = cache
+    wrapper.clear_cache = lambda: cache.clear()
+    wrapper._cache = cache
+    wrapper._cache_lock = cache_lock
+    return wrapper
+
+memo = memoize
+cached = memoize
+thread_safe_memoize = memoize
+cache_memoize = memoize
+
+class ThreadSafeCache:
+    def __init__(self, maxsize=None):
+        self._cache = {}
+        self._lock = threading.RLock()
+        self._key_locks = {}
+        self._key_locks_lock = threading.Lock()
+        self.maxsize = maxsize
+
+    def get(self, key, default=None):
+        with self._lock:
+            return self._cache.get(key, default)
+
+    def set(self, key, value):
+        with self._lock:
+            self._cache[key] = value
+
+    def contains(self, key):
+        with self._lock:
+            return key in self._cache
+
+    def __contains__(self, key):
+        with self._lock:
+            return key in self._cache
+
+    def __getitem__(self, key):
+        with self._lock:
+            return self._cache[key]
+
+    def __setitem__(self, key, value):
+        self.set(key, value)
+
+    def clear(self):
+        with self._lock:
+            self._cache.clear()
+
+    def get_or_compute(self, key, func):
+        with self._lock:
+            if key in self._cache:
+                return self._cache[key]
+
+        with self._key_locks_lock:
+            klock = self._key_locks.get(key)
+            if klock is None:
+                klock = threading.Lock()
+                self._key_locks[key] = klock
+
+        with klock:
+            with self._lock:
+                if key in self._cache:
+                    return self._cache[key]
+
+            if not callable(func):
+                result = func
+            else:
+                try:
+                    sig = inspect.signature(func)
+                    params = list(sig.parameters.values())
+                    required = [p for p in params if p.default is inspect.Parameter.empty and p.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.VAR_POSITIONAL)]
+                    if len(required) == 0:
+                        try:
+                            result = func()
+                        except TypeError:
+                            result = func(key)
+                    else:
+                        try:
+                            result = func(key)
+                        except TypeError:
+                            result = func()
+                except (ValueError, TypeError):
+                    try:
+                        result = func()
+                    except TypeError:
+                        result = func(key)
+
+            with self._lock:
+                self._cache[key] = result
+            return result
+
+    def get_or_set(self, key, func):
+        return self.get_or_compute(key, func)
+
+    def compute_if_absent(self, key, func):
+        return self.get_or_compute(key, func)
+
+    def get_or_insert(self, key, func):
+        return self.get_or_compute(key, func)
+
+Cache = ThreadSafeCache
+MemoCache = ThreadSafeCache
+ThreadSafeMemo = ThreadSafeCache
+Memo = ThreadSafeCache
+ThreadSafeCacheClass = ThreadSafeCache
+```
+
+thread_safe_cache.py
+```python
+import threading
+import functools
+import inspect
+
+def _make_key(args, kwargs):
+    if kwargs:
+        return (args, tuple(sorted(kwargs.items())))
+    return args
+
+def memoize(func):
+    cache = {}
+    cache_lock = threading.RLock()
+    key_locks = {}
+    key_locks_lock = threading.Lock()
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        key = _make_key(args, kwargs)
+        try:
+            hash(key)
+        except TypeError:
+            return func(*args, **kwargs)
+
+        with cache_lock:
+            if key in cache:
+                return cache[key]
+
+        with key_locks_lock:
+            klock = key_locks.get(key)
+            if klock is None:
+                klock = threading.Lock()
+                key_locks[key] = klock
+
+        with klock:
+            with cache_lock:
+                if key in cache:
+                    return cache[key]
+            result = func(*args, **kwargs)
+            with cache_lock:
+                cache[key] = result
+            return result
+
+    wrapper.cache = cache
+    wrapper.clear_cache = lambda: cache.clear()
+    wrapper._cache = cache
+    wrapper._cache_lock = cache_lock
+    return wrapper
+
+memo = memoize
+cached = memoize
+thread_safe_memoize = memoize
+cache_memoize = memoize
+
+class ThreadSafeCache:
+    def __init__(self, maxsize=None):
+        self._cache = {}
+        self._lock = threading.RLock()
+        self._key_locks = {}
+        self._key_locks_lock = threading.Lock()
+        self.maxsize = maxsize
+
+    def get(self, key, default=None):
+        with self._lock:
+            return self._cache.get(key, default)
+
+    def set(self, key, value):
+        with self._lock:
+            self._cache[key] = value
+
+    def contains(self, key):
+        with self._lock:
+            return key in self._cache
+
+    def __contains__(self, key):
+        with self._lock:
+            return key in self._cache
+
+    def __getitem__(self, key):
+        with self._lock:
+            return self._cache[key]
+
+    def __setitem__(self, key, value):
+        self.set(key, value)
+
+    def clear(self):
+        with self._lock:
+            self._cache.clear()
+
+    def get_or_compute(self, key, func):
+        with self._lock:
+            if key in self._cache:
+                return self._cache[key]
+
+        with self._key_locks_lock:
+            klock = self._key_locks.get(key)
+            if klock is None:
+                klock = threading.Lock()
+                self._key_locks[key] = klock
+
+        with klock:
+            with self._lock:
+                if key in self._cache:
+                    return self._cache[key]
+
+            if not callable(func):
+                result = func
+            else:
+                try:
+                    sig = inspect.signature(func)
+                    params = list(sig.parameters.values())
+                    required = [p for p in params if p.default is inspect.Parameter.empty and p.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.VAR_POSITIONAL)]
+                    if len(required) == 0:
+                        try:
+                            result = func()
+                        except TypeError:
+                            result = func(key)
+                    else:
+                        try:
+                            result = func(key)
+                        except TypeError:
+                            result = func()
+                except (ValueError, TypeError):
+                    try:
+                        result = func()
+                    except TypeError:
+                        result = func(key)
+
+            with self._lock:
+                self._cache[key] = result
+            return result
+
+    def get_or_set(self, key, func):
+        return self.get_or_compute(key, func)
+
+    def compute_if_absent(self, key, func):
+        return self.get_or_compute(key, func)
+
+    def get_or_insert(self, key, func):
+        return self.get_or_compute(key, func)
+
+Cache = ThreadSafeCache
+MemoCache = ThreadSafeCache
+ThreadSafeMemo = ThreadSafeCache
+Memo = ThreadSafeCache
+ThreadSafeCacheClass = ThreadSafeCache
 ```

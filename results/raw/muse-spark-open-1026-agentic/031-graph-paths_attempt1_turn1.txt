@@ -23,11 +23,11 @@ class Graph:
 
         while pq:
             d, u = heapq.heappop(pq)
-            # skip stale entries
-            if d != dist.get(u):
+            # Skip stale entries
+            if d > dist.get(u, float('inf')):
                 continue
             if u == target:
-                return float(d)
+                return d
             for v, w in self._adj.get(u, []):
                 nd = d + w
                 if v not in dist or nd < dist[v]:

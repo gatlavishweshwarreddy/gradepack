@@ -3,23 +3,17 @@ pipeline.py
 from cache import ResultCache
 
 
-def _make_hashable(obj):
-    # Convert mutable containers into immutable, hashable equivalents
-    # so the cache key captures the full contents, not object identity.
-    if isinstance(obj, list):
-        return tuple(_make_hashable(x) for x in obj)
-    if isinstance(obj, tuple):
-        return tuple(_make_hashable(x) for x in obj)
-    if isinstance(obj, dict):
-        return tuple(sorted((_make_hashable(k), _make_hashable(v)) for k, v in obj.items()))
-    if isinstance(obj, set):
-        return frozenset(_make_hashable(x) for x in obj)
-    # For other types, try to use as-is if hashable, otherwise fallback to repr
-    try:
-        hash(obj)
-        return obj
-    except TypeError:
-        return repr(obj)
+def _make_hashable(value):
+    if isinstance(value, list):
+        return tuple(_make_hashable(v) for v in value)
+    elif isinstance(value, tuple):
+        return tuple(_make_hashable(v) for v in value)
+    elif isinstance(value, dict):
+        return tuple(sorted((k, _make_hashable(v)) for k, v in value.items()))
+    elif isinstance(value, set):
+        return frozenset(_make_hashable(v) for v in value)
+    else:
+        return value
 
 
 class Pipeline:
@@ -30,7 +24,14 @@ class Pipeline:
     def run(self, data):
         result = data
         for t in self._transforms:
-            key = (t.name, _make_hashable(result))
+            try:
+                hashable_result = _make_hashable(result)
+                # ensure the key is hashable
+                hash(hashable_result)
+            except TypeError:
+                # fallback for unhashable element types: repr captures contents
+                hashable_result = repr(result)
+            key = (t.name, hashable_result)
             if self._cache.has(key):
                 result = self._cache.get(key)
             else:

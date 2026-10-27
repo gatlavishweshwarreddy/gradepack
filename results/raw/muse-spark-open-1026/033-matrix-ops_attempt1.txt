@@ -5,17 +5,21 @@ def coerce_element(v):
     Convert v to an appropriate numeric type.
     Preserves fractional values instead of truncating to int.
     """
-    # bool is subclass of int, handle explicitly
-    if isinstance(v, bool):
-        return int(v)
-    if isinstance(v, int):
-        return int(v)
+    # Preserve float values - do not truncate via int()
     if isinstance(v, float):
         return float(v)
+    if isinstance(v, int) and not isinstance(v, bool):
+        return int(v)
+    if isinstance(v, bool):
+        return int(v)
+    # For strings or other types, try int first, then float
     try:
         return int(v)
     except (TypeError, ValueError):
-        return float(v)
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            return v
 ```
 
 matrix.py

@@ -3,31 +3,35 @@ pipeline.py
 from cache import ResultCache
 
 
-def _make_hashable(obj):
-    if isinstance(obj, list):
-        return tuple(_make_hashable(x) for x in obj)
-    if isinstance(obj, tuple):
-        return tuple(_make_hashable(x) for x in obj)
-    if isinstance(obj, dict):
-        return tuple(sorted((k, _make_hashable(v)) for k, v in obj.items()))
-    if isinstance(obj, set):
-        return frozenset(_make_hashable(x) for x in obj)
-    try:
-        hash(obj)
-        return obj
-    except TypeError:
-        return repr(obj)
-
-
 class Pipeline:
     def __init__(self, transforms):
         self._transforms = transforms
         self._cache = ResultCache()
 
+    def _make_hashable(self, obj):
+        # Recursively convert mutable/unhashable structures into hashable ones
+        # so the cache key captures the full contents, not just object identity.
+        if isinstance(obj, list):
+            return tuple(self._make_hashable(x) for x in obj)
+        if isinstance(obj, tuple):
+            return tuple(self._make_hashable(x) for x in obj)
+        if isinstance(obj, dict):
+            return frozenset((self._make_hashable(k), self._make_hashable(v)) for k, v in obj.items())
+        if isinstance(obj, set):
+            return frozenset(self._make_hashable(x) for x in obj)
+        if isinstance(obj, bytearray):
+            return bytes(obj)
+        try:
+            hash(obj)
+            return obj
+        except TypeError:
+            # Fallback for other unhashable types
+            return repr(obj)
+
     def run(self, data):
         result = data
         for t in self._transforms:
-            key = (t.name, _make_hashable(result))
+            key = (t.name, self._make_hashable(result))
             if self._cache.has(key):
                 result = self._cache.get(key)
             else:

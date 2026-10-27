@@ -52,19 +52,25 @@ class BufferedIterator:
     def peek(self, index=0, default=_sentinel):
         if index < 0:
             raise ValueError("index must be non-negative")
+        if len(self._buffer) > index:
+            return self._buffer[index]
+        if self._exhausted:
+            if default is not _sentinel:
+                return default
+            raise StopIteration
         while len(self._buffer) <= index:
             if self._exhausted:
-                if default is not _sentinel:
-                    return default
-                raise StopIteration
+                break
             try:
                 self._buffer.append(next(self._source_iter))
             except StopIteration:
                 self._exhausted = True
-                if default is not _sentinel:
-                    return default
-                raise StopIteration
-        return self._buffer[index]
+                break
+        if len(self._buffer) > index:
+            return self._buffer[index]
+        if default is not _sentinel:
+            return default
+        raise StopIteration
 
     def has_next(self):
         try:
@@ -76,7 +82,8 @@ class BufferedIterator:
     def push_back(self, *values):
         if not values:
             return
-        self._buffer.extendleft(reversed(values))
+        for v in reversed(values):
+            self._buffer.appendleft(v)
         self._exhausted = False
 
     def take(self, n):
@@ -93,46 +100,43 @@ class BufferedIterator:
     def window(self, size, step=1):
         if size <= 0 or step <= 0:
             raise ValueError("size and step must be positive")
-        # initial window
-        window = []
+        buf = deque()
         for _ in range(size):
             try:
-                window.append(next(self))
+                buf.append(next(self))
             except StopIteration:
                 return
-        yield tuple(window)
+        yield tuple(buf)
         while True:
-            if step < size:
-                new_items = []
+            if step <= size:
+                for _ in range(step):
+                    buf.popleft()
                 for _ in range(step):
                     try:
-                        new_items.append(next(self))
+                        buf.append(next(self))
                     except StopIteration:
                         return
-                window = window[step:] + new_items
-                yield tuple(window)
+                yield tuple(buf)
             else:
-                skip = step - size
-                for _ in range(skip):
+                buf.clear()
+                for _ in range(step - size):
                     try:
                         next(self)
                     except StopIteration:
                         return
-                new_window = []
                 for _ in range(size):
                     try:
-                        new_window.append(next(self))
+                        buf.append(next(self))
                     except StopIteration:
                         return
-                window = new_window
-                yield tuple(window)
+                yield tuple(buf)
 
     def close(self):
         if hasattr(self._source_iter, 'close'):
             try:
                 self._source_iter.close()
-            except Exception:
-                raise
+            except BaseException:
+                pass
         self._buffer.clear()
         self._exhausted = True
 
@@ -140,24 +144,21 @@ class BufferedIterator:
         self._buffer.clear()
         if hasattr(self._source_iter, 'throw'):
             try:
-                result = self._source_iter.throw(exc_type, exc_val, tb)
-                self._exhausted = False
-                return result
+                return self._source_iter.throw(exc_type, exc_val, tb)
             except StopIteration:
                 self._exhausted = True
                 raise
             except BaseException:
+                self._exhausted = True
                 raise
         if isinstance(exc_type, BaseException):
             if tb is not None:
                 raise exc_type.with_traceback(tb)
             raise exc_type
-        if exc_val is None:
-            exc = exc_type()
-        elif isinstance(exc_val, BaseException):
-            exc = exc_val
-        else:
+        if exc_val is not None:
             exc = exc_type(exc_val)
+        else:
+            exc = exc_type()
         if tb is not None:
             raise exc.with_traceback(tb)
         raise exc

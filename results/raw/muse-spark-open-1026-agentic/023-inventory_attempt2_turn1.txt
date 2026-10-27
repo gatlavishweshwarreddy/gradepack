@@ -8,7 +8,7 @@ class Inventory:
     def __init__(self):
         self._stock = {}
         self._log = ReservationLog()
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
 
     def add_stock(self, item, qty):
         with self._lock:
@@ -20,6 +20,7 @@ class Inventory:
 
     def reserve(self, item, qty):
         with self._lock:
+            # atomically check available (which accounts for already committed reservations) and record
             available = self._stock.get(item, 0) - self._log.total_reserved(item)
             if available >= qty:
                 self._log.record(item, qty)
@@ -29,16 +30,14 @@ class Inventory:
     def reservations(self):
         return self._log
 ```
-
 reservation.py
 ```python
 import threading
 
-
 class ReservationLog:
     def __init__(self):
         self._log = []
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
 
     def record(self, item, qty):
         with self._lock:

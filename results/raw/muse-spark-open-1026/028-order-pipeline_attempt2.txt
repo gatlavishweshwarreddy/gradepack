@@ -10,7 +10,6 @@ def apply_bulk_discount(subtotal):
         return subtotal * 0.95
     return subtotal
 ```
-
 pipeline.py
 ```python
 from order import Order

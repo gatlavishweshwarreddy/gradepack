@@ -10,14 +10,14 @@ class EventScheduler:
         self._events: list[tuple[str, datetime]] = []
 
     def add_event(self, name: str, utc_dt: datetime) -> None:
-        if utc_dt.tzinfo is None:
+        if utc_dt.tzinfo is None or utc_dt.tzinfo.utcoffset(utc_dt) is None:
             raise ValueError("utc_dt must be timezone-aware")
         self._events.append((name, utc_dt))
 
     def next_event_in(self, tz_name: str) -> tuple[str, timedelta] | None:
         tz = zoneinfo.ZoneInfo(tz_name)
         now = self._clock.now()
-        # filter strictly upcoming events (as instants)
+        now_in_tz = now.astimezone(tz)
         upcoming = [
             (name, dt) for name, dt in self._events
             if dt > now
@@ -26,9 +26,6 @@ class EventScheduler:
             return None
         upcoming.sort(key=lambda x: x[1])
         name, dt = upcoming[0]
-        # compute timedelta relative to current time in the given timezone
-        now_in_tz = now.astimezone(tz)
-        dt_in_tz = dt.astimezone(tz)
-        delta = dt_in_tz - now_in_tz
+        delta = dt.astimezone(tz) - now_in_tz
         return name, delta
 ```

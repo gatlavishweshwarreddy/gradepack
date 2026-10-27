@@ -1,11 +1,7 @@
 inventory.py
 ```python
+from reservation import ReservationLog
 import threading
-
-try:
-    from reservation import ReservationLog
-except ImportError:
-    from .reservation import ReservationLog
 
 
 class Inventory:

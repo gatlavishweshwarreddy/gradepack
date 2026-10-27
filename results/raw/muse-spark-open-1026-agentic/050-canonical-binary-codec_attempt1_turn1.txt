@@ -43,7 +43,6 @@ def _decode_varint(buf, pos):
 
 
 def _encode_zigzag(n):
-    # canonical zigzag for arbitrary Python ints
     if n >= 0:
         return n << 1
     else:
@@ -55,26 +54,32 @@ def _decode_zigzag(n):
 
 
 def _sort_key(x):
-    # canonical deterministic ordering for dict keys / set elements
-    # order by type tag: None < bool < int < float < str < bytes
+    # canonical order: None < bool < int < float < str < bytes < list < dict < set
     if x is None:
-        return (0, 0)
+        return (0, 0, 0)
     elif isinstance(x, bool):
-        return (1, x)
+        return (1, int(x), 0)
     elif isinstance(x, int):
-        return (2, x)
+        return (2, x, 0)
     elif isinstance(x, float):
         if math.isnan(x):
-            # NaN sorts after all other floats deterministically
             return (3, float('inf'), 1)
+        if x == 0.0:
+            # distinguish -0.0 and 0.0
+            return (3, 0.0, math.copysign(1.0, x))
         return (3, x, 0)
     elif isinstance(x, str):
-        return (4, x)
+        return (4, x, 0)
     elif isinstance(x, bytes):
-        return (5, x)
+        return (5, x, 0)
+    elif isinstance(x, list):
+        return (6, repr(x), 0)
+    elif isinstance(x, dict):
+        return (7, repr(x), 0)
+    elif isinstance(x, set):
+        return (8, repr(x), 0)
     else:
-        # fallback for unexpected types (should not occur for hashable keys)
-        return (6, repr(x))
+        return (9, repr(x), 0)
 
 
 class Codec:
@@ -150,9 +155,9 @@ class Codec:
             next_id[0] += 1
             buf.append(TAG_DICT)
             buf.extend(_encode_varint(len(obj)))
-            for k in sorted(obj.keys(), key=_sort_key):
+            for k, v in sorted(obj.items(), key=lambda kv: _sort_key(kv[0])):
                 self._encode(k, buf, memo, next_id)
-                self._encode(obj[k], buf, memo, next_id)
+                self._encode(v, buf, memo, next_id)
         elif isinstance(obj, set):
             memo[obj_id] = next_id[0]
             next_id[0] += 1
@@ -187,7 +192,10 @@ class Codec:
             length, pos = _decode_varint(buf, pos)
             if pos + length > len(buf):
                 raise ValueError("truncated str")
-            s = buf[pos:pos+length].decode('utf-8')
+            try:
+                s = buf[pos:pos+length].decode('utf-8')
+            except UnicodeDecodeError as e:
+                raise ValueError("invalid utf-8") from e
             pos += length
             return s, pos
         elif tag == TAG_BYTES:

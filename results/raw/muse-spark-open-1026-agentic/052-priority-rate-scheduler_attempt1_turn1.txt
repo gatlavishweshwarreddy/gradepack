@@ -117,6 +117,8 @@ class Scheduler:
         if task_id not in self.tasks:
             return False
         task = self.tasks[task_id]
+        if task.state == TaskState.RUNNING:
+            return False
         if task.state in (TaskState.PENDING, TaskState.READY):
             task.state = TaskState.CANCELLED
             return True
@@ -131,7 +133,7 @@ class Scheduler:
         self._now = now
         self.bucket.refill(now)
 
-        completed_tasks = []
+        completed = []
 
         for task in list(self.tasks.values()):
             if task.state == TaskState.RUNNING and task.start_time is not None and now >= task.start_time + task.duration:
@@ -142,26 +144,35 @@ class Scheduler:
                     task.error = e
                     task.state = TaskState.FAILED
                 self.running_count -= 1
-                completed_tasks.append(task)
+                completed.append(task.task_id)
 
-        # deterministic priority order for completed
-        completed_tasks.sort(key=lambda t: (t.priority, t.seq))
-        completed = [t.task_id for t in completed_tasks]
+        completed.sort(key=lambda tid: (self.tasks[tid].priority, self.tasks[tid].seq))
 
-        # Promote PENDING tasks, with FAILED propagation (including transitive)
-        # Must be checked every tick, iteratively to handle chains
+        # Promote PENDING tasks, with propagation of FAILED/CANCELLED.
+        # Loop until stable to handle transitive propagation in same tick.
         changed = True
         while changed:
             changed = False
-            for task in list(self.tasks.values()):
+            for task in self.tasks.values():
                 if task.state != TaskState.PENDING:
                     continue
-                dep_states = [self.tasks[d].state for d in task.deps]
-                if any(s == TaskState.FAILED or s == TaskState.CANCELLED for s in dep_states):
+                # Check deps
+                has_failed = False
+                all_completed = True
+                for d in task.deps:
+                    dep_state = self.tasks[d].state
+                    if dep_state == TaskState.FAILED or dep_state == TaskState.CANCELLED:
+                        has_failed = True
+                        break
+                    if dep_state != TaskState.COMPLETED:
+                        all_completed = False
+                if has_failed:
                     task.state = TaskState.FAILED
                     changed = True
-                elif all(s == TaskState.COMPLETED for s in dep_states):
-                    # all deps completed (vacuously true for empty deps, but those are already READY)
+                elif all_completed:
+                    # all deps completed (for empty deps this is vacuously true,
+                    # but empty-deps tasks are already READY via submit)
+                    # Only promote if there are deps or if somehow still PENDING with no deps
                     task.state = TaskState.READY
                     heapq.heappush(self.ready_heap, (task.priority, task.seq, task.task_id))
                     changed = True

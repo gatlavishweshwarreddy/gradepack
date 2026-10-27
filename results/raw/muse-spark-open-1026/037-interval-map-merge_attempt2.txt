@@ -23,7 +23,7 @@ class IntervalMap:
         merged = []
         for a, b, v in new_intervals:
             if merged and merged[-1][1] == a and merged[-1][2] == v:
-                merged[-1][1] = b
+                merged[-1][1] = max(merged[-1][1], b)
             else:
                 merged.append([a, b, v])
         self._intervals = merged

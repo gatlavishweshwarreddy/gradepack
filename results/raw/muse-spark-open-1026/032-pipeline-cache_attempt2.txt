@@ -4,23 +4,23 @@ from cache import ResultCache
 
 
 def _to_hashable(value):
-    # Recursively convert mutable containers to immutable, hashable equivalents
+    # Recursively convert unhashable containers to hashable equivalents
+    # so the cache key captures the full contents of the input.
     if isinstance(value, list):
         return tuple(_to_hashable(v) for v in value)
-    if isinstance(value, tuple):
+    elif isinstance(value, tuple):
         return tuple(_to_hashable(v) for v in value)
-    if isinstance(value, dict):
-        # sort by hashable key representation to be deterministic
+    elif isinstance(value, dict):
         return tuple(sorted((_to_hashable(k), _to_hashable(v)) for k, v in value.items()))
-    if isinstance(value, set):
+    elif isinstance(value, set):
         return frozenset(_to_hashable(v) for v in value)
-    # hashable leaf types (str, int, float, bool, None, etc.)
-    try:
-        hash(value)
-        return value
-    except TypeError:
-        # fallback for unhashable custom objects: use repr which captures value
-        return repr(value)
+    else:
+        try:
+            hash(value)
+            return value
+        except TypeError:
+            # Fallback for unhashable custom objects
+            return repr(value)
 
 
 class Pipeline:
@@ -31,7 +31,7 @@ class Pipeline:
     def run(self, data):
         result = data
         for t in self._transforms:
-            # cache key captures full contents of the input, not identity
+            # Cache key captures transform identity and full contents of input
             key = (t.name, _to_hashable(result))
             if self._cache.has(key):
                 result = self._cache.get(key)

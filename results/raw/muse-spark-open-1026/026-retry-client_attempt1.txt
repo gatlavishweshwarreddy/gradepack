@@ -28,7 +28,6 @@ class HttpClient:
                 self._waits.append(delay)
         return resp
 ```
-
 backoff.py
 ```python
 def wait_seconds(attempt, base=1.0):

@@ -17,14 +17,15 @@ class EventScheduler:
     def next_event_in(self, tz_name: str) -> tuple[str, timedelta] | None:
         tz = zoneinfo.ZoneInfo(tz_name)
         now = self._clock.now()
-        if now.tzinfo is None:
-            now = now.replace(tzinfo=timezone.utc)
-
+        # use clock's aware UTC time, not naive utcnow()
         upcoming = [(name, dt) for name, dt in self._events if dt > now]
         if not upcoming:
             return None
         upcoming.sort(key=lambda x: x[1])
         name, dt = upcoming[0]
+        # timedelta relative to current time in the given timezone
+        # dt - now and dt.astimezone(tz) - now.astimezone(tz) are equivalent;
+        # use astimezone to make timezone intent explicit
         delta = dt.astimezone(tz) - now.astimezone(tz)
         return name, delta
 ```

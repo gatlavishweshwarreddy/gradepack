@@ -10,10 +10,10 @@ def sliding_max(nums: list, k: int) -> list:
     dq: deque[int] = deque()  # stores indices
     result = []
     for i, val in enumerate(nums):
-        # Remove indices outside the window
+        # Remove indices outside the window (window is [i-k+1, i])
         while dq and dq[0] <= i - k:
             dq.popleft()
-        # Remove smaller elements from back
+        # Remove smaller elements from back (keep deque decreasing)
         while dq and nums[dq[-1]] <= val:
             dq.pop()
         dq.append(i)

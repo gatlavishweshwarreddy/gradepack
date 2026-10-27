@@ -144,30 +144,28 @@ class Scheduler:
                 self.running_count -= 1
                 completed.append(task.task_id)
 
-        if completed:
-            completed.sort(key=lambda tid: (self.tasks[tid].priority, self.tasks[tid].seq))
-
-        # Promote PENDING tasks and propagate FAILED/CANCELLED
-        # Loop to handle transitive propagation in same tick
+        # Promote PENDING tasks: check FAILED/CANCELLED propagation and COMPLETED promotion
+        # Loop to handle transitive propagation within same tick (A->B->C chain)
         changed = True
         while changed:
             changed = False
             for task in self.tasks.values():
                 if task.state != TaskState.PENDING:
                     continue
-                # If any dep is FAILED or CANCELLED, propagate FAILED
-                has_failed = False
-                for dep_id in task.deps:
-                    dep_state = self.tasks[dep_id].state
+                # Check dependencies
+                dep_failed_or_cancelled = False
+                all_completed = True
+                for d in task.deps:
+                    dep_state = self.tasks[d].state
                     if dep_state in (TaskState.FAILED, TaskState.CANCELLED):
-                        has_failed = True
+                        dep_failed_or_cancelled = True
                         break
-                if has_failed:
+                    if dep_state != TaskState.COMPLETED:
+                        all_completed = False
+                if dep_failed_or_cancelled:
                     task.state = TaskState.FAILED
                     changed = True
-                    continue
-                # If all deps are COMPLETED, become READY
-                if all(self.tasks[d].state == TaskState.COMPLETED for d in task.deps):
+                elif all_completed:
                     task.state = TaskState.READY
                     heapq.heappush(self.ready_heap, (task.priority, task.seq, task.task_id))
                     changed = True
@@ -185,6 +183,11 @@ class Scheduler:
             task.state = TaskState.RUNNING
             task.start_time = now
             self.running_count += 1
+
+        if completed:
+            completed_tasks = [self.tasks[tid] for tid in completed]
+            completed_tasks.sort(key=lambda t: (t.priority, t.seq))
+            completed = [t.task_id for t in completed_tasks]
 
         return completed
 ```

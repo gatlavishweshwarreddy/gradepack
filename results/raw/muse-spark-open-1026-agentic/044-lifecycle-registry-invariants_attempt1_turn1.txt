@@ -74,10 +74,10 @@ class LifecycleRegistry:
         return self._state == "CLOSED"
 
     def open(self):
-        if self._state == "CLOSED":
-            raise RegistryClosed("registry is closed")
         if self._state == "OPEN":
             return
+        if self._state == "CLOSED":
+            raise RegistryClosed("registry closed")
         self._state = "OPEN"
 
     def close(self):
@@ -85,13 +85,11 @@ class LifecycleRegistry:
             return
         if self._state != "OPEN":
             raise RegistryClosed("registry not open")
-        # first check for any in-use resource; must not mutate if so
-        for rid, state in self._states.items():
-            if state != "DISPOSED" and self._refcounts.get(rid, 0) > 0:
-                raise ResourceInUse(f"resource {rid} in use refcount {self._refcounts.get(rid, 0)}")
-        # transition every non-DISPOSED to DISPOSED
-        for rid, state in list(self._states.items()):
-            if state != "DISPOSED":
+        for rid, st in self._states.items():
+            if st != "DISPOSED" and self._refcounts.get(rid, 0) > 0:
+                raise ResourceInUse(f"refcount {self._refcounts.get(rid,0)}")
+        for rid in list(self._states.keys()):
+            if self._states[rid] != "DISPOSED":
                 self._states[rid] = "DISPOSED"
         self._state = "CLOSED"
 
@@ -224,11 +222,7 @@ class LifecycleRegistry:
         class _Session:
             def __enter__(self):
                 registry.acquire(rid)
-                try:
-                    return registry.get(rid)
-                except Exception:
-                    registry.release(rid)
-                    raise
+                return registry.get(rid)
             def __exit__(self, exc_type, exc, tb):
                 registry.release(rid)
                 return False

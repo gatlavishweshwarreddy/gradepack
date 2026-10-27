@@ -6,18 +6,22 @@ from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 class Ledger:
     def __init__(self, initial_balance="0"):
         try:
-            self._balance = Decimal(initial_balance)
+            self._balance = Decimal(str(initial_balance))
         except (InvalidOperation, ValueError, TypeError, AttributeError):
             raise ValueError(f"Invalid amount: {initial_balance!r}")
 
     def add(self, amount_str: str) -> None:
         try:
-            self._balance += Decimal(amount_str)
+            # Use Decimal for exact decimal arithmetic to avoid binary float errors
+            self._balance += Decimal(str(amount_str))
         except (InvalidOperation, ValueError, TypeError, AttributeError):
             raise ValueError(f"Invalid amount: {amount_str!r}")
 
     def balance(self) -> str:
-        # quantized to two decimal places using commercial rounding
+        # Round to two decimal places using commercial rounding (half up)
         quantized = self._balance.quantize(Decimal("0.00"), rounding=ROUND_HALF_UP)
+        # Normalize -0.00 to 0.00
+        if quantized == 0:
+            quantized = Decimal("0.00")
         return format(quantized, "f")
 ```

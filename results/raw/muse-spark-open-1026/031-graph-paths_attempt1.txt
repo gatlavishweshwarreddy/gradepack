@@ -25,13 +25,60 @@ class Graph:
             d, u = heapq.heappop(pq)
             # skip stale entries
             if d != dist.get(u):
-                continue
+                # also handles d > dist[u] case
+                if u not in dist or d > dist[u]:
+                    continue
+                if d != dist.get(u):
+                    continue
             if u == target:
                 return d
+            # extra guard for stale entry (float safe)
+            if d > dist.get(u, float('inf')):
+                continue
             for v, w in self._adj.get(u, []):
                 nd = d + w
                 if v not in dist or nd < dist[v]:
                     dist[v] = nd
                     heapq.heappush(pq, (nd, v))
         return None
+```
+heap.py
+```python
+import heapq
+
+
+class MinHeap:
+    def __init__(self):
+        self._heap = []
+
+    def push(self, *args):
+        if len(args) == 1:
+            item = args[0]
+        elif len(args) == 2:
+            item = (args[0], args[1])
+        else:
+            item = args
+        heapq.heappush(self._heap, item)
+
+    def pop(self):
+        if not self._heap:
+            raise IndexError("pop from empty heap")
+        return heapq.heappop(self._heap)
+
+    def peek(self):
+        if not self._heap:
+            raise IndexError("peek from empty heap")
+        return self._heap[0]
+
+    def __len__(self):
+        return len(self._heap)
+
+    def __bool__(self):
+        return bool(self._heap)
+
+    def is_empty(self):
+        return not self._heap
+
+    def empty(self):
+        return not self._heap
 ```

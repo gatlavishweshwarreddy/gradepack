@@ -34,7 +34,7 @@ class ThrottledRunner:
 
     def submit(self, task_id: str, fn=None, priority: int = 0) -> bool:
         existing = self._tasks.get(task_id)
-        if existing is not None and existing["state"] in ("PENDING", "RUNNING"):
+        if existing and existing["state"] in ("PENDING", "RUNNING"):
             return False
         self._seq += 1
         self._tasks[task_id] = {"fn": fn, "priority": priority, "state": "PENDING", "seq": self._seq}
@@ -55,19 +55,14 @@ class ThrottledRunner:
         self._tokens = min(float(self.burst), self._tokens + elapsed * self.rps)
         self._last_tick = now
         started = []
-        while self._pending:
-            if len(self._running) >= self.max_concurrent:
-                break
-            if self._tokens < 1:
-                break
+        while self._pending and self._tokens >= 1 and len(self._running) < self.max_concurrent:
             prio, seq, tid = heapq.heappop(self._pending)
             info = self._tasks.get(tid)
             if not info or info["state"] != "PENDING" or info["seq"] != seq:
                 continue
-            # consume token only when actually starting
-            self._tokens -= 1
             info["state"] = "RUNNING"
             self._running.add(tid)
+            self._tokens -= 1
             started.append(tid)
         return started
 

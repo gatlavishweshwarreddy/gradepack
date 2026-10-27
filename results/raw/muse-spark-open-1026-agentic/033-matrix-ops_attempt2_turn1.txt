@@ -5,19 +5,28 @@ def coerce_element(v):
     Convert v to an appropriate numeric type.
     Preserves fractional values instead of truncating to int.
     """
-    # Preserve bool as int (bool is subclass of int)
+    # bool is subclass of int, handle explicitly
     if isinstance(v, bool):
         return int(v)
-    # Preserve existing numeric types without truncation
     if isinstance(v, int):
-        return int(v)
+        return v
     if isinstance(v, float):
-        return float(v)
-    # For string or other convertible types, try int first then float
+        if v.is_integer():
+            return int(v)
+        return v
+    # For strings or other types, try int then float without truncation
     try:
+        # int("3.5") raises ValueError, so fractional strings fall through to float
         return int(v)
     except (TypeError, ValueError):
-        return float(v)
+        pass
+    try:
+        f = float(v)
+        if f.is_integer():
+            return int(f)
+        return f
+    except (TypeError, ValueError):
+        return v
 ```
 
 matrix.py

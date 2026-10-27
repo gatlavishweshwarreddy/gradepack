@@ -8,122 +8,22 @@ class SearchIndex:
         self._built = False
         self.comparison_count = 0
         # inverted indexes
-        self._index = {}          # word -> set(doc_id)
-        self._ngram_index = {}    # n-gram (1-3) -> set(doc_id)
+        self._index = {}          # full-text substrings for short docs
+        self._word_index = {}      # word -> set(doc_id) for long docs
+        self._substr_index = {}    # substring of word -> set(doc_id) for long docs
+        self._max_sub_len = 50
+        self._short_threshold = 100
 
     def add(self, doc_id, text):
         self._docs[doc_id] = text.lower()
         self._built = False
 
     def build(self):
-        """Build inverted index for words and n-grams for substring search."""
         self._index = {}
-        self._ngram_index = {}
+        self._word_index = {}
+        self._substr_index = {}
+
         for doc_id, text in self._docs.items():
-            # word index - split on word characters
-            for word in re.findall(r'\w+', text):
-                self._index.setdefault(word, set()).add(doc_id)
-            # n-gram index (1,2,3) for efficient substring filtering
-            L = len(text)
-            for i in range(L):
-                for n in (1, 2, 3):
-                    if i + n <= L:
-                        gram = text[i:i+n]
-                        self._ngram_index.setdefault(gram, set()).add(doc_id)
-        self._built = True
-
-    def search(self, query):
-        """Return doc_ids whose text contains query using inverted index."""
-        q = query.lower()
-
-        if q == "":
-            # "" in text is True for all docs in original implementation
-            return list(self._docs.keys())
-
-        # ensure index is built
-        if not self._built:
-            self.build()
-
-        # 1) exact word fast path - O(1) dict lookup, no string comparison
-        if q in self._index:
-            # return copy, sorted for determinism if possible
-            try:
-                return sorted(self._index[q])
-            except TypeError:
-                return list(self._index[q])
-
-        # 2) n-gram based filtering for substring / phrase queries
-        # for very short queries we can answer directly from ngram index
-        if len(q) in (1, 2):
-            docs = self._ngram_index.get(q)
-            if docs is None:
-                return []
-            # ngram index for length 1-2 is exact, no verification needed
-            try:
-                return sorted(docs)
-            except TypeError:
-                return list(docs)
-
-        # len(q) >= 3 : use trigram intersection to get candidates
-        if len(q) >= 3:
-            trigrams = [q[i:i+3] for i in range(len(q) - 2)]
-            candidates = None
-            for tri in trigrams:
-                docs = self._ngram_index.get(tri)
-                if docs is None:
-                    return []
-                if candidates is None:
-                    candidates = set(docs)
-                else:
-                    candidates &= docs
-                if not candidates:
-                    return []
-            # verify candidates with actual substring check (at most |candidates| comparisons)
-            results = []
-            for doc_id in candidates:
-                self.comparison_count += 1
-                if q in self._docs[doc_id]:
-                    results.append(doc_id)
-            # keep deterministic order if possible
-            try:
-                results.sort()
-            except TypeError:
-                pass
-            return results
-
-        # 3) fallback - word intersection for phrase queries where trigram not applicable
-        # (should rarely be reached)
-        words = re.findall(r'\w+', q)
-        if words:
-            candidates = None
-            for w in words:
-                docs = self._index.get(w)
-                if docs is None:
-                    candidates = None
-                    break
-                if candidates is None:
-                    candidates = set(docs)
-                else:
-                    candidates &= docs
-                if not candidates:
-                    return []
-            if candidates is not None:
-                results = []
-                for doc_id in candidates:
-                    self.comparison_count += 1
-                    if q in self._docs[doc_id]:
-                        results.append(doc_id)
-                try:
-                    results.sort()
-                except TypeError:
-                    pass
-                return results
-
-        # final fallback full scan (correctness, but should not be used for performance tests)
-        results = []
-        for doc_id, text in self._docs.items():
-            self.comparison_count += 1
-            if q in text:
-                results.append(doc_id)
-        return results
-```
+            n = len(text)
+            if n <= self._short_threshold:
+                # index every substring (including spaces

@@ -55,14 +55,14 @@ class ThrottledRunner:
         self._tokens = min(float(self.burst), self._tokens + elapsed * self.rps)
         self._last_tick = now
         started = []
-        while self._pending and self._tokens >= 1 and len(self._running) < self.max_concurrent:
-            prio_neg, seq, tid = heapq.heappop(self._pending)
+        while self._pending:
+            prio, seq, tid = heapq.heappop(self._pending)
             info = self._tasks.get(tid)
-            if not info or info["state"] != "PENDING":
+            if not info or info["state"] != "PENDING" or info.get("seq") != seq:
                 continue
-            if info.get("seq") != seq:
-                continue
-            # actually start the task
+            if self._tokens < 1 or len(self._running) >= self.max_concurrent:
+                heapq.heappush(self._pending, (prio, seq, tid))
+                break
             self._tokens -= 1
             info["state"] = "RUNNING"
             self._running.add(tid)

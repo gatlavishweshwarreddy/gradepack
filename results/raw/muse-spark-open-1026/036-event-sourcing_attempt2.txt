@@ -22,7 +22,6 @@ class Projector:
     def apply(self, events):
         """Fold events into state dict."""
         state = {}
-        # Ensure sequence order even if caller passes insertion-ordered events
         for e in sorted(events, key=lambda e: e.sequence):
             if e.type == "set":
                 state[e.payload["key"]] = e.payload["value"]

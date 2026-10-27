@@ -1,6 +1,7 @@
 workqueue.py
 ```python
 import threading
+# workqueue.py (not queue.py — avoids shadowing stdlib queue)
 
 
 class WorkQueue:
@@ -33,6 +34,7 @@ import threading
 
 
 class Worker:
+    # shared lock to protect the shared results list from concurrent appends
     _results_lock = threading.Lock()
 
     def __init__(self, queue, results):
@@ -45,8 +47,4 @@ class Worker:
             if item is not None:
                 with Worker._results_lock:
                     self._results.append(item * 2)
-            else:
-                # avoid tight busy-spin when queue is temporarily empty
-                # yield to other threads
-                threading.Event().wait(0.0001)
 ```

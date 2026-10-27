@@ -4,7 +4,7 @@ from cache import ResultCache
 
 
 def _make_hashable(obj):
-    # Recursively convert unhashable containers to hashable equivalents
+    # Convert potentially unhashable/mutable structures to a hashable snapshot
     if isinstance(obj, list):
         return tuple(_make_hashable(x) for x in obj)
     if isinstance(obj, tuple):
@@ -29,7 +29,7 @@ class Pipeline:
     def run(self, data):
         result = data
         for t in self._transforms:
-            # cache key captures full contents, not just identity
+            # Use content-based key instead of id() so mutation is detected
             key = (t.name, _make_hashable(result))
             if self._cache.has(key):
                 result = self._cache.get(key)
@@ -37,4 +37,29 @@ class Pipeline:
                 result = t.apply(result)
                 self._cache.set(key, result)
         return result
+```
+cache.py
+```python
+import copy
+
+
+class ResultCache:
+    def __init__(self):
+        self._store = {}
+
+    def get(self, key):
+        val = self._store.get(key)
+        try:
+            return copy.deepcopy(val)
+        except Exception:
+            return val
+
+    def set(self, key, value):
+        try:
+            self._store[key] = copy.deepcopy(value)
+        except Exception:
+            self._store[key] = value
+
+    def has(self, key):
+        return key in self._store
 ```
