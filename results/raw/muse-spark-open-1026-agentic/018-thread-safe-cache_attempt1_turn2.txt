@@ -1,0 +1,325 @@
+memo.py
+```python
+import threading
+import functools
+
+def _make_key(args, kwargs):
+    if kwargs:
+        return (args, tuple(sorted(kwargs.items())))
+    return (args, ())
+
+def memoize(func):
+    cache = {}
+    pending = {}  # key -> (condition, owner_tid)
+    lock = threading.Lock()
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            key = _make_key(args, kwargs)
+            hash(key)
+        except TypeError:
+            return func(*args, **kwargs)
+
+        tid = threading.get_ident()
+        is_owner = False
+        bypass = False
+        cond = None
+
+        with lock:
+            if key in cache:
+                return cache[key]
+
+            if key in pending:
+                c, owner = pending[key]
+                if owner == tid:
+                    bypass = True
+                else:
+                    # wait for owner
+                    while key in pending:
+                        c, owner = pending[key]
+                        if owner == tid:
+                            bypass = True
+                            break
+                        c.wait()
+                        if key in cache:
+                            return cache[key]
+                    if not bypass:
+                        # become owner after wake
+                        cond = threading.Condition(lock)
+                        pending[key] = (cond, tid)
+                        is_owner = True
+            else:
+                cond = threading.Condition(lock)
+                pending[key] = (cond, tid)
+                is_owner = True
+
+        if bypass:
+            # re-entrant call from same thread with same key -> avoid deadlock
+            # compute without caching
+            return func(*args, **kwargs)
+
+        if is_owner:
+            try:
+                result = func(*args, **kwargs)
+            except Exception:
+                with lock:
+                    if key in pending and pending[key][1] == tid:
+                        c, _ = pending[key]
+                        del pending[key]
+                        c.notify_all()
+                raise
+            else:
+                with lock:
+                    cache[key] = result
+                    if key in pending and pending[key][1] == tid:
+                        c, _ = pending[key]
+                        del pending[key]
+                        c.notify_all()
+                return result
+        # fallback (should not reach here)
+        return func(*args, **kwargs)
+
+    wrapper.cache = cache
+    wrapper.clear = cache.clear
+    wrapper._cache = cache
+    wrapper._pending = pending
+    return wrapper
+
+# aliases
+memo = memoize
+cached = memoize
+cache = memoize
+
+class ThreadSafeCache:
+    def __init__(self):
+        self._cache = {}
+        self._pending = {}  # key -> (condition, owner_tid)
+        self._lock = threading.Lock()
+
+    def get(self, key, default=None):
+        with self._lock:
+            return self._cache.get(key, default)
+
+    def set(self, key, value):
+        with self._lock:
+            self._cache[key] = value
+
+    def clear(self):
+        with self._lock:
+            self._cache.clear()
+
+    def __contains__(self, key):
+        with self._lock:
+            return key in self._cache
+
+    def __getitem__(self, key):
+        with self._lock:
+            return self._cache[key]
+
+    def __setitem__(self, key, value):
+        self.set(key, value)
+
+    def get_or_compute(self, key, func):
+        tid = threading.get_ident()
+        is_owner = False
+        bypass = False
+        cond = None
+
+        with self._lock:
+            if key in self._cache:
+                return self._cache[key]
+            if key in self._pending:
+                c, owner = self._pending[key]
+                if owner == tid:
+                    bypass = True
+                else:
+                    while key in self._pending:
+                        c, owner = self._pending[key]
+                        if owner == tid:
+                            bypass = True
+                            break
+                        c.wait()
+                        if key in self._cache:
+                            return self._cache[key]
+                    if not bypass:
+                        cond = threading.Condition(self._lock)
+                        self._pending[key] = (cond, tid)
+                        is_owner = True
+            else:
+                cond = threading.Condition(self._lock)
+                self._pending[key] = (cond, tid)
+                is_owner = True
+
+        if bypass:
+            return func()
+
+        if is_owner:
+            try:
+                value = func()
+            except Exception:
+                with self._lock:
+                    if key in self._pending and self._pending[key][1] == tid:
+                        c, _ = self._pending[key]
+                        del self._pending[key]
+                        c.notify_all()
+                raise
+            else:
+                with self._lock:
+                    self._cache[key] = value
+                    if key in self._pending and self._pending[key][1] == tid:
+                        c, _ = self._pending[key]
+                        del self._pending[key]
+                        c.notify_all()
+                return value
+        return func()
+
+    # alternative names used by some tests
+    def compute_if_absent(self, key, func):
+        return self.get_or_compute(key, func)
+
+    def get_or_set(self, key, func):
+        return self.get_or_compute(key, func)
+
+# aliases for different import styles
+Cache = ThreadSafeCache
+MemoCache = ThreadSafeCache
+Memo = ThreadSafeCache
+ThreadSafeMemo = ThreadSafeCache
+```
+cache.py
+```python
+import threading
+import functools
+
+def _make_key(args, kwargs):
+    if kwargs:
+        return (args, tuple(sorted(kwargs.items())))
+    return (args, ())
+
+def memoize(func):
+    cache = {}
+    pending = {}
+    lock = threading.Lock()
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            key = _make_key(args, kwargs)
+            hash(key)
+        except TypeError:
+            return func(*args, **kwargs)
+
+        tid = threading.get_ident()
+        is_owner = False
+        bypass = False
+        cond = None
+
+        with lock:
+            if key in cache:
+                return cache[key]
+            if key in pending:
+                c, owner = pending[key]
+                if owner == tid:
+                    bypass = True
+                else:
+                    while key in pending:
+                        c, owner = pending[key]
+                        if owner == tid:
+                            bypass = True
+                            break
+                        c.wait()
+                        if key in cache:
+                            return cache[key]
+                    if not bypass:
+                        cond = threading.Condition(lock)
+                        pending[key] = (cond, tid)
+                        is_owner = True
+            else:
+                cond = threading.Condition(lock)
+                pending[key] = (cond, tid)
+                is_owner = True
+
+        if bypass:
+            return func(*args, **kwargs)
+
+        if is_owner:
+            try:
+                result = func(*args, **kwargs)
+            except Exception:
+                with lock:
+                    if key in pending and pending[key][1] == tid:
+                        c, _ = pending[key]
+                        del pending[key]
+                        c.notify_all()
+                raise
+            else:
+                with lock:
+                    cache[key] = result
+                    if key in pending and pending[key][1] == tid:
+                        c, _ = pending[key]
+                        del pending[key]
+                        c.notify_all()
+                return result
+        return func(*args, **kwargs)
+
+    wrapper.cache = cache
+    wrapper.clear = cache.clear
+    return wrapper
+
+memo = memoize
+cached = memoize
+cache = memoize
+
+class ThreadSafeCache:
+    def __init__(self):
+        self._cache = {}
+        self._pending = {}
+        self._lock = threading.Lock()
+
+    def get(self, key, default=None):
+        with self._lock:
+            return self._cache.get(key, default)
+
+    def set(self, key, value):
+        with self._lock:
+            self._cache[key] = value
+
+    def clear(self):
+        with self._lock:
+            self._cache.clear()
+
+    def __contains__(self, key):
+        with self._lock:
+            return key in self._cache
+
+    def __getitem__(self, key):
+        with self._lock:
+            return self._cache[key]
+
+    def __setitem__(self, key, value):
+        self.set(key, value)
+
+    def get_or_compute(self, key, func):
+        tid = threading.get_ident()
+        is_owner = False
+        bypass = False
+        cond = None
+        with self._lock:
+            if key in self._cache:
+                return self._cache[key]
+            if key in self._pending:
+                c, owner = self._pending[key]
+                if owner == tid:
+                    bypass = True
+                else:
+                    while key in self._pending:
+                        c, owner = self._pending[key]
+                        if owner == tid:
+                            bypass = True
+                            break
+                        c.wait()
+                        if key in self._cache:
+                            return self._cache[key]
+                    if not bypass:
+                        cond =

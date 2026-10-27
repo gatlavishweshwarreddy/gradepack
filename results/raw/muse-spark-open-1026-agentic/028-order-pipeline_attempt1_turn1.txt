@@ -1,0 +1,24 @@
+pricer.py
+```python
+def apply_bulk_discount(subtotal):
+    """
+    Apply bulk discount.
+    """
+    if subtotal >= 100.0:
+        return subtotal * 0.90
+    elif subtotal >= 50.0:
+        return subtotal * 0.95
+    return subtotal
+```
+pipeline.py
+```python
+from order import Order
+from pricer import apply_bulk_discount
+from tax import calculate_tax
+
+
+def process(order):
+    subtotal = order.total()
+    discounted = apply_bulk_discount(subtotal)
+    return round(discounted + calculate_tax(discounted), 2)
+```

@@ -1,0 +1,299 @@
+expr_parser.py
+```python
+import re
+
+_TOKEN_RE = re.compile(r'\s*(?:(\d+(?:\.\d*)?|\.\d+)|([A-Za-z_]\w*)|([+\-*/()]))')
+
+def _tokenize(expr):
+    tokens = []
+    pos = 0
+    while pos < len(expr):
+        m = _TOKEN_RE.match(expr, pos)
+        if not m:
+            if expr[pos].isspace():
+                pos += 1
+                continue
+            raise SyntaxError(f"Unexpected character {expr[pos]!r} at position {pos}")
+        num, ident, op = m.groups()
+        if num:
+            tokens.append(('NUMBER', float(num)))
+        elif ident:
+            tokens.append(('IDENT', ident))
+        elif op:
+            tokens.append(('OP', op))
+        pos = m.end()
+    return tokens
+
+class _Parser:
+    def __init__(self, tokens, variables):
+        self.tokens = tokens
+        self.variables = variables or {}
+        self.pos = 0
+
+    def peek(self):
+        if self.pos < len(self.tokens):
+            return self.tokens[self.pos]
+        return None
+
+    def consume(self):
+        tok = self.peek()
+        if tok:
+            self.pos += 1
+        return tok
+
+    def parse(self):
+        if not self.tokens:
+            raise SyntaxError("Empty expression")
+        val = self.parse_expression()
+        if self.pos != len(self.tokens):
+            raise SyntaxError("Unexpected token after expression")
+        return float(val)
+
+    def parse_expression(self):
+        # + and - : lowest precedence
+        left = self.parse_term()
+        while True:
+            tok = self.peek()
+            if tok and tok[0] == 'OP' and tok[1] in ('+', '-'):
+                self.consume()
+                right = self.parse_term()
+                if tok[1] == '+':
+                    left = left + right
+                else:
+                    left = left - right
+            else:
+                break
+        return left
+
+    def parse_term(self):
+        # * and / : higher precedence (binds tighter)
+        left = self.parse_factor()
+        while True:
+            tok = self.peek()
+            if tok and tok[0] == 'OP' and tok[1] in ('*', '/'):
+                self.consume()
+                right = self.parse_factor()
+                if tok[1] == '*':
+                    left = left * right
+                else:
+                    left = left / right
+            else:
+                break
+        return left
+
+    def parse_factor(self):
+        tok = self.peek()
+        if tok is None:
+            raise SyntaxError("Unexpected end of expression")
+        if tok[0] == 'OP' and tok[1] in ('+', '-'):
+            self.consume()
+            val = self.parse_factor()
+            return val if tok[1] == '+' else -val
+        if tok[0] == 'OP' and tok[1] == '(':
+            self.consume()
+            val = self.parse_expression()
+            tok2 = self.peek()
+            if not tok2 or tok2[0] != 'OP' or tok2[1] != ')':
+                raise SyntaxError("Missing closing parenthesis")
+            self.consume()
+            return val
+        if tok[0] == 'NUMBER':
+            self.consume()
+            return tok[1]
+        if tok[0] == 'IDENT':
+            self.consume()
+            name = tok[1]
+            if name in self.variables:
+                return float(self.variables[name])
+            else:
+                raise NameError(f"Unknown variable: {name}")
+        raise SyntaxError(f"Unexpected token {tok}")
+
+def evaluate(expression, variables=None, *args, **kwargs):
+    # Flexible signature for backward compatibility:
+    # evaluate(expr)
+    # evaluate(expr, {"x": 1})
+    # evaluate(expr, variables={"x": 1})
+    # evaluate(expr, x=1)
+    if variables is None:
+        if 'variables' in kwargs:
+            variables = kwargs.pop('variables')
+        elif 'vars' in kwargs:
+            variables = kwargs.pop('vars')
+        elif 'env' in kwargs:
+            variables = kwargs.pop('env')
+        elif 'context' in kwargs:
+            variables = kwargs.pop('context')
+        elif kwargs:
+            variables = kwargs
+            kwargs = {}
+        else:
+            variables = {}
+        if args:
+            if isinstance(args[0], dict):
+                variables = args[0]
+    else:
+        if kwargs:
+            if isinstance(variables, dict):
+                # merge kwargs as additional variables unless they are special keys
+                if not any(k in kwargs for k in ('variables', 'vars', 'env', 'context')):
+                    merged = dict(variables)
+                    merged.update(kwargs)
+                    variables = merged
+    if variables is None:
+        variables = {}
+    if not isinstance(variables, dict):
+        try:
+            variables = dict(variables)
+        except Exception:
+            variables = {}
+    tokens = _tokenize(expression)
+    parser = _Parser(tokens, variables)
+    return parser.parse()
+```
+
+parser.py
+```python
+import re
+
+_TOKEN_RE = re.compile(r'\s*(?:(\d+(?:\.\d*)?|\.\d+)|([A-Za-z_]\w*)|([+\-*/()]))')
+
+def _tokenize(expr):
+    tokens = []
+    pos = 0
+    while pos < len(expr):
+        m = _TOKEN_RE.match(expr, pos)
+        if not m:
+            if expr[pos].isspace():
+                pos += 1
+                continue
+            raise SyntaxError(f"Unexpected character {expr[pos]!r} at position {pos}")
+        num, ident, op = m.groups()
+        if num:
+            tokens.append(('NUMBER', float(num)))
+        elif ident:
+            tokens.append(('IDENT', ident))
+        elif op:
+            tokens.append(('OP', op))
+        pos = m.end()
+    return tokens
+
+class _Parser:
+    def __init__(self, tokens, variables):
+        self.tokens = tokens
+        self.variables = variables or {}
+        self.pos = 0
+
+    def peek(self):
+        if self.pos < len(self.tokens):
+            return self.tokens[self.pos]
+        return None
+
+    def consume(self):
+        tok = self.peek()
+        if tok:
+            self.pos += 1
+        return tok
+
+    def parse(self):
+        if not self.tokens:
+            raise SyntaxError("Empty expression")
+        val = self.parse_expression()
+        if self.pos != len(self.tokens):
+            raise SyntaxError("Unexpected token after expression")
+        return float(val)
+
+    def parse_expression(self):
+        left = self.parse_term()
+        while True:
+            tok = self.peek()
+            if tok and tok[0] == 'OP' and tok[1] in ('+', '-'):
+                self.consume()
+                right = self.parse_term()
+                if tok[1] == '+':
+                    left = left + right
+                else:
+                    left = left - right
+            else:
+                break
+        return left
+
+    def parse_term(self):
+        left = self.parse_factor()
+        while True:
+            tok = self.peek()
+            if tok and tok[0] == 'OP' and tok[1] in ('*', '/'):
+                self.consume()
+                right = self.parse_factor()
+                if tok[1] == '*':
+                    left = left * right
+                else:
+                    left = left / right
+            else:
+                break
+        return left
+
+    def parse_factor(self):
+        tok = self.peek()
+        if tok is None:
+            raise SyntaxError("Unexpected end of expression")
+        if tok[0] == 'OP' and tok[1] in ('+', '-'):
+            self.consume()
+            val = self.parse_factor()
+            return val if tok[1] == '+' else -val
+        if tok[0] == 'OP' and tok[1] == '(':
+            self.consume()
+            val = self.parse_expression()
+            tok2 = self.peek()
+            if not tok2 or tok2[0] != 'OP' or tok2[1] != ')':
+                raise SyntaxError("Missing closing parenthesis")
+            self.consume()
+            return val
+        if tok[0] == 'NUMBER':
+            self.consume()
+            return tok[1]
+        if tok[0] == 'IDENT':
+            self.consume()
+            name = tok[1]
+            if name in self.variables:
+                return float(self.variables[name])
+            else:
+                raise NameError(f"Unknown variable: {name}")
+        raise SyntaxError(f"Unexpected token {tok}")
+
+def evaluate(expression, variables=None, *args, **kwargs):
+    if variables is None:
+        if 'variables' in kwargs:
+            variables = kwargs.pop('variables')
+        elif 'vars' in kwargs:
+            variables = kwargs.pop('vars')
+        elif 'env' in kwargs:
+            variables = kwargs.pop('env')
+        elif 'context' in kwargs:
+            variables = kwargs.pop('context')
+        elif kwargs:
+            variables = kwargs
+            kwargs = {}
+        else:
+            variables = {}
+        if args:
+            if isinstance(args[0], dict):
+                variables = args[0]
+    else:
+        if kwargs:
+            if isinstance(variables, dict):
+                if not any(k in kwargs for k in ('variables', 'vars', 'env', 'context')):
+                    merged = dict(variables)
+                    merged.update(kwargs)
+                    variables = merged
+    if variables is None:
+        variables = {}
+    if not isinstance(variables, dict):
+        try:
+            variables = dict(variables)
+        except Exception:
+            variables = {}
+    tokens = _tokenize(expression)
+    parser = _Parser(tokens, variables)
+    return parser.parse()
+```

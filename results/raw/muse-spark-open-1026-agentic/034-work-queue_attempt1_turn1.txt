@@ -1,0 +1,51 @@
+workqueue.py
+```python
+import threading
+# workqueue.py (not queue.py — avoids shadowing stdlib queue)
+
+
+class WorkQueue:
+    def __init__(self):
+        self._items = []
+        self._lock = threading.Lock()
+        self._done = False
+
+    def put(self, item):
+        with self._lock:
+            self._items.append(item)
+
+    def get(self):
+        with self._lock:
+            if self._items:
+                return self._items.pop(0)
+            return None
+
+    def done(self):
+        with self._lock:
+            self._done = True
+
+    def is_done(self):
+        with self._lock:
+            return self._done and not self._items
+```
+
+worker.py
+```python
+import threading
+
+
+class Worker:
+    # Class-level lock to protect shared results list across all workers
+    _results_lock = threading.Lock()
+
+    def __init__(self, queue, results):
+        self._queue = queue
+        self._results = results
+
+    def run(self):
+        while not self._queue.is_done():
+            item = self._queue.get()
+            if item is not None:
+                with self._results_lock:
+                    self._results.append(item * 2)
+```

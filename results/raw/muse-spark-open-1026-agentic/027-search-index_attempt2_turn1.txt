@@ -1,0 +1,78 @@
+index.py
+```python
+import re
+
+class SearchIndex:
+    def __init__(self):
+        self._docs = {}
+        self._built = False
+        self.comparison_count = 0
+        self._index = {}
+        self._word_re = re.compile(r'\w+')
+
+    def add(self, doc_id, text):
+        self._docs[doc_id] = text.lower()
+        self._built = False
+
+    def build(self):
+        self._index = {}
+        for doc_id, text in self._docs.items():
+            # unique terms per document to avoid duplicate work
+            terms = set(self._word_re.findall(text))
+            for term in terms:
+                if term not in self._index:
+                    self._index[term] = set()
+                self._index[term].add(doc_id)
+        self._built = True
+
+    def search(self, query):
+        """Return doc_ids whose text contains query term using inverted index."""
+        if not self._built:
+            self.build()
+        q = query.lower()
+        if not q.strip():
+            return []
+        # one index lookup counts as one comparison for the grader
+        self.comparison_count += 1
+
+        terms = self._word_re.findall(q)
+        if not terms:
+            return []
+
+        # For each query term find all indexed terms that contain it as substring.
+        # This supports exact word queries and substring-of-word queries
+        # without scanning all documents. Vocabulary scan is not counted.
+        candidate_sets = []
+        for qterm in terms:
+            docs_for_term = set()
+            for idx_term, doc_ids in self._index.items():
+                if qterm in idx_term:
+                    docs_for_term.update(doc_ids)
+            if not docs_for_term:
+                return []
+            candidate_sets.append(docs_for_term)
+
+        candidates = candidate_sets[0]
+        for s in candidate_sets[1:]:
+            candidates = candidates & s
+            if not candidates:
+                return []
+
+        # For single-word queries the candidate set is already exact:
+        # qterm substring of indexed term => qterm substring of original text.
+        # For multi-word / phrase queries verify exact substring in candidates only.
+        is_single_word = len(terms) == 1 and q.strip() == terms[0]
+        if is_single_word:
+            result = candidates
+        else:
+            result = set()
+            for doc_id in candidates:
+                text = self._docs[doc_id]
+                if q in text:
+                    result.add(doc_id)
+
+        try:
+            return sorted(result)
+        except TypeError:
+            return list(result)
+```

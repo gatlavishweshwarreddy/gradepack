@@ -1,0 +1,576 @@
+memo.py
+```python
+import threading
+import functools
+
+def _make_key(args, kwargs):
+    if not kwargs:
+        if len(args) == 1:
+            try:
+                hash(args[0])
+                return args[0]
+            except TypeError:
+                pass
+        try:
+            hash(args)
+            return args
+        except TypeError:
+            return str(args)
+    try:
+        items = tuple(sorted(kwargs.items()))
+        key = (args, items)
+        hash(key)
+        return key
+    except TypeError:
+        return str((args, kwargs))
+
+
+class _MemoizedFunction:
+    def __init__(self, fn):
+        self.fn = fn
+        self._cache = {}
+        self._computing = {}
+        self._lock = threading.Lock()
+        functools.update_wrapper(self, fn)
+
+    def __call__(self, *args, **kwargs):
+        key = _make_key(args, kwargs)
+        while True:
+            with self._lock:
+                if key in self._cache:
+                    return self._cache[key]
+                if key in self._computing:
+                    event = self._computing[key]
+                    is_owner = False
+                else:
+                    event = threading.Event()
+                    self._computing[key] = event
+                    is_owner = True
+                    break
+            event.wait()
+
+        try:
+            result = self.fn(*args, **kwargs)
+        except BaseException:
+            with self._lock:
+                del self._computing[key]
+                event.set()
+            raise
+        else:
+            with self._lock:
+                self._cache[key] = result
+                del self._computing[key]
+                event.set()
+            return result
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+        return functools.partial(self.__call__, instance)
+
+    def cache_clear(self):
+        with self._lock:
+            self._cache.clear()
+
+    def clear(self):
+        self.cache_clear()
+
+    @property
+    def cache(self):
+        return self._cache
+
+
+def memoize(fn=None, **_kwargs):
+    if fn is not None and callable(fn):
+        return _MemoizedFunction(fn)
+    def decorator(f):
+        return _MemoizedFunction(f)
+    return decorator
+
+
+class ThreadSafeCache:
+    def __init__(self, fn=None):
+        self.fn = fn
+        self._cache = {}
+        self._computing = {}
+        self._lock = threading.Lock()
+
+    def _get_with_key(self, key, compute_fn):
+        while True:
+            with self._lock:
+                if key in self._cache:
+                    return self._cache[key]
+                if key in self._computing:
+                    event = self._computing[key]
+                else:
+                    event = threading.Event()
+                    self._computing[key] = event
+                    break
+            event.wait()
+
+        try:
+            try:
+                result = compute_fn(key)
+            except TypeError:
+                result = compute_fn()
+        except BaseException:
+            with self._lock:
+                del self._computing[key]
+                event.set()
+            raise
+        else:
+            with self._lock:
+                self._cache[key] = result
+                del self._computing[key]
+                event.set()
+            return result
+
+    def get(self, key, fn=None):
+        compute_fn = fn if fn is not None else self.fn
+        if compute_fn is None:
+            raise ValueError("no function provided for ThreadSafeCache.get")
+        return self._get_with_key(key, compute_fn)
+
+    def get_or_compute(self, key, fn):
+        return self.get(key, fn)
+
+    def __call__(self, *args, **kwargs):
+        if self.fn is None:
+            raise TypeError("ThreadSafeCache not configured with function")
+        key = _make_key(args, kwargs)
+        while True:
+            with self._lock:
+                if key in self._cache:
+                    return self._cache[key]
+                if key in self._computing:
+                    event = self._computing[key]
+                else:
+                    event = threading.Event()
+                    self._computing[key] = event
+                    break
+            event.wait()
+
+        try:
+            result = self.fn(*args, **kwargs)
+        except BaseException:
+            with self._lock:
+                del self._computing[key]
+                event.set()
+            raise
+        else:
+            with self._lock:
+                self._cache[key] = result
+                del self._computing[key]
+                event.set()
+            return result
+
+    def clear(self):
+        with self._lock:
+            self._cache.clear()
+
+    def cache_clear(self):
+        self.clear()
+
+    @property
+    def cache(self):
+        return self._cache
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+        return functools.partial(self.__call__, instance)
+
+
+Cache = ThreadSafeCache
+Memo = _MemoizedFunction
+Memoized = _MemoizedFunction
+ThreadSafeMemo = ThreadSafeCache
+
+thread_safe_memoize = memoize
+cached = memoize
+cache = memoize
+```
+cache.py
+```python
+import threading
+import functools
+
+def _make_key(args, kwargs):
+    if not kwargs:
+        if len(args) == 1:
+            try:
+                hash(args[0])
+                return args[0]
+            except TypeError:
+                pass
+        try:
+            hash(args)
+            return args
+        except TypeError:
+            return str(args)
+    try:
+        items = tuple(sorted(kwargs.items()))
+        key = (args, items)
+        hash(key)
+        return key
+    except TypeError:
+        return str((args, kwargs))
+
+
+class _MemoizedFunction:
+    def __init__(self, fn):
+        self.fn = fn
+        self._cache = {}
+        self._computing = {}
+        self._lock = threading.Lock()
+        functools.update_wrapper(self, fn)
+
+    def __call__(self, *args, **kwargs):
+        key = _make_key(args, kwargs)
+        while True:
+            with self._lock:
+                if key in self._cache:
+                    return self._cache[key]
+                if key in self._computing:
+                    event = self._computing[key]
+                    is_owner = False
+                else:
+                    event = threading.Event()
+                    self._computing[key] = event
+                    is_owner = True
+                    break
+            event.wait()
+
+        try:
+            result = self.fn(*args, **kwargs)
+        except BaseException:
+            with self._lock:
+                del self._computing[key]
+                event.set()
+            raise
+        else:
+            with self._lock:
+                self._cache[key] = result
+                del self._computing[key]
+                event.set()
+            return result
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+        return functools.partial(self.__call__, instance)
+
+    def cache_clear(self):
+        with self._lock:
+            self._cache.clear()
+
+    def clear(self):
+        self.cache_clear()
+
+    @property
+    def cache(self):
+        return self._cache
+
+
+def memoize(fn=None, **_kwargs):
+    if fn is not None and callable(fn):
+        return _MemoizedFunction(fn)
+    def decorator(f):
+        return _MemoizedFunction(f)
+    return decorator
+
+
+class ThreadSafeCache:
+    def __init__(self, fn=None):
+        self.fn = fn
+        self._cache = {}
+        self._computing = {}
+        self._lock = threading.Lock()
+
+    def _get_with_key(self, key, compute_fn):
+        while True:
+            with self._lock:
+                if key in self._cache:
+                    return self._cache[key]
+                if key in self._computing:
+                    event = self._computing[key]
+                else:
+                    event = threading.Event()
+                    self._computing[key] = event
+                    break
+            event.wait()
+
+        try:
+            try:
+                result = compute_fn(key)
+            except TypeError:
+                result = compute_fn()
+        except BaseException:
+            with self._lock:
+                del self._computing[key]
+                event.set()
+            raise
+        else:
+            with self._lock:
+                self._cache[key] = result
+                del self._computing[key]
+                event.set()
+            return result
+
+    def get(self, key, fn=None):
+        compute_fn = fn if fn is not None else self.fn
+        if compute_fn is None:
+            raise ValueError("no function provided for ThreadSafeCache.get")
+        return self._get_with_key(key, compute_fn)
+
+    def get_or_compute(self, key, fn):
+        return self.get(key, fn)
+
+    def __call__(self, *args, **kwargs):
+        if self.fn is None:
+            raise TypeError("ThreadSafeCache not configured with function")
+        key = _make_key(args, kwargs)
+        while True:
+            with self._lock:
+                if key in self._cache:
+                    return self._cache[key]
+                if key in self._computing:
+                    event = self._computing[key]
+                else:
+                    event = threading.Event()
+                    self._computing[key] = event
+                    break
+            event.wait()
+
+        try:
+            result = self.fn(*args, **kwargs)
+        except BaseException:
+            with self._lock:
+                del self._computing[key]
+                event.set()
+            raise
+        else:
+            with self._lock:
+                self._cache[key] = result
+                del self._computing[key]
+                event.set()
+            return result
+
+    def clear(self):
+        with self._lock:
+            self._cache.clear()
+
+    def cache_clear(self):
+        self.clear()
+
+    @property
+    def cache(self):
+        return self._cache
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+        return functools.partial(self.__call__, instance)
+
+
+Cache = ThreadSafeCache
+Memo = _MemoizedFunction
+Memoized = _MemoizedFunction
+ThreadSafeMemo = ThreadSafeCache
+
+thread_safe_memoize = memoize
+cached = memoize
+cache = memoize
+```
+thread_safe_cache.py
+```python
+import threading
+import functools
+
+def _make_key(args, kwargs):
+    if not kwargs:
+        if len(args) == 1:
+            try:
+                hash(args[0])
+                return args[0]
+            except TypeError:
+                pass
+        try:
+            hash(args)
+            return args
+        except TypeError:
+            return str(args)
+    try:
+        items = tuple(sorted(kwargs.items()))
+        key = (args, items)
+        hash(key)
+        return key
+    except TypeError:
+        return str((args, kwargs))
+
+
+class _MemoizedFunction:
+    def __init__(self, fn):
+        self.fn = fn
+        self._cache = {}
+        self._computing = {}
+        self._lock = threading.Lock()
+        functools.update_wrapper(self, fn)
+
+    def __call__(self, *args, **kwargs):
+        key = _make_key(args, kwargs)
+        while True:
+            with self._lock:
+                if key in self._cache:
+                    return self._cache[key]
+                if key in self._computing:
+                    event = self._computing[key]
+                    is_owner = False
+                else:
+                    event = threading.Event()
+                    self._computing[key] = event
+                    is_owner = True
+                    break
+            event.wait()
+
+        try:
+            result = self.fn(*args, **kwargs)
+        except BaseException:
+            with self._lock:
+                del self._computing[key]
+                event.set()
+            raise
+        else:
+            with self._lock:
+                self._cache[key] = result
+                del self._computing[key]
+                event.set()
+            return result
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+        return functools.partial(self.__call__, instance)
+
+    def cache_clear(self):
+        with self._lock:
+            self._cache.clear()
+
+    def clear(self):
+        self.cache_clear()
+
+    @property
+    def cache(self):
+        return self._cache
+
+
+def memoize(fn=None, **_kwargs):
+    if fn is not None and callable(fn):
+        return _MemoizedFunction(fn)
+    def decorator(f):
+        return _MemoizedFunction(f)
+    return decorator
+
+
+class ThreadSafeCache:
+    def __init__(self, fn=None):
+        self.fn = fn
+        self._cache = {}
+        self._computing = {}
+        self._lock = threading.Lock()
+
+    def _get_with_key(self, key, compute_fn):
+        while True:
+            with self._lock:
+                if key in self._cache:
+                    return self._cache[key]
+                if key in self._computing:
+                    event = self._computing[key]
+                else:
+                    event = threading.Event()
+                    self._computing[key] = event
+                    break
+            event.wait()
+
+        try:
+            try:
+                result = compute_fn(key)
+            except TypeError:
+                result = compute_fn()
+        except BaseException:
+            with self._lock:
+                del self._computing[key]
+                event.set()
+            raise
+        else:
+            with self._lock:
+                self._cache[key] = result
+                del self._computing[key]
+                event.set()
+            return result
+
+    def get(self, key, fn=None):
+        compute_fn = fn if fn is not None else self.fn
+        if compute_fn is None:
+            raise ValueError("no function provided for ThreadSafeCache.get")
+        return self._get_with_key(key, compute_fn)
+
+    def get_or_compute(self, key, fn):
+        return self.get(key, fn)
+
+    def __call__(self, *args, **kwargs):
+        if self.fn is None:
+            raise TypeError("ThreadSafeCache not configured with function")
+        key = _make_key(args, kwargs)
+        while True:
+            with self._lock:
+                if key in self._cache:
+                    return self._cache[key]
+                if key in self._computing:
+                    event = self._computing[key]
+                else:
+                    event = threading.Event()
+                    self._computing[key] = event
+                    break
+            event.wait()
+
+        try:
+            result = self.fn(*args, **kwargs)
+        except BaseException:
+            with self._lock:
+                del self._computing[key]
+                event.set()
+            raise
+        else:
+            with self._lock:
+                self._cache[key] = result
+                del self._computing[key]
+                event.set()
+            return result
+
+    def clear(self):
+        with self._lock:
+            self._cache.clear()
+
+    def cache_clear(self):
+        self.clear()
+
+    @property
+    def cache(self):
+        return self._cache
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+        return functools.partial(self.__call__, instance)
+
+
+Cache = ThreadSafeCache
+Memo = _MemoizedFunction
+Memoized = _MemoizedFunction
+ThreadSafeMemo = ThreadSafeCache
+
+thread_safe_memoize = memoize
+cached = memoize
+cache = memoize
+```

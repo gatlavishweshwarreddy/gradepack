@@ -1,0 +1,41 @@
+scheduler.py
+```python
+from datetime import datetime, timezone, timedelta
+import zoneinfo
+
+
+class EventScheduler:
+    def __init__(self, clock):
+        self._clock = clock
+        self._events: list[tuple[str, datetime]] = []
+
+    def add_event(self, name: str, utc_dt: datetime) -> None:
+        if utc_dt.tzinfo is None or utc_dt.tzinfo.utcoffset(utc_dt) is None:
+            raise ValueError("utc_dt must be timezone-aware")
+        self._events.append((name, utc_dt))
+
+    def next_event_in(self, tz_name: str) -> tuple[str, timedelta] | None:
+        tz = zoneinfo.ZoneInfo(tz_name)
+        now = self._clock.now()
+        upcoming = [
+            (name, dt) for name, dt in self._events
+            if dt > now
+        ]
+        if not upcoming:
+            return None
+        upcoming.sort(key=lambda x: x[1])
+        name, dt = upcoming[0]
+        delta = dt.astimezone(tz) - now.astimezone(tz)
+        return name, delta
+```
+clock.py
+```python
+from datetime import datetime, timezone
+
+
+class UtcClock:
+    """Returns current UTC time as a timezone-aware datetime."""
+
+    def now(self) -> datetime:
+        return datetime.now(tz=timezone.utc)
+```

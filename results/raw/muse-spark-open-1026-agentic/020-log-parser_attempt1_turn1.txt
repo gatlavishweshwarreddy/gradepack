@@ -1,0 +1,25 @@
+stats.py
+```python
+import datetime
+
+
+def duration_seconds(entries):
+    """
+    Return elapsed seconds between first and last entry.
+    Returns 0 if fewer than 2 entries.
+    Handles spans crossing midnight by advancing the date when time goes backwards.
+    """
+    if len(entries) < 2:
+        return 0
+    base = datetime.date(2000, 1, 1)
+    first = datetime.datetime.combine(base, entries[0].time)
+    prev = first
+    for e in entries[1:]:
+        cur = datetime.datetime.combine(prev.date(), e.time)
+        if cur < prev:
+            cur += datetime.timedelta(days=1)
+        prev = cur
+    last = prev
+    delta = last - first
+    return delta.total_seconds()
+```

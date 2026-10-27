@@ -1,0 +1,352 @@
+expr.py
+```python
+from parser import parse_and_eval
+
+def evaluate(expression, variables=None, **kwargs):
+    """
+    Evaluate an expression string.
+
+    Supports flexible calling conventions:
+      evaluate("2+3")
+      evaluate("x+2", {"x": 3})
+      evaluate("x+2", variables={"x": 3})
+      evaluate("x+2", env={"x": 3})
+      evaluate("x+2", x=3)  # kwargs as variables
+    """
+    # Allow variables to be passed via alternative kwarg names
+    if variables is None:
+        for key in ('variables', 'vars', 'env', 'context', 'bindings', 'scope'):
+            if key in kwargs:
+                variables = kwargs[key]
+                break
+        # if still None and kwargs contains direct variable bindings,
+        # treat remaining kwargs as variables
+        if variables is None and kwargs:
+            remaining = {k: v for k, v in kwargs.items()
+                         if k not in ('variables', 'vars', 'env', 'context', 'bindings', 'scope')}
+            if remaining:
+                variables = remaining
+                # don't pass these as kwargs again to avoid duplication
+                kwargs = {k: v for k, v in kwargs.items()
+                          if k in ('variables', 'vars', 'env', 'context', 'bindings', 'scope')}
+    return parse_and_eval(expression, variables, **kwargs)
+```
+parser.py
+```python
+import re
+import math
+
+# Supported functions
+_FUNCTIONS = {
+    'sin': math.sin,
+    'cos': math.cos,
+    'tan': math.tan,
+    'asin': math.asin,
+    'acos': math.acos,
+    'atan': math.atan,
+    'atan2': math.atan2,
+    'sinh': math.sinh,
+    'cosh': math.cosh,
+    'tanh': math.tanh,
+    'sqrt': math.sqrt,
+    'log': math.log,
+    'log10': math.log10,
+    'log2': getattr(math, 'log2', lambda x, b=2: math.log(x, b)),
+    'exp': math.exp,
+    'pow': pow,
+    'abs': abs,
+    'ceil': math.ceil,
+    'floor': math.floor,
+    'factorial': math.factorial,
+    'gcd': math.gcd,
+    'hypot': math.hypot,
+    'degrees': math.degrees,
+    'radians': math.radians,
+    'trunc': math.trunc,
+    'round': round,
+    'max': max,
+    'min': min,
+    'sum': sum,
+}
+
+_CONSTANTS = {
+    'pi': math.pi,
+    'e': math.e,
+    'tau': getattr(math, 'tau', 2 * math.pi),
+    'inf': math.inf,
+    'nan': math.nan,
+    'True': True,
+    'False': False,
+    'None': None,
+}
+
+def _tokenize(expr):
+    tokens = []
+    i = 0
+    n = len(expr)
+    while i < n:
+        c = expr[i]
+        if c.isspace():
+            i += 1
+            continue
+        # multi-char operators
+        if expr.startswith('**', i):
+            tokens.append(('OP', '**'))
+            i += 2
+            continue
+        if expr.startswith('//', i):
+            tokens.append(('OP', '//'))
+            i += 2
+            continue
+        if expr.startswith('==', i) or expr.startswith('!=', i) or expr.startswith('<=', i) or expr.startswith('>=', i):
+            tokens.append(('OP', expr[i:i+2]))
+            i += 2
+            continue
+        if c in '+-*/%<>=^(),':
+            if c == '(':
+                tokens.append(('LPAREN', '('))
+            elif c == ')':
+                tokens.append(('RPAREN', ')'))
+            elif c == ',':
+                tokens.append(('COMMA', ','))
+            else:
+                tokens.append(('OP', c))
+            i += 1
+            continue
+        if c.isdigit() or c == '.':
+            m = re.match(r'\d+\.\d*(?:[eE][+-]?\d+)?|\.\d+(?:[eE][+-]?\d+)?|\d+(?:[eE][+-]?\d+)?', expr[i:])
+            if m:
+                num_str = m.group(0)
+                # avoid single '.' being tokenized as number
+                if num_str == '.':
+                    raise SyntaxError(f"Unexpected character '.' at position {i}")
+                tokens.append(('NUMBER', num_str))
+                i += len(num_str)
+                continue
+            else:
+                raise SyntaxError(f"Invalid number at position {i}")
+        if c.isalpha() or c == '_':
+            m = re.match(r'[A-Za-z_][A-Za-z0-9_]*', expr[i:])
+            if m:
+                ident = m.group(0)
+                if ident in ('and', 'or', 'not'):
+                    tokens.append(('OP', ident))
+                else:
+                    tokens.append(('IDENT', ident))
+                i += len(ident)
+                continue
+        raise SyntaxError(f"Unexpected character '{c}' at position {i}")
+    tokens.append(('EOF', None))
+    return tokens
+
+class _Parser:
+    def __init__(self, tokens, variables):
+        self.tokens = tokens
+        self.pos = 0
+        self.variables = variables if variables is not None else {}
+
+    def peek(self):
+        return self.tokens[self.pos]
+
+    def peek_type(self):
+        return self.tokens[self.pos][0]
+
+    def peek_value(self):
+        return self.tokens[self.pos][1]
+
+    def advance(self):
+        tok = self.tokens[self.pos]
+        self.pos += 1
+        return tok
+
+    def parse(self):
+        if self.peek_type() == 'EOF':
+            raise SyntaxError("Empty expression")
+        result = self.parse_or()
+        if self.peek_type() != 'EOF':
+            raise SyntaxError(f"Unexpected token {self.peek()} after expression")
+        return result
+
+    def parse_or(self):
+        left = self.parse_and()
+        while self.peek_type() == 'OP' and self.peek_value() == 'or':
+            self.advance()
+            right = self.parse_and()
+            left = left or right
+        return left
+
+    def parse_and(self):
+        left = self.parse_not()
+        while self.peek_type() == 'OP' and self.peek_value() == 'and':
+            self.advance()
+            right = self.parse_not()
+            left = left and right
+        return left
+
+    def parse_not(self):
+        if self.peek_type() == 'OP' and self.peek_value() == 'not':
+            self.advance()
+            operand = self.parse_not()
+            return not operand
+        else:
+            return self.parse_comparison()
+
+    def parse_comparison(self):
+        left = self.parse_additive()
+        ops = []
+        operands = [left]
+        while self.peek_type() == 'OP' and self.peek_value() in ('==', '!=', '<', '>', '<=', '>='):
+            op = self.peek_value()
+            self.advance()
+            right = self.parse_additive()
+            ops.append(op)
+            operands.append(right)
+        if not ops:
+            return left
+        result = True
+        for i, op in enumerate(ops):
+            a = operands[i]
+            b = operands[i+1]
+            if op == '==':
+                cond = a == b
+            elif op == '!=':
+                cond = a != b
+            elif op == '<':
+                cond = a < b
+            elif op == '>':
+                cond = a > b
+            elif op == '<=':
+                cond = a <= b
+            elif op == '>=':
+                cond = a >= b
+            else:
+                raise SyntaxError(f"Unknown comparison operator {op}")
+            result = result and cond
+        return result
+
+    def parse_additive(self):
+        left = self.parse_multiplicative()
+        while self.peek_type() == 'OP' and self.peek_value() in ('+', '-'):
+            op = self.peek_value()
+            self.advance()
+            right = self.parse_multiplicative()
+            if op == '+':
+                left = left + right
+            else:
+                left = left - right
+        return left
+
+    def parse_multiplicative(self):
+        left = self.parse_unary()
+        while self.peek_type() == 'OP' and self.peek_value() in ('*', '/', '%', '//'):
+            op = self.peek_value()
+            self.advance()
+            right = self.parse_unary()
+            if op == '*':
+                left = left * right
+            elif op == '/':
+                if right == 0:
+                    raise ZeroDivisionError("division by zero")
+                left = left / right
+            elif op == '%':
+                if right == 0:
+                    raise ZeroDivisionError("modulo by zero")
+                left = left % right
+            elif op == '//':
+                if right == 0:
+                    raise ZeroDivisionError("integer division by zero")
+                left = left // right
+        return left
+
+    def parse_unary(self):
+        if self.peek_type() == 'OP' and self.peek_value() in ('+', '-'):
+            op = self.peek_value()
+            self.advance()
+            operand = self.parse_unary()
+            return +operand if op == '+' else -operand
+        else:
+            return self.parse_power()
+
+    def parse_power(self):
+        left = self.parse_primary()
+        if self.peek_type() == 'OP' and self.peek_value() in ('**', '^'):
+            self.advance()
+            right = self.parse_unary()
+            left = left ** right
+        return left
+
+    def parse_primary(self):
+        tok_type, tok_val = self.peek()
+        if tok_type == 'LPAREN':
+            self.advance()
+            expr_val = self.parse_or()
+            if self.peek_type() != 'RPAREN':
+                raise SyntaxError("Expected ')'")
+            self.advance()
+            return expr_val
+        elif tok_type == 'NUMBER':
+            self.advance()
+            if '.' in tok_val or 'e' in tok_val.lower():
+                try:
+                    return float(tok_val)
+                except ValueError:
+                    raise SyntaxError(f"Invalid number {tok_val}")
+            else:
+                try:
+                    return int(tok_val)
+                except ValueError:
+                    return float(tok_val)
+        elif tok_type == 'IDENT':
+            name = tok_val
+            self.advance()
+            if self.peek_type() == 'LPAREN':
+                self.advance()
+                args = []
+                if self.peek_type() != 'RPAREN':
+                    args.append(self.parse_or())
+                    while self.peek_type() == 'COMMA':
+                        self.advance()
+                        args.append(self.parse_or())
+                if self.peek_type() != 'RPAREN':
+                    raise SyntaxError("Expected ')' after function arguments")
+                self.advance()
+                return self.call_function(name, args)
+            else:
+                return self.lookup_variable(name)
+        else:
+            raise SyntaxError(f"Unexpected token {tok_type} {tok_val}")
+
+    def lookup_variable(self, name):
+        if name in self.variables:
+            return self.variables[name]
+        if name in _CONSTANTS:
+            return _CONSTANTS[name]
+        raise NameError(f"Undefined variable or constant '{name}'")
+
+    def call_function(self, name, args):
+        if name in self.variables and callable(self.variables[name]):
+            func = self.variables[name]
+            return func(*args)
+        if name in _FUNCTIONS:
+            func = _FUNCTIONS[name]
+            return func(*args)
+        raise NameError(f"Undefined function '{name}'")
+
+def parse_and_eval(expression, variables=None, **kwargs):
+    if not isinstance(expression, str):
+        raise TypeError("Expression must be a string")
+    if variables is None:
+        for key in ('variables', 'vars', 'env', 'context', 'bindings', 'scope'):
+            if key in kwargs:
+                variables = kwargs[key]
+                break
+        if variables is None and kwargs:
+            remaining = {k: v for k, v in kwargs.items()
+                         if k not in ('variables', 'vars', 'env', 'context', 'bindings', 'scope')}
+            if remaining:
+                variables = remaining
+    if variables is None:
+        variables = {}
+    if not isinstance(variables, dict):
+        raise TypeError("Variables must be a dict")
+    if

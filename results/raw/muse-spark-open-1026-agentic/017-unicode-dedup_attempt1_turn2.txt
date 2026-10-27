@@ -1,0 +1,32 @@
+dedup.py
+```python
+import unicodedata
+
+class NormalizedStr(str):
+    def __eq__(self, other):
+        if isinstance(other, str):
+            # Normalize both strings and compare as plain str to avoid
+            # recursion when unicodedata.normalize preserves the subclass.
+            a = str(unicodedata.normalize('NFC', str(self)))
+            b = str(unicodedata.normalize('NFC', str(other)))
+            return str.__eq__(a, b)
+        return NotImplemented
+
+    def __hash__(self):
+        # Hash must be consistent with __eq__
+        return hash(str(unicodedata.normalize('NFC', str(self))))
+
+
+def dedup(strings):
+    seen = set()
+    result = []
+    for s in strings:
+        # Use NFC normalized form for deduplication, preserve first occurrence
+        n = unicodedata.normalize('NFC', s)
+        # Ensure plain str for set membership (defensive)
+        n = str(n)
+        if n not in seen:
+            seen.add(n)
+            result.append(s)
+    return result
+```

@@ -1,0 +1,65 @@
+matrix.py
+```python
+from dtype import coerce_element
+
+
+class Matrix:
+    def __init__(self, rows):
+        self.rows = [[coerce_element(v) for v in row] for row in rows]
+        self.nrows = len(rows)
+        self.ncols = len(rows[0]) if rows else 0
+
+    def __matmul__(self, other):
+        if self.ncols != other.nrows:
+            raise ValueError("incompatible shapes")
+        result = []
+        for i in range(self.nrows):
+            row = []
+            for j in range(other.ncols):
+                s = sum(self.rows[i][k] * other.rows[k][j]
+                        for k in range(self.ncols))
+                row.append(coerce_element(s))
+            result.append(row)
+        return Matrix(result)
+
+    def scale(self, factor):
+        return Matrix([[coerce_element(v * factor) for v in row]
+                       for row in self.rows])
+
+    def __eq__(self, other):
+        return self.rows == other.rows
+
+    def __repr__(self):
+        return f"Matrix({self.rows!r})"
+```
+
+dtype.py
+```python
+def coerce_element(v):
+    """
+    Convert v to an appropriate numeric type.
+    Preserves fractional values instead of truncating to int.
+    """
+    # Handle bool explicitly (bool is subclass of int)
+    if isinstance(v, bool):
+        return int(v)
+    # Native int -> keep as int
+    if isinstance(v, int):
+        return v
+    # Native float -> keep as float, normalize integer-valued floats to int
+    if isinstance(v, float):
+        if v.is_integer():
+            return int(v)
+        return float(v)
+    # For other types (e.g., strings), try int first then float without truncation
+    try:
+        return int(v)
+    except (TypeError, ValueError):
+        try:
+            fv = float(v)
+            if fv.is_integer():
+                return int(fv)
+            return fv
+        except (TypeError, ValueError):
+            return v
+```

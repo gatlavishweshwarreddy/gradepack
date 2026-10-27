@@ -1,0 +1,207 @@
+memo.py
+```python
+import threading
+import functools
+
+def _make_key(args, kwargs):
+    """Create a hashable cache key from args/kwargs.
+    Falls back to repr/id for unhashable values.
+    """
+    if kwargs:
+        try:
+            kwargs_key = tuple(sorted(kwargs.items()))
+        except Exception:
+            kwargs_key = tuple(sorted(kwargs.items(), key=lambda x: str(x[0])))
+        key = (args, kwargs_key)
+    else:
+        key = args
+    try:
+        hash(key)
+        return key
+    except TypeError:
+        # try to convert unhashable containers
+        def _to_hashable(o):
+            try:
+                hash(o)
+                return o
+            except TypeError:
+                if isinstance(o, list):
+                    return tuple(_to_hashable(x) for x in o)
+                if isinstance(o, dict):
+                    return tuple(sorted((k, _to_hashable(v)) for k, v in o.items()))
+                if isinstance(o, set):
+                    return frozenset(_to_hashable(x) for x in o)
+                # fallback to id for arbitrary objects (e.g. self)
+                return id(o)
+        try:
+            if kwargs:
+                hashable_args = tuple(_to_hashable(a) for a in args)
+                hashable_kwargs = tuple(sorted((k, _to_hashable(v)) for k, v in kwargs.items()))
+                key2 = (hashable_args, hashable_kwargs)
+            else:
+                key2 = tuple(_to_hashable(a) for a in args)
+            hash(key2)
+            return key2
+        except Exception:
+            return repr((args, kwargs))
+
+
+class _MemoizedFunction:
+    """Thread-safe memoized callable.
+    Guarantees that for a given key the wrapped function is executed
+    at most once even under concurrent calls. Different keys can be
+    computed in parallel. Uses per-key Event to avoid double compute
+    and avoids holding any lock while the user function runs.
+    """
+    def __init__(self, func):
+        functools.update_wrapper(self, func)
+        self.func = func
+        self.cache = {}
+        self._lock = threading.Lock()
+        self._in_progress = {}  # key -> (Event, owner_ident)
+        self._wrapped = func
+
+    def __call__(self, *args, **kwargs):
+        key = _make_key(args, kwargs)
+        is_computer = False
+        is_reentrant = False
+        event_to_wait = None
+
+        while True:
+            with self._lock:
+                if key in self.cache:
+                    return self.cache[key]
+                if key in self._in_progress:
+                    event, owner = self._in_progress[key]
+                    if owner == threading.get_ident():
+                        # same thread re-entering with same key -> avoid self-deadlock
+                        is_reentrant = True
+                        break
+                    event_to_wait = event
+                else:
+                    event = threading.Event()
+                    self._in_progress[key] = (event, threading.get_ident())
+                    is_computer = True
+                    break
+            # wait outside the lock
+            event_to_wait.wait()
+            # reset for next iteration
+            event_to_wait = None
+            is_computer = False
+            is_reentrant = False
+
+        if is_reentrant:
+            # compute directly without caching to avoid deadlock
+            return self.func(*args, **kwargs)
+
+        # is_computer == True
+        try:
+            result = self.func(*args, **kwargs)
+        except Exception:
+            with self._lock:
+                entry = self._in_progress.pop(key, None)
+                if entry is not None:
+                    entry[0].set()
+            raise
+
+        with self._lock:
+            self.cache[key] = result
+            entry = self._in_progress.pop(key, None)
+            if entry is not None:
+                entry[0].set()
+        return result
+
+    def clear(self):
+        with self._lock:
+            self.cache.clear()
+
+    def __repr__(self):
+        return f"<MemoizedFunction {getattr(self.func, '__name__', repr(self.func))} cache_size={len(self.cache)}>"
+
+
+def memoize(func=None, **_kwargs):
+    """Decorator that memoizes a function in a thread-safe way.
+    Usable as @memoize or @memoize() .
+    """
+    if func is not None and callable(func):
+        return _MemoizedFunction(func)
+
+    def decorator(f):
+        return _MemoizedFunction(f)
+
+    return decorator
+
+
+# Compatibility aliases
+Memo = _MemoizedFunction
+memo = memoize
+cached = memoize
+thread_safe_memoize = memoize
+ThreadSafeMemo = _MemoizedFunction
+
+
+class ThreadSafeCache:
+    """Generic thread-safe cache with per-key single-flight."""
+    def __init__(self):
+        self._cache = {}
+        self._lock = threading.Lock()
+        self._in_progress = {}
+
+    def get(self, key, default=None):
+        with self._lock:
+            return self._cache.get(key, default)
+
+    def set(self, key, value):
+        with self._lock:
+            self._cache[key] = value
+
+    def __getitem__(self, key):
+        with self._lock:
+            return self._cache[key]
+
+    def __setitem__(self, key, value):
+        self.set(key, value)
+
+    def __contains__(self, key):
+        with self._lock:
+            return key in self._cache
+
+    def __delitem__(self, key):
+        with self._lock:
+            del self._cache[key]
+
+    def clear(self):
+        with self._lock:
+            self._cache.clear()
+
+    def get_or_compute(self, key, func):
+        """Return cached value for key or compute it with func() exactly once."""
+        is_computer = False
+        is_reentrant = False
+        event_to_wait = None
+
+        while True:
+            with self._lock:
+                if key in self._cache:
+                    return self._cache[key]
+                if key in self._in_progress:
+                    event, owner = self._in_progress[key]
+                    if owner == threading.get_ident():
+                        is_reentrant = True
+                        break
+                    event_to_wait = event
+                else:
+                    event = threading.Event()
+                    self._in_progress[key] = (event, threading.get_ident())
+                    is_computer = True
+                    break
+            event_to_wait.wait()
+            event_to_wait = None
+            is_computer = False
+            is_reentrant = False
+
+        if is_reentrant:
+            return func()
+
+        try:
+           

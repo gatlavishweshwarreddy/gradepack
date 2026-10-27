@@ -120,18 +120,18 @@ async function loadResultFiles() {
   }
   const results = {};
   for (const name of filenames) {
-    for (const base of ['results/', '../results/']) {
-      try {
-        const r = await fetch(base + name + '.json');
-        if (r.ok) { results[name] = await r.json(); break; }
-      } catch (_) {}
-    }
+    const file = name.endsWith('.json') ? name : name + '.json';
+    const label = name.replace(/\.json$/, '');
+    try {
+      const r = await fetch('results/' + file);
+      if (r.ok) { results[label] = await r.json(); }
+    } catch (_) {}
   }
   return results;
 }
 
 async function loadTaskIndex() {
-  for (const path of ['../tasks/index.json', '../../tasks/index.json']) {
+  for (const path of ['api/index.json']) {
     try {
       const r = await fetch(path);
       if (r.ok) return await r.json();

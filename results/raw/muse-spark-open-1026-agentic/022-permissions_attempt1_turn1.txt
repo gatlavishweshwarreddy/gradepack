@@ -1,0 +1,13 @@
+permissions.py
+```python
+def has_permission(user_roles, permission):
+    """
+    Return True if any role in user_roles grants the given permission.
+    """
+    if not user_roles:
+        return False
+    for role in user_roles:
+        if permission in role.permissions:
+            return True
+    return False
+```
