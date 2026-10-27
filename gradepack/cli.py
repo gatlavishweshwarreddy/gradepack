@@ -6,10 +6,13 @@ Usage:
     python -m gradepack verify <task-id>
     python -m gradepack run <task-id> --candidate <dir>
     python -m gradepack bench --model <name> [--attempts N] [--parallel M] [--mock]
+    python -m gradepack factory [--help]
+    python -m gradepack promote <draft-id> [--help]
     python -m gradepack review <task-id> [--mock]
     python -m gradepack serve [--port N]
     python -m gradepack mcp
 """
+import argparse
 import json
 import pathlib
 import shutil
@@ -131,6 +134,106 @@ def cmd_run(task_id: str, candidate_dir: str) -> None:
         shutil.rmtree(tmp_parent, ignore_errors=True)
 
 
+# ---------------------------------------------------------------------------
+# promote
+# ---------------------------------------------------------------------------
+
+def _build_promote_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        prog="gradepack promote",
+        description=(
+            "Move a discriminating draft from drafts/accepted/<id> into tasks/<id>. "
+            "Runs verify before promoting; refuses if verify fails. "
+            "Moves review.json to reviews/<id>.json."
+        ),
+    )
+    p.add_argument("draft_id", help="Draft id, e.g. 037-my-task")
+    return p
+
+
+def cmd_promote_argv(argv: list[str]) -> None:
+    """Parse argv and run promote. Supports --help."""
+    parser = _build_promote_parser()
+    args = parser.parse_args(argv)
+    cmd_promote(args.draft_id)
+
+
+def cmd_promote(draft_id: str) -> None:
+    from gradepack import factory as _factory
+
+    repo = core._repo_root()
+    accepted_dir = repo / "drafts" / "accepted"
+    draft_dir = accepted_dir / draft_id
+
+    if not draft_dir.exists():
+        # Also accept plain drafts/ for backwards compat
+        fallback = repo / "drafts" / draft_id
+        if fallback.exists():
+            draft_dir = fallback
+        else:
+            print(f"FAIL: draft '{draft_id}' not found in drafts/accepted/ or drafts/")
+            sys.exit(1)
+
+    # 1. Load task.json to confirm id matches directory name
+    task_json_path = draft_dir / "task.json"
+    if not task_json_path.exists():
+        print(f"FAIL: no task.json in {draft_dir}")
+        sys.exit(1)
+    try:
+        meta = json.loads(task_json_path.read_text())
+    except Exception as exc:
+        print(f"FAIL: cannot parse task.json: {exc}")
+        sys.exit(1)
+
+    task_id = meta.get("id", "")
+    if task_id != draft_id:
+        print(f"FAIL: id in task.json ({task_id!r}) does not match directory name ({draft_id!r})")
+        sys.exit(1)
+
+    # 2. Run verify on the draft
+    solution_dir = draft_dir / "solution"
+    if not solution_dir.exists():
+        print(f"FAIL: no solution/ directory found in draft {draft_id}")
+        sys.exit(1)
+
+    # Use _verify_draft_files to verify without touching tasks/
+    files = {}
+    files["task.json"] = task_json_path.read_text()
+    for subdir in ("starter", "grader", "solution"):
+        d = draft_dir / subdir
+        if d.exists():
+            for f in d.iterdir():
+                if f.is_file():
+                    files[f"{subdir}/{f.name}"] = f.read_text()
+
+    ok, reason = _factory._verify_draft_files(files, task_id)
+    if not ok:
+        print(f"FAIL: verify failed — {reason}")
+        sys.exit(1)
+
+    # 3. Check target directory does not already exist
+    dest = core.tasks_dir() / task_id
+    if dest.exists():
+        print(f"FAIL: tasks/{task_id} already exists; cannot overwrite")
+        sys.exit(1)
+
+    # 4. Move draft into tasks/
+    shutil.copytree(str(draft_dir), str(dest))
+    shutil.rmtree(str(draft_dir), ignore_errors=True)
+
+    # 5. Move review.json to reviews/
+    reviews_dir = repo / "reviews"
+    reviews_dir.mkdir(exist_ok=True)
+    review_src = dest / "review.json"
+    if review_src.exists():
+        shutil.move(str(review_src), str(reviews_dir / f"{task_id}.json"))
+
+    print(f"PROMOTED  {task_id}")
+    print(f"  tasks/{task_id}/")
+    if (reviews_dir / f"{task_id}.json").exists():
+        print(f"  reviews/{task_id}.json")
+
+
 def _print_json_error(task_id: str, message: str) -> None:
     print(json.dumps({"task_id": task_id, "error": message}, indent=2))
 
@@ -210,10 +313,10 @@ def main(argv: list[str]) -> None:
 
     elif command == "factory":
         from gradepack import factory as _factory
-        rest = argv[1:]
-        n = int(_get_flag(rest, "--n") or "1")
-        mock = "--mock" in rest
-        _factory.cmd_factory(n=n, mock=mock)
+        _factory.cmd_factory_argv(argv[1:])
+
+    elif command == "promote":
+        cmd_promote_argv(argv[1:])
 
     elif command == "report":
         from gradepack import report as _report
@@ -256,7 +359,9 @@ def _usage() -> None:
         "  python -m gradepack list\n"
         "  python -m gradepack verify <task-id>\n"
         "  python -m gradepack run <task-id> --candidate <dir>\n"
-        "  python -m gradepack bench --model <name> [--attempts N] [--parallel M] [--mock]\n"
+        "  python -m gradepack bench --model <name> [--help]\n"
+        "  python -m gradepack factory [--help]\n"
+        "  python -m gradepack promote <draft-id> [--help]\n"
         "  python -m gradepack review <task-id> [--mock]\n"
         "  python -m gradepack serve [--port N]\n"
         "  python -m gradepack mcp\n"

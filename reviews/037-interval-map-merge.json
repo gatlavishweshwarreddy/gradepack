@@ -1,0 +1,9 @@
+{
+  "verdict": "accept",
+  "fair": true,
+  "fully_specified": true,
+  "issues": [],
+  "summary": "Well-specified debugging task with clear half-open interval API, comprehensive deterministic tests including seeded brute-force comparison, and correct reference solution addressing all intentional starter bugs.",
+  "task_id": "019-interval-map-merge",
+  "date": "2026-10-27T14:06:37Z"
+}

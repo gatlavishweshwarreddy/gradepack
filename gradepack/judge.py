@@ -79,7 +79,7 @@ def cmd_review(task_id: str, mock: bool = False) -> None:
     )
 
     try:
-        resp_data = _api.chat(_REVIEW_SYSTEM, user_text, temperature=0, max_tokens=1024)
+        resp_data = _api.chat(_REVIEW_SYSTEM, user_text, temperature=0, max_tokens=8192)
         content = _api.extract_content(resp_data)
         verdict = _parse_json_from_content(content)
         verdict["task_id"] = task_id

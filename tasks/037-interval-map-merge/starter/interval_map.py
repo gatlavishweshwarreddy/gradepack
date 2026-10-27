@@ -1,0 +1,75 @@
+class IntervalMap:
+    def __init__(self):
+        self._intervals = []
+
+    def set(self, l, r, value):
+        if l >= r:
+            return
+        if value is None:
+            raise ValueError("value cannot be None")
+        new_intervals = []
+        for a, b, v in self._intervals:
+            if b <= l or a >= r:
+                new_intervals.append([a, b, v])
+            else:
+                if a < l:
+                    new_intervals.append([a, l, v])
+                if b > r:
+                    new_intervals.append([r, b, v])
+        new_intervals.append([l, r, value])
+        new_intervals.sort(key=lambda x: x[0])
+        merged = []
+        for a, b, v in new_intervals:
+            if merged and merged[-1][1] > a and merged[-1][2] == v:
+                merged[-1][1] = max(merged[-1][1], b)
+            else:
+                merged.append([a, b, v])
+        self._intervals = merged
+
+    def remove(self, l, r):
+        if l >= r:
+            raise ValueError("l must be < r")
+        new_intervals = []
+        for a, b, v in self._intervals:
+            if b <= l or a >= r:
+                new_intervals.append([a, b, v])
+            else:
+                if a < l:
+                    new_intervals.append([a, l, v])
+                elif b > r:
+                    new_intervals.append([r, b, v])
+        self._intervals = new_intervals
+
+    def get(self, key):
+        for a, b, v in self._intervals:
+            if a <= key <= b:
+                return v
+        return None
+
+    def get_interval(self, key):
+        for a, b, v in self._intervals:
+            if a <= key < b:
+                return (a, b, v)
+        return None
+
+    def intervals(self):
+        return self._intervals
+
+    def total_covered(self):
+        return sum(b - a + 1 for a, b, v in self._intervals)
+
+    def overlapping_intervals(self, l, r):
+        if l >= r:
+            raise ValueError("l must be < r")
+        result = []
+        for a, b, v in self._intervals:
+            if b <= l or a >= r:
+                continue
+            result.append((a, b, v))
+        return result
+
+    def __len__(self):
+        return len(self._intervals)
+
+    def __contains__(self, key):
+        return self.get(key) is not None

@@ -1,0 +1,87 @@
+memo.py
+```python
+import threading
+import functools
+from collections import namedtuple
+
+CacheInfo = namedtuple('CacheInfo', ['hits', 'misses', 'maxsize', 'currsize'])
+
+def _make_key(args, kwargs, typed=False):
+    # Try to use functools._make_key for compatibility with Python's lru_cache
+    try:
+        return functools._make_key(args, kwargs, typed)
+    except Exception:
+        pass
+    # Fallback: simple hashable key
+    try:
+        if kwargs:
+            # sorted items to be deterministic
+            items = tuple(sorted(kwargs.items()))
+            key = (args, items)
+        else:
+            key = (args, ())
+        # ensure hashable, otherwise fallback to repr
+        hash(key)
+        return key
+    except TypeError:
+        # unhashable args (e.g. list) -> use repr
+        try:
+            return (repr(args), repr(sorted(kwargs.items())) if kwargs else ())
+        except Exception:
+            return (id(args), id(kwargs))
+
+def memoize(_func=None, *, maxsize=None, typed=False):
+    """
+    Thread-safe memoization decorator.
+    Guarantees that for a given key the underlying function is computed
+    at most once even when many threads request the same key concurrently.
+    Different keys can be computed in parallel.
+    """
+    def decorator(func):
+        cache = {}
+        events = {}  # key -> threading.Event for in-progress computations
+        lock = threading.Lock()
+        hits = [0]
+        misses = [0]
+
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            key = _make_key(args, kwargs, typed=typed)
+
+            # Fast path + coordination loop
+            while True:
+                with lock:
+                    if key in cache:
+                        hits[0] += 1
+                        return cache[key]
+                    if key in events:
+                        event = events[key]
+                        # we are a waiter
+                    else:
+                        # we become the computer
+                        event = threading.Event()
+                        events[key] = event
+                        misses[0] += 1
+                        break
+                # wait outside lock
+                event.wait()
+                # after wake, loop to check cache again (or retry if previous computer failed)
+                continue
+
+            # --- we are the computer, no lock held ---
+            try:
+                result = func(*args, **kwargs)
+            except Exception:
+                # on exception, wake waiters and let them retry
+                with lock:
+                    # remove our event and wake up waiters
+                    if key in events:
+                        del events[key]
+                    event.set()
+                raise
+
+            # store result and wake waiters
+            with lock:
+                # optional maxsize handling (simple LRU eviction if needed)
+                if maxsize is not None and len(cache) >= maxsize:
+                    # evict oldest (first inserted) - not strictly LRU but prevents unbounded

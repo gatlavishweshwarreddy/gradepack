@@ -217,24 +217,69 @@ Prints the task prompt, the failing starter tests, the model's response, and the
 
 ---
 
-### `factory --n N`
+### `factory [--help]`
 
 ```bash
-# Mock (offline)
+# Help
+gradepack factory --help
+
+# Mock (offline) — probes always pass → too_easy drafts
 gradepack factory --n 3 --mock
 
-# Real
-BASE_URL=... API_KEY=... gradepack factory --n 5
+# Mock with probes failing → discriminating drafts
+gradepack factory --n 3 --mock --mock-probe-fail
+
+# Real run: keep drafting until 2 discriminating tasks found (cap 20 attempts)
+BASE_URL=... API_KEY=... gradepack factory --target-kept 2 --max-drafts 20
+
+# Real run: 5 parallel workers, 3 probe attempts each
+BASE_URL=... API_KEY=... gradepack factory --n 10 --parallel 5 --probe-attempts 3
 ```
 
-For each of N task ideas:
-1. Sends a drafting prompt (includes the last 10 lessons from `LESSONS.md`).
-2. Runs `verify` on the draft.
-3. Sends a **separate** review request (no shared history).
-4. Records `accepted` or `rejected` with the reason in `drafts/<id>/review.json`.
-5. Appends rejection reasons as lessons to `LESSONS.md`.
+All flags:
 
-**Accepted drafts stay in `drafts/` until you manually move them into `tasks/`.** They are never published automatically.
+| Flag | Default | Description |
+|---|---|---|
+| `--n N` | 1 | Total drafts to attempt |
+| `--target-kept N` | off | Stop when N discriminating drafts found |
+| `--max-drafts M` | same as `--n` | Hard cap on total attempts (overrides `--n` when `--target-kept` is set) |
+| `--probe-attempts K` | 3 | Times to probe each judge-accepted draft |
+| `--parallel P` | 2 | Concurrent draft workers |
+| `--mock` | off | Use mock drafts (offline); mock probes always pass → too_easy |
+| `--mock-probe-fail` | off | Mock probes always fail → discriminating (for offline testing) |
+
+**Pipeline per draft:**
+1. Reads the last 10 lessons from `LESSONS.md` (rejections *and* too-easy lessons).
+2. Sends a drafting prompt that includes harder-task guidance (do not enumerate expected behaviour, keep prompt shorter than code, use interacting constraints, performance limits, etc.).
+3. Runs `verify` on the draft locally.
+4. Sends a **separate** review request (no shared history) → judge verdict.
+5. **Probe stage**: runs the model against the draft `--probe-attempts` times.
+   - All probes pass → `too_easy` → saved under `drafts/too_easy/`, lesson appended.
+   - ≥ 1 probe fails → `discriminating` → saved under `drafts/accepted/`.
+   - Judge rejected → saved under `drafts/rejected/`.
+6. Writes `factory_stats.json` after each draft.
+7. Prints a funnel summary at the end.
+
+**Drafts are never promoted automatically.** Use `gradepack promote <id>` to move a discriminating draft into `tasks/`.
+
+#### `factory_stats.json`
+
+Written after each draft run with counts: `drafted`, `failed_draft_stage`, `failed_verify`, `judge_rejected`, `judge_accepted`, `probed`, `too_easy`, `discriminating`, plus per-draft `probe_results` and `probe_solve_count`.
+
+---
+
+### `promote <draft-id> [--help]`
+
+```bash
+gradepack promote 037-my-task
+```
+
+Moves a discriminating draft from `drafts/accepted/<id>/` into `tasks/<id>/`:
+1. Verifies that `task.json`'s `id` matches the directory name.
+2. Runs `verify` (starter must fail ≥ 1 test; solution must pass all). Refuses on failure.
+3. Copies the draft into `tasks/<id>/`.
+4. Moves `review.json` to `reviews/<id>.json`.
+5. Removes the draft from `drafts/accepted/`.
 
 ---
 
@@ -340,12 +385,23 @@ tasks/<id>/
 ### Factory flow
 
 ```
-gradepack factory --n N [--mock]
+gradepack factory --n N [--mock] [--probe-attempts K]
     │
     ├─ draft request  →  model  →  task.json + starter + grader + solution
+    ├─ auto-assign id (next free NNN- number, never collides with tasks/ or drafts/)
     ├─ verify locally (starter must fail, solution must pass)
     ├─ review request  →  model (fresh, no shared history)  →  verdict
+    │     ├─ REJECTED  → drafts/rejected/<id>/   + lesson → LESSONS.md
+    │     └─ ACCEPTED  → probe stage
+    ├─ probe K times against draft task
+    │     ├─ all pass  → TOO EASY → drafts/too_easy/<id>/  + lesson → LESSONS.md
+    │     └─ ≥1 fails  → DISCRIMINATING → drafts/accepted/<id>/
     │
-    ├─ ACCEPTED → drafts/<id>/  (manual review required before moving to tasks/)
-    └─ REJECTED → lesson appended to LESSONS.md → included in next draft prompt
+    └─ factory_stats.json updated after every draft
+
+gradepack promote <id>
+    │
+    ├─ verify (refuses if fails)
+    ├─ move drafts/accepted/<id>/ → tasks/<id>/
+    └─ move review.json → reviews/<id>.json
 ```
