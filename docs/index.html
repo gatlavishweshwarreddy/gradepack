@@ -109,7 +109,7 @@ async function loadResultFiles() {
   let filenames = [];
   for (const path of ['results/index.json', '../results/index.json']) {
     try {
-      const r = await fetch(path);
+      const r = await fetch(path, { cache: 'no-store' });
       if (r.ok) { filenames = await r.json(); break; }
     } catch (_) {}
   }
@@ -123,7 +123,7 @@ async function loadResultFiles() {
     const file = name.endsWith('.json') ? name : name + '.json';
     const label = name.replace(/\.json$/, '');
     try {
-      const r = await fetch('results/' + file);
+      const r = await fetch('results/' + file, { cache: 'no-store' });
       if (r.ok) { results[label] = await r.json(); }
     } catch (_) {}
   }
@@ -133,7 +133,7 @@ async function loadResultFiles() {
 async function loadTaskIndex() {
   for (const path of ['api/index.json']) {
     try {
-      const r = await fetch(path);
+      const r = await fetch(path, { cache: 'no-store' });
       if (r.ok) return await r.json();
     } catch (_) {}
   }
