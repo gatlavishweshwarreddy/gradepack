@@ -2,8 +2,8 @@
 
 Installable registry of realistic software tasks with automated graders for testing AI coding agents.
 
-Built during the Meta Global AI Developer Hackathon (Oct 26 to Nov 4, 2026)
-All code in this repository was written between Oct 26 and Nov 4, 2026.
+Built during the Meta Global AI Developer Hackathon. The repository was created after the Oct 26 kickoff session (the first commit is the auto-generated license and README).
+All code was written between the kickoff and Nov 4, 2026.
 
 ---
 
@@ -444,7 +444,7 @@ bash scripts/check_all.sh
 Offline smoke test — no API calls needed:
 
 ```bash
-# 1. Validate all 37 tasks
+# 1. Validate all 42 tasks
 gradepack validate
 
 # 2. Verify one task end-to-end
